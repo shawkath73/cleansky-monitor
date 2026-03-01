@@ -1,0 +1,114 @@
+{
+  "model_type": "XGBoostRegressor",
+  "feature_cols": [
+    "PM2.5",
+    "PM10",
+    "NO",
+    "NO2",
+    "NOx",
+    "NH3",
+    "CO",
+    "SO2",
+    "O3",
+    "Benzene",
+    "Toluene",
+    "Xylene",
+    "PM2.5_ratio",
+    "PM10_ratio",
+    "NO_ratio",
+    "NO2_ratio",
+    "NOx_ratio",
+    "NH3_ratio",
+    "CO_ratio",
+    "SO2_ratio",
+    "O3_ratio",
+    "Benzene_ratio",
+    "Toluene_ratio",
+    "Xylene_ratio",
+    "total_pollution",
+    "dominant_encoded",
+    "month",
+    "day_of_week",
+    "year",
+    "quarter",
+    "season",
+    "is_weekend",
+    "city_encoded",
+    "pm_total",
+    "pm_ratio"
+  ],
+  "pollutant_cols": [
+    "PM2.5",
+    "PM10",
+    "NO",
+    "NO2",
+    "NOx",
+    "NH3",
+    "CO",
+    "SO2",
+    "O3",
+    "Benzene",
+    "Toluene",
+    "Xylene"
+  ],
+  "target": "AQI",
+  "region": "India",
+  "cities": [
+    "Amaravati",
+    "Amritsar",
+    "Chandigarh",
+    "Delhi",
+    "Gurugram",
+    "Hyderabad",
+    "Kolkata",
+    "Mumbai",
+    "Patna",
+    "Visakhapatnam"
+  ],
+  "metrics": {
+    "mae": 17.44,
+    "rmse": 30.62,
+    "r2": 0.9295
+  },
+  "aqi_categories": {
+    "Good": {
+      "range": "0-50",
+      "color": "#00e400",
+      "emoji": "\ud83d\udfe2"
+    },
+    "Satisfactory": {
+      "range": "51-100",
+      "color": "#92d050",
+      "emoji": "\ud83d\udfe1"
+    },
+    "Moderate": {
+      "range": "101-200",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0"
+    },
+    "Poor": {
+      "range": "201-300",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34"
+    },
+    "Very Poor": {
+      "range": "301-400",
+      "color": "#ff0000",
+      "emoji": "\ud83d\udfe3"
+    },
+    "Severe": {
+      "range": "400+",
+      "color": "#7e0023",
+      "emoji": "\u26ab"
+    }
+  },
+  "health_recommendations": {
+    "Good": "Air quality is good. Enjoy outdoor activities!",
+    "Satisfactory": "Air quality is acceptable. Unusually sensitive people should limit outdoor exertion.",
+    "Moderate": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
+    "Poor": "Everyone may begin to experience health effects. Limit prolonged outdoor exertion.",
+    "Very Poor": "Health alert! Everyone may experience serious health effects. Avoid outdoor activities.",
+    "Severe": "Health emergency! Everyone is affected. Stay indoors and keep windows closed."
+  },
+  "trained_on": "2026-03-01 11:56:24.480192"
+}
