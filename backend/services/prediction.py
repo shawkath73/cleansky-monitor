@@ -42,7 +42,6 @@ def engineer_features(pollution_data: dict, city: str = 'Delhi') -> pd.DataFrame
         features[col] = float(pollution_data.get(col, 0))
 
     # Datetime features
-    features['month']       = pollution_data.get('hour', now.hour) if 'month' not in pollution_data else now.month
     features['month']       = now.month
     features['day_of_week'] = now.weekday()
     features['year']        = now.year
