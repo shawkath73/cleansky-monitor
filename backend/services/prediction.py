@@ -1,6 +1,5 @@
 import joblib
 import pandas as pd
-import numpy as np
 import json
 import os
 from datetime import datetime
@@ -23,10 +22,14 @@ print(f"✅ Model loaded! Features: {len(feature_cols)}")
 
 def get_season(month: int) -> int:
     """India-specific season encoding matching Colab training."""
-    if month in [12, 1, 2]:       return 0  # Winter
-    elif month in [3, 4, 5]:      return 1  # Summer
-    elif month in [6, 7, 8, 9]:   return 2  # Monsoon
-    else:                          return 3  # Post-monsoon
+    if month in [12, 1, 2]:
+        return 0  # Winter
+    elif month in [3, 4, 5]:
+        return 1  # Summer
+    elif month in [6, 7, 8, 9]:
+        return 2  # Monsoon
+    else:
+        return 3  # Post-monsoon
 
 
 def engineer_features(pollution_data: dict, city: str = 'Delhi') -> pd.DataFrame:
@@ -150,7 +153,6 @@ def predict_forecast(forecast_list: list, city: str = 'Delhi') -> list:
     Returns array of 48 hourly AQI predictions.
     """
     predictions = []
-    now = datetime.utcnow()
 
     for item in forecast_list:
         try:
@@ -173,7 +175,7 @@ def predict_forecast(forecast_list: list, city: str = 'Delhi') -> list:
                 'emoji':      category['emoji'],
                 'dominant':   dominant
             })
-        except Exception as e:
+        except Exception:
             continue
 
     return predictions

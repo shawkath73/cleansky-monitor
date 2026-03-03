@@ -105,12 +105,18 @@ def health_risk():
         aqi = float(request.args.get('aqi', 0))
 
         # Determine category
-        if aqi <= 50:    category = 'Good'
-        elif aqi <= 100: category = 'Satisfactory'
-        elif aqi <= 200: category = 'Moderate'
-        elif aqi <= 300: category = 'Poor'
-        elif aqi <= 400: category = 'Very Poor'
-        else:            category = 'Severe'
+        if aqi <= 50:
+            category = 'Good'
+        elif aqi <= 100:
+            category = 'Satisfactory'
+        elif aqi <= 200:
+            category = 'Moderate'
+        elif aqi <= 300:
+            category = 'Poor'
+        elif aqi <= 400:
+            category = 'Very Poor'
+        else:
+            category = 'Severe'
 
         cat_info = metadata['aqi_categories'].get(category, {})
         recommendation = metadata['health_recommendations'].get(category, '')
