@@ -1,0 +1,157 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top right, #1f2a44, #0a0f1b 55%);
+  color: #e8eefc;
+}
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem 2.5rem;
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.hero h1 {
+  margin: 0 0 0.4rem;
+  font-size: 1.9rem;
+}
+
+.hero p {
+  margin: 0;
+  max-width: 650px;
+  color: #d2dcf8;
+}
+
+.controls {
+  display: grid;
+  gap: 0.8rem;
+  min-width: 240px;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  color: #dbe4fd;
+}
+
+select {
+  border: 1px solid #3a4b72;
+  border-radius: 0.5rem;
+  background: #11192b;
+  color: #f2f6ff;
+  padding: 0.55rem 0.65rem;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.grid-3 {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.grid-2 {
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+}
+
+.card {
+  background: rgba(22, 34, 56, 0.78);
+  border: 1px solid #2f4368;
+  border-radius: 0.9rem;
+  padding: 1rem;
+}
+
+.card h2 {
+  margin-top: 0;
+  margin-bottom: 0.7rem;
+  font-size: 1.05rem;
+}
+
+.highlight {
+  background: linear-gradient(
+    145deg,
+    rgba(35, 51, 84, 0.94),
+    rgba(22, 33, 55, 0.86)
+  );
+}
+
+.aqi-value {
+  margin: 0;
+  font-size: 2.3rem;
+  font-weight: 700;
+}
+
+.muted {
+  color: #9fb0d6;
+}
+
+.simple-list {
+  margin: 0;
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+th,
+td {
+  padding: 0.5rem;
+  border-bottom: 1px solid #334975;
+  text-align: left;
+}
+
+th {
+  color: #b8c8ee;
+  font-weight: 600;
+}
+
+.status {
+  color: #c5d6fc;
+}
+
+.status.error {
+  color: #ff9da8;
+}
+
+@media (max-width: 800px) {
+  .hero {
+    flex-direction: column;
+  }
+
+  .controls {
+    width: 100%;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
