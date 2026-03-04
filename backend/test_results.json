@@ -1,0 +1,734 @@
+{
+  "test1_single": {
+    "aqi": 166.5,
+    "category": "Moderate",
+    "color": "#ffff00",
+    "emoji": "\ud83d\udfe0",
+    "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
+    "dominant_pollutant": "PM10",
+    "pollutants": {
+      "PM2.5": 85.5,
+      "PM10": 120.3,
+      "NO": 0.0,
+      "NO2": 45.2,
+      "NOx": 0.0,
+      "NH3": 0.0,
+      "CO": 1.2,
+      "SO2": 12.8,
+      "O3": 35.6,
+      "Benzene": 0.0,
+      "Toluene": 0.0,
+      "Xylene": 0.0
+    },
+    "pollutant_percentages": {
+      "PM2.5": 28.4,
+      "PM10": 40.0,
+      "NO2": 15.0,
+      "CO": 0.4,
+      "SO2": 4.3,
+      "O3": 11.8
+    },
+    "city": "Delhi",
+    "datetime": "2026-03-04T01:28:53.570428"
+  },
+  "test2_forecast": [
+    {
+      "datetime": "2026-03-04T01:28:53.600674",
+      "hour": 1,
+      "aqi": 153.3,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T02:28:53.600674",
+      "hour": 2,
+      "aqi": 154.6,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T03:28:53.600674",
+      "hour": 3,
+      "aqi": 155.8,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T04:28:53.600674",
+      "hour": 4,
+      "aqi": 157.0,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T05:28:53.600674",
+      "hour": 5,
+      "aqi": 158.3,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T06:28:53.600674",
+      "hour": 6,
+      "aqi": 163.4,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T07:28:53.600674",
+      "hour": 7,
+      "aqi": 165.4,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T08:28:53.600674",
+      "hour": 8,
+      "aqi": 167.4,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T09:28:53.600674",
+      "hour": 9,
+      "aqi": 169.4,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T10:28:53.600674",
+      "hour": 10,
+      "aqi": 171.4,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T11:28:53.600674",
+      "hour": 11,
+      "aqi": 173.5,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T12:28:53.600674",
+      "hour": 12,
+      "aqi": 175.5,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T13:28:53.600674",
+      "hour": 13,
+      "aqi": 177.5,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T14:28:53.600674",
+      "hour": 14,
+      "aqi": 179.5,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T15:28:53.600674",
+      "hour": 15,
+      "aqi": 181.5,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T16:28:53.600674",
+      "hour": 16,
+      "aqi": 183.5,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T17:28:53.600674",
+      "hour": 17,
+      "aqi": 185.5,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T18:28:53.600674",
+      "hour": 18,
+      "aqi": 187.6,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T19:28:53.600674",
+      "hour": 19,
+      "aqi": 189.6,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T20:28:53.600674",
+      "hour": 20,
+      "aqi": 191.6,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T21:28:53.600674",
+      "hour": 21,
+      "aqi": 178.1,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T22:28:53.600674",
+      "hour": 22,
+      "aqi": 179.3,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-04T23:28:53.600674",
+      "hour": 23,
+      "aqi": 180.6,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-05T00:28:53.600674",
+      "hour": 0,
+      "aqi": 181.8,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    }
+  ],
+  "test3_multi_city": [
+    {
+      "aqi": 161.1,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
+      "dominant_pollutant": "PM10",
+      "pollutants": {
+        "PM2.5": 75.0,
+        "PM10": 110.0,
+        "NO": 0.0,
+        "NO2": 40.0,
+        "NOx": 0.0,
+        "NH3": 0.0,
+        "CO": 1.5,
+        "SO2": 15.0,
+        "O3": 30.0,
+        "Benzene": 0.0,
+        "Toluene": 0.0,
+        "Xylene": 0.0
+      },
+      "pollutant_percentages": {
+        "PM2.5": 27.6,
+        "PM10": 40.5,
+        "NO2": 14.7,
+        "CO": 0.6,
+        "SO2": 5.5,
+        "O3": 11.0
+      },
+      "city": "Delhi",
+      "datetime": "2026-03-04T01:28:54.048181"
+    },
+    {
+      "aqi": 161.1,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
+      "dominant_pollutant": "PM10",
+      "pollutants": {
+        "PM2.5": 75.0,
+        "PM10": 110.0,
+        "NO": 0.0,
+        "NO2": 40.0,
+        "NOx": 0.0,
+        "NH3": 0.0,
+        "CO": 1.5,
+        "SO2": 15.0,
+        "O3": 30.0,
+        "Benzene": 0.0,
+        "Toluene": 0.0,
+        "Xylene": 0.0
+      },
+      "pollutant_percentages": {
+        "PM2.5": 27.6,
+        "PM10": 40.5,
+        "NO2": 14.7,
+        "CO": 0.6,
+        "SO2": 5.5,
+        "O3": 11.0
+      },
+      "city": "Mumbai",
+      "datetime": "2026-03-04T01:28:54.048181"
+    },
+    {
+      "aqi": 161.1,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
+      "dominant_pollutant": "PM10",
+      "pollutants": {
+        "PM2.5": 75.0,
+        "PM10": 110.0,
+        "NO": 0.0,
+        "NO2": 40.0,
+        "NOx": 0.0,
+        "NH3": 0.0,
+        "CO": 1.5,
+        "SO2": 15.0,
+        "O3": 30.0,
+        "Benzene": 0.0,
+        "Toluene": 0.0,
+        "Xylene": 0.0
+      },
+      "pollutant_percentages": {
+        "PM2.5": 27.6,
+        "PM10": 40.5,
+        "NO2": 14.7,
+        "CO": 0.6,
+        "SO2": 5.5,
+        "O3": 11.0
+      },
+      "city": "Chennai",
+      "datetime": "2026-03-04T01:28:54.048181"
+    },
+    {
+      "aqi": 161.1,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
+      "dominant_pollutant": "PM10",
+      "pollutants": {
+        "PM2.5": 75.0,
+        "PM10": 110.0,
+        "NO": 0.0,
+        "NO2": 40.0,
+        "NOx": 0.0,
+        "NH3": 0.0,
+        "CO": 1.5,
+        "SO2": 15.0,
+        "O3": 30.0,
+        "Benzene": 0.0,
+        "Toluene": 0.0,
+        "Xylene": 0.0
+      },
+      "pollutant_percentages": {
+        "PM2.5": 27.6,
+        "PM10": 40.5,
+        "NO2": 14.7,
+        "CO": 0.6,
+        "SO2": 5.5,
+        "O3": 11.0
+      },
+      "city": "Kolkata",
+      "datetime": "2026-03-04T01:28:54.048181"
+    },
+    {
+      "aqi": 161.1,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
+      "dominant_pollutant": "PM10",
+      "pollutants": {
+        "PM2.5": 75.0,
+        "PM10": 110.0,
+        "NO": 0.0,
+        "NO2": 40.0,
+        "NOx": 0.0,
+        "NH3": 0.0,
+        "CO": 1.5,
+        "SO2": 15.0,
+        "O3": 30.0,
+        "Benzene": 0.0,
+        "Toluene": 0.0,
+        "Xylene": 0.0
+      },
+      "pollutant_percentages": {
+        "PM2.5": 27.6,
+        "PM10": 40.5,
+        "NO2": 14.7,
+        "CO": 0.6,
+        "SO2": 5.5,
+        "O3": 11.0
+      },
+      "city": "Bangalore",
+      "datetime": "2026-03-04T01:28:54.048181"
+    },
+    {
+      "aqi": 161.1,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
+      "dominant_pollutant": "PM10",
+      "pollutants": {
+        "PM2.5": 75.0,
+        "PM10": 110.0,
+        "NO": 0.0,
+        "NO2": 40.0,
+        "NOx": 0.0,
+        "NH3": 0.0,
+        "CO": 1.5,
+        "SO2": 15.0,
+        "O3": 30.0,
+        "Benzene": 0.0,
+        "Toluene": 0.0,
+        "Xylene": 0.0
+      },
+      "pollutant_percentages": {
+        "PM2.5": 27.6,
+        "PM10": 40.5,
+        "NO2": 14.7,
+        "CO": 0.6,
+        "SO2": 5.5,
+        "O3": 11.0
+      },
+      "city": "Hyderabad",
+      "datetime": "2026-03-04T01:28:54.048181"
+    },
+    {
+      "aqi": 161.1,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
+      "dominant_pollutant": "PM10",
+      "pollutants": {
+        "PM2.5": 75.0,
+        "PM10": 110.0,
+        "NO": 0.0,
+        "NO2": 40.0,
+        "NOx": 0.0,
+        "NH3": 0.0,
+        "CO": 1.5,
+        "SO2": 15.0,
+        "O3": 30.0,
+        "Benzene": 0.0,
+        "Toluene": 0.0,
+        "Xylene": 0.0
+      },
+      "pollutant_percentages": {
+        "PM2.5": 27.6,
+        "PM10": 40.5,
+        "NO2": 14.7,
+        "CO": 0.6,
+        "SO2": 5.5,
+        "O3": 11.0
+      },
+      "city": "Ahmedabad",
+      "datetime": "2026-03-04T01:28:54.048181"
+    },
+    {
+      "aqi": 161.1,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
+      "dominant_pollutant": "PM10",
+      "pollutants": {
+        "PM2.5": 75.0,
+        "PM10": 110.0,
+        "NO": 0.0,
+        "NO2": 40.0,
+        "NOx": 0.0,
+        "NH3": 0.0,
+        "CO": 1.5,
+        "SO2": 15.0,
+        "O3": 30.0,
+        "Benzene": 0.0,
+        "Toluene": 0.0,
+        "Xylene": 0.0
+      },
+      "pollutant_percentages": {
+        "PM2.5": 27.6,
+        "PM10": 40.5,
+        "NO2": 14.7,
+        "CO": 0.6,
+        "SO2": 5.5,
+        "O3": 11.0
+      },
+      "city": "Pune",
+      "datetime": "2026-03-04T01:28:54.048181"
+    },
+    {
+      "aqi": 161.1,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
+      "dominant_pollutant": "PM10",
+      "pollutants": {
+        "PM2.5": 75.0,
+        "PM10": 110.0,
+        "NO": 0.0,
+        "NO2": 40.0,
+        "NOx": 0.0,
+        "NH3": 0.0,
+        "CO": 1.5,
+        "SO2": 15.0,
+        "O3": 30.0,
+        "Benzene": 0.0,
+        "Toluene": 0.0,
+        "Xylene": 0.0
+      },
+      "pollutant_percentages": {
+        "PM2.5": 27.6,
+        "PM10": 40.5,
+        "NO2": 14.7,
+        "CO": 0.6,
+        "SO2": 5.5,
+        "O3": 11.0
+      },
+      "city": "Jaipur",
+      "datetime": "2026-03-04T01:28:54.048181"
+    },
+    {
+      "aqi": 161.1,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
+      "dominant_pollutant": "PM10",
+      "pollutants": {
+        "PM2.5": 75.0,
+        "PM10": 110.0,
+        "NO": 0.0,
+        "NO2": 40.0,
+        "NOx": 0.0,
+        "NH3": 0.0,
+        "CO": 1.5,
+        "SO2": 15.0,
+        "O3": 30.0,
+        "Benzene": 0.0,
+        "Toluene": 0.0,
+        "Xylene": 0.0
+      },
+      "pollutant_percentages": {
+        "PM2.5": 27.6,
+        "PM10": 40.5,
+        "NO2": 14.7,
+        "CO": 0.6,
+        "SO2": 5.5,
+        "O3": 11.0
+      },
+      "city": "Lucknow",
+      "datetime": "2026-03-04T01:28:54.048181"
+    },
+    {
+      "aqi": 161.1,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
+      "dominant_pollutant": "PM10",
+      "pollutants": {
+        "PM2.5": 75.0,
+        "PM10": 110.0,
+        "NO": 0.0,
+        "NO2": 40.0,
+        "NOx": 0.0,
+        "NH3": 0.0,
+        "CO": 1.5,
+        "SO2": 15.0,
+        "O3": 30.0,
+        "Benzene": 0.0,
+        "Toluene": 0.0,
+        "Xylene": 0.0
+      },
+      "pollutant_percentages": {
+        "PM2.5": 27.6,
+        "PM10": 40.5,
+        "NO2": 14.7,
+        "CO": 0.6,
+        "SO2": 5.5,
+        "O3": 11.0
+      },
+      "city": "Kanpur",
+      "datetime": "2026-03-04T01:28:54.048181"
+    },
+    {
+      "aqi": 161.1,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
+      "dominant_pollutant": "PM10",
+      "pollutants": {
+        "PM2.5": 75.0,
+        "PM10": 110.0,
+        "NO": 0.0,
+        "NO2": 40.0,
+        "NOx": 0.0,
+        "NH3": 0.0,
+        "CO": 1.5,
+        "SO2": 15.0,
+        "O3": 30.0,
+        "Benzene": 0.0,
+        "Toluene": 0.0,
+        "Xylene": 0.0
+      },
+      "pollutant_percentages": {
+        "PM2.5": 27.6,
+        "PM10": 40.5,
+        "NO2": 14.7,
+        "CO": 0.6,
+        "SO2": 5.5,
+        "O3": 11.0
+      },
+      "city": "Nagpur",
+      "datetime": "2026-03-04T01:28:54.048181"
+    },
+    {
+      "aqi": 161.1,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
+      "dominant_pollutant": "PM10",
+      "pollutants": {
+        "PM2.5": 75.0,
+        "PM10": 110.0,
+        "NO": 0.0,
+        "NO2": 40.0,
+        "NOx": 0.0,
+        "NH3": 0.0,
+        "CO": 1.5,
+        "SO2": 15.0,
+        "O3": 30.0,
+        "Benzene": 0.0,
+        "Toluene": 0.0,
+        "Xylene": 0.0
+      },
+      "pollutant_percentages": {
+        "PM2.5": 27.6,
+        "PM10": 40.5,
+        "NO2": 14.7,
+        "CO": 0.6,
+        "SO2": 5.5,
+        "O3": 11.0
+      },
+      "city": "Patna",
+      "datetime": "2026-03-04T01:28:54.048181"
+    },
+    {
+      "aqi": 161.1,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
+      "dominant_pollutant": "PM10",
+      "pollutants": {
+        "PM2.5": 75.0,
+        "PM10": 110.0,
+        "NO": 0.0,
+        "NO2": 40.0,
+        "NOx": 0.0,
+        "NH3": 0.0,
+        "CO": 1.5,
+        "SO2": 15.0,
+        "O3": 30.0,
+        "Benzene": 0.0,
+        "Toluene": 0.0,
+        "Xylene": 0.0
+      },
+      "pollutant_percentages": {
+        "PM2.5": 27.6,
+        "PM10": 40.5,
+        "NO2": 14.7,
+        "CO": 0.6,
+        "SO2": 5.5,
+        "O3": 11.0
+      },
+      "city": "Indore",
+      "datetime": "2026-03-04T01:28:54.048181"
+    },
+    {
+      "aqi": 161.1,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
+      "dominant_pollutant": "PM10",
+      "pollutants": {
+        "PM2.5": 75.0,
+        "PM10": 110.0,
+        "NO": 0.0,
+        "NO2": 40.0,
+        "NOx": 0.0,
+        "NH3": 0.0,
+        "CO": 1.5,
+        "SO2": 15.0,
+        "O3": 30.0,
+        "Benzene": 0.0,
+        "Toluene": 0.0,
+        "Xylene": 0.0
+      },
+      "pollutant_percentages": {
+        "PM2.5": 27.6,
+        "PM10": 40.5,
+        "NO2": 14.7,
+        "CO": 0.6,
+        "SO2": 5.5,
+        "O3": 11.0
+      },
+      "city": "Bhopal",
+      "datetime": "2026-03-04T01:28:54.048181"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
+import os
+import json
 import joblib
 import pandas as pd
-import json
-import os
 from datetime import datetime
 
 # ---- Load model files on startup ----
@@ -32,19 +32,20 @@ def get_season(month: int) -> int:
         return 3  # Post-monsoon
 
 
-def engineer_features(pollution_data: dict, city: str = 'Delhi') -> pd.DataFrame:
+def engineer_features(pollution_data: dict, city: str = 'Delhi', dt: datetime = None) -> tuple:
     """
     Engineer the exact same features as Colab training.
     This is the critical step — features must match training exactly!
     """
-    now = datetime.utcnow()
+    # ✅ Use provided datetime OR fall back to now
+    now = dt if dt else datetime.utcnow()
 
     # Base pollutant values
     features = {}
     for col in pollutant_cols:
         features[col] = float(pollution_data.get(col, 0))
 
-    # Datetime features
+    # Datetime features — now uses correct forecast time
     features['month']       = now.month
     features['day_of_week'] = now.weekday()
     features['year']        = now.year
@@ -111,6 +112,57 @@ def get_aqi_category(aqi: float) -> dict:
     }
 
 
+def pm25_to_aqi(pm25):
+    """Convert PM2.5 to AQI using EPA breakpoints."""
+    breakpoints = [
+        (0.0,   12.0,  0,   50),
+        (12.1,  35.4,  51,  100),
+        (35.5,  55.4,  101, 150),
+        (55.5,  150.4, 151, 200),
+        (150.5, 250.4, 201, 300),
+        (250.5, 350.4, 301, 400),
+        (350.5, 500.4, 401, 500)
+    ]
+    for bp_lo, bp_hi, aqi_lo, aqi_hi in breakpoints:
+        if bp_lo <= pm25 <= bp_hi:
+            return ((aqi_hi - aqi_lo) / (bp_hi - bp_lo)) * (pm25 - bp_lo) + aqi_lo
+    return 500 if pm25 > 500 else 0
+
+
+def pm10_to_aqi(pm10):
+    """Convert PM10 to AQI using EPA breakpoints."""
+    breakpoints = [
+        (0,   54,  0,   50),
+        (55,  154, 51,  100),
+        (155, 254, 101, 150),
+        (255, 354, 151, 200),
+        (355, 424, 201, 300),
+        (425, 504, 301, 400),
+        (505, 604, 401, 500)
+    ]
+    for bp_lo, bp_hi, aqi_lo, aqi_hi in breakpoints:
+        if bp_lo <= pm10 <= bp_hi:
+            return ((aqi_hi - aqi_lo) / (bp_hi - bp_lo)) * (pm10 - bp_lo) + aqi_lo
+    return 500 if pm10 > 604 else 0
+
+
+def no2_to_aqi(no2):
+    """Convert NO2 to AQI using EPA breakpoints."""
+    breakpoints = [
+        (0,    53,   0,   50),
+        (54,   100,  51,  100),
+        (101,  360,  101, 150),
+        (361,  649,  151, 200),
+        (650,  1249, 201, 300),
+        (1250, 1649, 301, 400),
+        (1650, 2049, 401, 500)
+    ]
+    for bp_lo, bp_hi, aqi_lo, aqi_hi in breakpoints:
+        if bp_lo <= no2 <= bp_hi:
+            return ((aqi_hi - aqi_lo) / (bp_hi - bp_lo)) * (no2 - bp_lo) + aqi_lo
+    return 500 if no2 > 2049 else 0
+
+
 def predict_aqi(pollution_data: dict, city: str = 'Delhi') -> dict:
     """
     Main prediction function called by Flask routes.
@@ -118,9 +170,20 @@ def predict_aqi(pollution_data: dict, city: str = 'Delhi') -> dict:
     """
     input_df, dominant_pollutant = engineer_features(pollution_data, city)
 
-    # Run XGBoost prediction
-    predicted_aqi = float(model.predict(input_df)[0])
-    predicted_aqi = max(0, round(predicted_aqi, 1))  # no negative AQI
+    # XGBoost prediction
+    ml_aqi = float(model.predict(input_df)[0])
+
+    # EPA formula as ground truth
+    pm25  = float(pollution_data.get('PM2.5', 0))
+    pm10  = float(pollution_data.get('PM10',  0))
+    no2   = float(pollution_data.get('NO2',   0))
+    epa_aqi = max(pm25_to_aqi(pm25), pm10_to_aqi(pm10), no2_to_aqi(no2))
+
+    # Use whichever is higher — EPA is reliable fallback
+    predicted_aqi = max(ml_aqi, epa_aqi)
+    predicted_aqi = max(0, round(predicted_aqi, 1))
+
+    print(f"🔍 Debug → ML: {ml_aqi:.1f} | EPA: {epa_aqi:.1f} | Final: {predicted_aqi}")
 
     category = get_aqi_category(predicted_aqi)
 
@@ -156,14 +219,25 @@ def predict_forecast(forecast_list: list, city: str = 'Delhi') -> list:
 
     for item in forecast_list:
         try:
-            # Override month/season with forecast datetime
+            # ✅ Parse forecast datetime
             forecast_dt = datetime.fromisoformat(item['datetime'])
-            item['month']  = forecast_dt.month
-            item['season'] = get_season(forecast_dt.month)
 
-            input_df, dominant = engineer_features(item, city)
-            predicted_aqi = float(model.predict(input_df)[0])
+            # ✅ Pass forecast_dt so features use correct time
+            input_df, dominant = engineer_features(item, city, dt=forecast_dt)
+            
+            # XGBoost prediction
+            ml_aqi = float(model.predict(input_df)[0])
+            
+            # EPA formula as ground truth
+            pm25 = float(item.get('PM2.5', 0))
+            pm10 = float(item.get('PM10', 0))
+            no2 = float(item.get('NO2', 0))
+            epa_aqi = max(pm25_to_aqi(pm25), pm10_to_aqi(pm10), no2_to_aqi(no2))
+            
+            # Use whichever is higher
+            predicted_aqi = max(ml_aqi, epa_aqi)
             predicted_aqi = max(0, round(predicted_aqi, 1))
+            
             category = get_aqi_category(predicted_aqi)
 
             predictions.append({
@@ -175,7 +249,8 @@ def predict_forecast(forecast_list: list, city: str = 'Delhi') -> list:
                 'emoji':      category['emoji'],
                 'dominant':   dominant
             })
-        except Exception:
+        except Exception as e:
+            print(f"⚠️  Forecast error for {item.get('datetime', 'unknown')}: {e}")
             continue
 
     return predictions

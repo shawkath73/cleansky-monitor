@@ -26,25 +26,23 @@ def get_current_pollution(lat: float, lon: float) -> dict:
     dt = data['list'][0]['dt']
 
     return {
-        'datetime': datetime.utcfromtimestamp(dt).isoformat(),
-        'lat': lat,
-        'lon': lon,
-        # OpenWeatherMap pollutant names → map to our model feature names
-        'PM2.5':   components.get('pm2_5', 0),
-        'PM10':    components.get('pm10', 0),
-        'NO':      components.get('no', 0),
-        'NO2':     components.get('no2', 0),
-        'NOx':     components.get('no2', 0),   # approximate NOx with NO2
-        'NH3':     components.get('nh3', 0),
-        'CO':      components.get('co', 0) / 1000,  # convert µg/m³ to mg/m³
-        'SO2':     components.get('so2', 0),
-        'O3':      components.get('o3', 0),
-        'Benzene': 0,   # not available from OpenWeatherMap
-        'Toluene': 0,
-        'Xylene':  0,
-        # Raw OpenAQI index from OpenWeatherMap (1=Good to 5=Very Poor)
-        'owm_aqi_index': data['list'][0]['main']['aqi']
-    }
+    'datetime': datetime.utcfromtimestamp(dt).isoformat(),
+    'lat': lat,
+    'lon': lon,
+    'PM2.5':   components.get('pm2_5', 0),
+    'PM10':    components.get('pm10', 0),
+    'NO':      components.get('no', 0),
+    'NO2':     components.get('no2', 0),
+    'NOx':     components.get('no2', 0),
+    'NH3':     components.get('nh3', 0),
+    'CO':      components.get('co', 0),   # ← REMOVE the /1000 division
+    'SO2':     components.get('so2', 0),
+    'O3':      components.get('o3', 0),
+    'Benzene': 0,
+    'Toluene': 0,
+    'Xylene':  0,
+    'owm_aqi_index': data['list'][0]['main']['aqi']
+}
 
 
 def get_forecast_pollution(lat: float, lon: float) -> list:
@@ -79,7 +77,7 @@ def get_forecast_pollution(lat: float, lon: float) -> list:
             'NO2':       components.get('no2', 0),
             'NOx':       components.get('no2', 0),
             'NH3':       components.get('nh3', 0),
-            'CO':        components.get('co', 0) / 1000,
+           'CO': components.get('co', 0),
             'SO2':       components.get('so2', 0),
             'O3':        components.get('o3', 0),
             'Benzene':   0,

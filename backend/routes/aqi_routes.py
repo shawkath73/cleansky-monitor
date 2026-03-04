@@ -249,3 +249,14 @@ def cities():
         'success': True,
         'cities':  supported_cities
     }), 200
+
+@aqi_bp.route('/debug', methods=['GET'])
+def debug():
+    """Temporary debug endpoint to inspect raw values"""
+    city = request.args.get('city', 'Delhi')
+    coords = get_city_coordinates(city)
+    pollution_data = get_current_pollution(coords['lat'], coords['lon'])
+    return jsonify({
+        'raw_pollution': pollution_data,
+        'feature_cols':  metadata.get('feature_cols', [])
+    })
