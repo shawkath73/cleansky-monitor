@@ -54,21 +54,37 @@
   "target": "AQI",
   "region": "India",
   "cities": [
+    "Ahmedabad",
+    "Aizawl",
     "Amaravati",
     "Amritsar",
+    "Bengaluru",
+    "Bhopal",
+    "Brajrajnagar",
     "Chandigarh",
+    "Chennai",
+    "Coimbatore",
     "Delhi",
+    "Ernakulam",
     "Gurugram",
+    "Guwahati",
     "Hyderabad",
+    "Jaipur",
+    "Jorapokhar",
+    "Kochi",
     "Kolkata",
+    "Lucknow",
     "Mumbai",
     "Patna",
+    "Shillong",
+    "Talcher",
+    "Thiruvananthapuram",
     "Visakhapatnam"
   ],
   "metrics": {
-    "mae": 17.44,
-    "rmse": 30.62,
-    "r2": 0.9295
+    "mae": 18.78,
+    "rmse": 35.16,
+    "r2": 0.9149
   },
   "aqi_categories": {
     "Good": {
@@ -110,5 +126,5 @@
     "Very Poor": "Health alert! Everyone may experience serious health effects. Avoid outdoor activities.",
     "Severe": "Health emergency! Everyone is affected. Stay indoors and keep windows closed."
   },
-  "trained_on": "2026-03-01 11:56:24.480192"
+  "trained_on": "2026-03-08 16:49:06.418938"
 }
