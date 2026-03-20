@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from services.weather import get_current_pollution, get_forecast_pollution, get_city_coordinates
 from services.prediction import predict_aqi, predict_forecast
+from services.database import save_aqi_reading, save_forecast
 import json
 import os
 
@@ -36,9 +37,17 @@ def current_aqi():
         # Run ML prediction
         result = predict_aqi(pollution_data, city)
 
+        # Persist AQI reading (non-fatal if DB write fails)
+        reading_id = None
+        try:
+            reading_id = save_aqi_reading(city, pollution_data, result['aqi'])
+        except Exception as e:
+            print(f"⚠️ AQI save failed: {e}")
+
         return jsonify({
             'success': True,
-            'data': result
+            'data': result,
+            'reading_id': reading_id
         }), 200
 
     except Exception as e:
@@ -81,11 +90,19 @@ def forecast():
             'hours':    len(predictions)
         }
 
+        # Persist forecast (non-fatal if DB write fails)
+        forecast_id = None
+        try:
+            forecast_id = save_forecast(city, predictions, summary)
+        except Exception as e:
+            print(f"⚠️ Forecast save failed: {e}")
+
         return jsonify({
             'success':     True,
             'city':        city,
             'summary':     summary,
-            'forecast':    predictions
+            'forecast':    predictions,
+            'forecast_id': forecast_id
         }), 200
 
     except Exception as e:

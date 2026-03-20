@@ -82,9 +82,9 @@
     "Visakhapatnam"
   ],
   "metrics": {
-    "mae": 18.78,
-    "rmse": 35.16,
-    "r2": 0.9149
+    "mae": 16.0,
+    "rmse": 24.89,
+    "r2": 0.9389
   },
   "aqi_categories": {
     "Good": {
@@ -126,5 +126,5 @@
     "Very Poor": "Health alert! Everyone may experience serious health effects. Avoid outdoor activities.",
     "Severe": "Health emergency! Everyone is affected. Stay indoors and keep windows closed."
   },
-  "trained_on": "2026-03-08 16:49:06.418938"
+  "trained_on": "2026-03-20 06:13:18.406557"
 }
