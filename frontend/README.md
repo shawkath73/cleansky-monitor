@@ -1,8 +1,20 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CleanSky Monitor Frontend
 
-## Getting Started
+This is the Next.js frontend application for the **CleanSky Monitor** project, built using the App Router.
 
-First, run the development server:
+## 🚀 Getting Started
+
+First, install the dependencies (assuming you are using npm, yarn, or pnpm):
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev
@@ -14,23 +26,18 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the running dashboard.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🎨 Design System
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The frontend is built with an extreme focus on aesthetics, utilizing a premium dark-mode glassmorphism design:
+- **Animations**: Smooth transitions, loading bars, and variants are powered by `framer-motion`.
+- **Icons**: Consistent UI iconography is provided by `lucide-react`.
+- **Components**: Reusable UI elements like `GlassCard` are used throughout the application.
+- **Styling**: We leverage vanilla CSS and `globals.css` to build an independent, tailored design system.
 
-## Learn More
+## 📂 Key Directories
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `src/app/` - Next.js App Router pages (Dashboard, Forecast, Pollutants, Health, Auth).
+- `src/components/` - Reusable React components (e.g., GlassCard, LoadingBar).
+- `src/app/globals.css` - Global design tokens and glassmorphism styling.
