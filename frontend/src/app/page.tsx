@@ -9,7 +9,7 @@ import GlassCard from "@/components/GlassCard";
 import AQIGauge from "@/components/AQIGauge";
 import { DashboardSkeleton } from "@/components/LoadingSkeleton";
 import {
-  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
+   XAxis, YAxis, Tooltip, ResponsiveContainer,
   CartesianGrid, Area, AreaChart,
 } from "recharts";
 
@@ -24,10 +24,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError(null);
 
     async function load() {
+      setLoading(true);
+      setError(null);
+
       try {
         const [aqiRes, forecastRes, pollutantsRes] = await Promise.all([
           fetchCurrentAQI(city),
@@ -80,7 +81,7 @@ export default function Dashboard() {
 
   // Prepare chart data
   const chartData = forecast.map((item) => ({
-    time: new Date(item.timestamp || item.dt * 1000).toLocaleTimeString([], {
+    time: new Date(item.datetime || item.timestamp).toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     }),

@@ -8,7 +8,7 @@ import GlassCard from "@/components/GlassCard";
 import { DashboardSkeleton } from "@/components/LoadingSkeleton";
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ReferenceLine,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend,
 } from "recharts";
 
 const CHART_COLORS = ["#6366F1", "#818CF8", "#A78BFA", "#C084FC", "#E879F9", "#F472B6", "#FB923C"];
@@ -17,29 +17,31 @@ export default function PollutantsPage() {
   const { city } = useCity();
   const [pollutants, setPollutants] = useState<PollutantDetail[]>([]);
   const [dominantPollutant, setDominantPollutant] = useState("");
-  const [currentAQI, setCurrentAQI] = useState(0);
+  const [, setCurrentAQI] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError(null);
 
-    fetchPollutants(city)
-      .then((res) => {
+    async function load() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const res = await fetchPollutants(city);
         if (cancelled) return;
         setPollutants(res.pollutants);
         setDominantPollutant(res.dominant_pollutant);
         setCurrentAQI(res.current_aqi);
-      })
-      .catch((e) => {
+      } catch (e) {
         if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load");
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) setLoading(false);
-      });
+      }
+    }
 
+    load();
     return () => { cancelled = true; };
   }, [city]);
 
@@ -114,8 +116,8 @@ export default function PollutantsPage() {
                     borderRadius: "8px",
                     color: "#F9FAFB",
                   }}
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  formatter={(value: any) => [`${Number(value).toFixed(1)}%`, "Share"]}
+                  
+                  formatter={(value) => [`${Number(value).toFixed(1)}%`, "Share"]}
                 />
               </PieChart>
             </ResponsiveContainer>

@@ -21,23 +21,24 @@ export default function ForecastPage() {
 
   useEffect(() => {
     let cancelled = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLoading(true);
-    setError(null);
 
-    fetchForecast(city)
-      .then((res) => {
+    async function load() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const res = await fetchForecast(city);
         if (cancelled) return;
         setForecast(res.forecast);
         setSummary(res.summary);
-      })
-      .catch((e) => {
+      } catch (e) {
         if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load forecast");
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) setLoading(false);
-      });
+      }
+    }
 
+    load();
     return () => { cancelled = true; };
   }, [city]);
 
@@ -66,7 +67,7 @@ export default function ForecastPage() {
 
   // Chart data
   const chartData = forecast.map((item) => {
-    const dt = new Date(item.timestamp || item.dt * 1000);
+    const dt = new Date(item.datetime || item.timestamp);
     return {
       time: dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       date: dt.toLocaleDateString([], { month: "short", day: "numeric" }),
@@ -173,7 +174,7 @@ export default function ForecastPage() {
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
           {forecast.map((item, idx) => {
-            const dt = new Date(item.timestamp || item.dt * 1000);
+            const dt = new Date(item.datetime || item.timestamp);
             const category = item.category || getAQICategory(item.aqi);
             const color = getAQIColorByValue(item.aqi);
             return (

@@ -16,6 +16,7 @@ export interface ForecastItem {
   category: string;
   color: string;
   emoji: string;
+  datetime: string;
   timestamp: string;
   dt: number;
   pollutants: Record<string, number>;
