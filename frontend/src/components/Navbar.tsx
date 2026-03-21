@@ -77,11 +77,10 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    active
-                      ? "bg-[#6366F1]/20 text-[#818CF8]"
-                      : "text-[#9CA3AF] hover:text-[#F9FAFB] hover:bg-[#1F2937]/50"
-                  }`}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${active
+                    ? "bg-[#6366F1]/20 text-[#818CF8]"
+                    : "text-[#9CA3AF] hover:text-[#F9FAFB] hover:bg-[#1F2937]/50"
+                    }`}
                 >
                   {link.label}
                 </Link>
@@ -98,9 +97,8 @@ export default function Navbar() {
               <span className="text-sm">📍</span>
               <span className="text-sm text-[#F9FAFB] font-medium">{city}</span>
               <svg
-                className={`w-4 h-4 text-[#9CA3AF] ml-auto transition-transform ${
-                  open ? "rotate-180" : ""
-                }`}
+                className={`w-4 h-4 text-[#9CA3AF] ml-auto transition-transform ${open ? "rotate-180" : ""
+                  }`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -125,11 +123,10 @@ export default function Navbar() {
                   {filtered.map((c) => (
                     <li key={c}>
                       <button
-                        className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                          c === city
-                            ? "bg-[#6366F1]/20 text-[#818CF8]"
-                            : "text-[#9CA3AF] hover:bg-[#1F2937] hover:text-[#F9FAFB]"
-                        }`}
+                        className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${c === city
+                          ? "bg-[#6366F1]/20 text-[#818CF8]"
+                          : "text-[#9CA3AF] hover:bg-[#1F2937] hover:text-[#F9FAFB]"
+                          }`}
                         onClick={() => {
                           setCity(c);
                           setOpen(false);
@@ -147,14 +144,6 @@ export default function Navbar() {
               </div>
             )}
           </div>
-
-          {/* Auth link */}
-          <Link
-            href="/login"
-            className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-[#6366F1] text-white hover:bg-[#818CF8] transition-colors"
-          >
-            Sign In
-          </Link>
 
           {/* Mobile hamburger */}
           <button
@@ -181,23 +170,16 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    active
-                      ? "bg-[#6366F1]/20 text-[#818CF8]"
-                      : "text-[#9CA3AF] hover:text-[#F9FAFB] hover:bg-[#1F2937]/50"
-                  }`}
+                  className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${active
+                    ? "bg-[#6366F1]/20 text-[#818CF8]"
+                    : "text-[#9CA3AF] hover:text-[#F9FAFB] hover:bg-[#1F2937]/50"
+                    }`}
                 >
                   {link.label}
                 </Link>
               );
             })}
-            <Link
-              href="/login"
-              onClick={() => setMobileOpen(false)}
-              className="px-4 py-2.5 rounded-lg text-sm font-medium bg-[#6366F1] text-white hover:bg-[#818CF8] transition-colors text-center mt-2"
-            >
-              Sign In
-            </Link>
+
           </div>
         )}
       </div>
