@@ -12,6 +12,18 @@ import {
    XAxis, YAxis, Tooltip, ResponsiveContainer,
   CartesianGrid, Area, AreaChart,
 } from "recharts";
+import { motion } from "framer-motion";
+import { AlertTriangle, TrendingUp, ChevronRight } from "lucide-react";
+
+const stagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.1 } },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const } },
+};
 
 export default function Dashboard() {
   const { city } = useCity();
@@ -66,7 +78,7 @@ export default function Dashboard() {
     return (
       <GlassCard>
         <div className="text-center py-12">
-          <span className="text-4xl mb-4 block">⚠️</span>
+          <AlertTriangle className="w-10 h-10 text-[#FF7E00] mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-[#F9FAFB] mb-2">Connection Error</h2>
           <p className="text-[#9CA3AF]">{error}</p>
           <p className="text-[#6B7280] text-sm mt-2">Make sure the Flask backend is running on port 5000</p>
@@ -93,19 +105,24 @@ export default function Dashboard() {
   const maxPollutantPct = Math.max(...topPollutants.map((p) => p.percentage), 1);
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      className="space-y-6"
+      variants={stagger}
+      initial="hidden"
+      animate="show"
+    >
       {/* Header */}
-      <div className="animate-fade-in">
+      <motion.div variants={fadeUp}>
         <h1 className="text-2xl font-bold text-[#F9FAFB]">
           Air Quality in <span className="text-[#6366F1]">{city}</span>
         </h1>
         <p className="text-[#9CA3AF] text-sm mt-1">
           Real-time AQI monitoring · Updated every 5 minutes
         </p>
-      </div>
+      </motion.div>
 
       {/* Row 1: AQI Gauge + Health Risk */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-6" variants={fadeUp}>
         {/* AQI Gauge card */}
         <GlassCard className="flex flex-col items-center justify-center" delay={1}>
           <h2 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-4">
@@ -156,7 +173,7 @@ export default function Dashboard() {
                 <ul className="space-y-1.5">
                   {healthRisk.actions.slice(0, 3).map((action, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-[#9CA3AF]">
-                      <span style={{ color }} className="mt-0.5">•</span>
+                      <ChevronRight className="w-4 h-4 mt-0.5 shrink-0" style={{ color }} />
                       {action}
                     </li>
                   ))}
@@ -165,82 +182,89 @@ export default function Dashboard() {
             </div>
           )}
         </GlassCard>
-      </div>
+      </motion.div>
 
       {/* Row 2: Forecast chart */}
-      <GlassCard delay={3}>
-        <h2 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-4">
-          📈 24-Hour AQI Forecast
-        </h2>
-        <div className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData}>
-              <defs>
-                <linearGradient id="aqiGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#6366F1" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
-              <XAxis
-                dataKey="time"
-                stroke="#6B7280"
-                tick={{ fill: "#9CA3AF", fontSize: 11 }}
-                interval="preserveStartEnd"
-              />
-              <YAxis
-                stroke="#6B7280"
-                tick={{ fill: "#9CA3AF", fontSize: 11 }}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#111827",
-                  border: "1px solid #1F2937",
-                  borderRadius: "8px",
-                  color: "#F9FAFB",
-                }}
-              />
-              <Area
-                type="monotone"
-                dataKey="aqi"
-                stroke="#6366F1"
-                strokeWidth={2}
-                fill="url(#aqiGrad)"
-                dot={false}
-                activeDot={{ r: 5, fill: "#6366F1" }}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </GlassCard>
-
-      {/* Row 3: Pollutant breakdown */}
-      <GlassCard>
-        <h2 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-4">
-          Pollutant Breakdown
-        </h2>
-        <div className="space-y-3">
-          {topPollutants.map((pol) => (
-            <div key={pol.name}>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium text-[#F9FAFB]">{pol.name}</span>
-                <span className="text-xs text-[#9CA3AF]">
-                  {pol.value.toFixed(1)} {pol.unit} · {pol.percentage.toFixed(0)}%
-                </span>
-              </div>
-              <div className="h-2 bg-[#1F2937] rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-700 ease-out"
-                  style={{
-                    width: `${(pol.percentage / maxPollutantPct) * 100}%`,
-                    backgroundColor: pol.status === "exceeded" ? "#FF7E00" : "#6366F1",
+      <motion.div variants={fadeUp}>
+        <GlassCard delay={3}>
+          <h2 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-4 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-[#6366F1]" />
+            24-Hour AQI Forecast
+          </h2>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient id="aqiGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#6366F1" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+                <XAxis
+                  dataKey="time"
+                  stroke="#6B7280"
+                  tick={{ fill: "#9CA3AF", fontSize: 11 }}
+                  interval="preserveStartEnd"
+                />
+                <YAxis
+                  stroke="#6B7280"
+                  tick={{ fill: "#9CA3AF", fontSize: 11 }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#111827",
+                    border: "1px solid #1F2937",
+                    borderRadius: "8px",
+                    color: "#F9FAFB",
                   }}
                 />
+                <Area
+                  type="monotone"
+                  dataKey="aqi"
+                  stroke="#6366F1"
+                  strokeWidth={2}
+                  fill="url(#aqiGrad)"
+                  dot={false}
+                  activeDot={{ r: 5, fill: "#6366F1" }}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </GlassCard>
+      </motion.div>
+
+      {/* Row 3: Pollutant breakdown */}
+      <motion.div variants={fadeUp}>
+        <GlassCard>
+          <h2 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-4">
+            Pollutant Breakdown
+          </h2>
+          <div className="space-y-3">
+            {topPollutants.map((pol, i) => (
+              <div key={pol.name}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-medium text-[#F9FAFB]">{pol.name}</span>
+                  <span className="text-xs text-[#9CA3AF]">
+                    {pol.value.toFixed(1)} {pol.unit} · {pol.percentage.toFixed(0)}%
+                  </span>
+                </div>
+                <div className="h-2 bg-[#1F2937] rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${(pol.percentage / maxPollutantPct) * 100}%` }}
+                    transition={{ duration: 0.8, delay: i * 0.1, ease: "easeOut" }}
+                    style={{
+                      backgroundColor: pol.status === "exceeded" ? "#FF7E00" : "#6366F1",
+                    }}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </GlassCard>
-    </div>
+            ))}
+          </div>
+        </GlassCard>
+      </motion.div>
+    </motion.div>
   );
 }

@@ -10,8 +10,20 @@ import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend,
 } from "recharts";
+import { motion } from "framer-motion";
+import { AlertTriangle } from "lucide-react";
 
 const CHART_COLORS = ["#6366F1", "#818CF8", "#A78BFA", "#C084FC", "#E879F9", "#F472B6", "#FB923C"];
+
+const stagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.1 } },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const } },
+};
 
 export default function PollutantsPage() {
   const { city } = useCity();
@@ -51,7 +63,7 @@ export default function PollutantsPage() {
     return (
       <GlassCard>
         <div className="text-center py-12">
-          <span className="text-4xl mb-4 block">⚠️</span>
+          <AlertTriangle className="w-10 h-10 text-[#FF7E00] mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-[#F9FAFB] mb-2">Connection Error</h2>
           <p className="text-[#9CA3AF]">{error}</p>
         </div>
@@ -73,9 +85,14 @@ export default function PollutantsPage() {
   }));
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      className="space-y-6"
+      variants={stagger}
+      initial="hidden"
+      animate="show"
+    >
       {/* Header */}
-      <div className="animate-fade-in">
+      <motion.div variants={fadeUp}>
         <h1 className="text-2xl font-bold text-[#F9FAFB]">Pollution Contributors</h1>
         <p className="text-[#9CA3AF] text-sm mt-1">
           Pollutant breakdown for <span className="text-[#6366F1]">{city}</span>
@@ -83,10 +100,10 @@ export default function PollutantsPage() {
             <> · Dominant: <span className="text-[#FF7E00]">{dominantPollutant}</span></>
           )}
         </p>
-      </div>
+      </motion.div>
 
       {/* Row 1: Donut + Bar */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <motion.div className="grid grid-cols-1 lg:grid-cols-2 gap-6" variants={fadeUp}>
         {/* Donut Chart */}
         <GlassCard delay={1}>
           <h2 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-4">
@@ -173,20 +190,24 @@ export default function PollutantsPage() {
             </ResponsiveContainer>
           </div>
         </GlassCard>
-      </div>
+      </motion.div>
 
       {/* Row 2: Pollutant detail cards */}
-      <div>
+      <motion.div variants={fadeUp}>
         <h2 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-4">
           Pollutant Details
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {pollutants.map((p) => {
+          {pollutants.map((p, i) => {
             const exceeded = p.status === "exceeded";
             return (
-              <div
+              <motion.div
                 key={p.name}
-                className="glass-light p-4 hover:scale-[1.02] transition-all duration-200"
+                className="glass-light p-4"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: i * 0.06 }}
+                whileHover={{ scale: 1.02 }}
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-semibold text-[#F9FAFB]">{p.name}</span>
@@ -212,19 +233,21 @@ export default function PollutantsPage() {
                 </div>
                 {/* Percentage bar */}
                 <div className="h-1.5 bg-[#1F2937] rounded-full mt-2 overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
+                  <motion.div
+                    className="h-full rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${Math.min((p.value / p.who_limit) * 100, 100)}%` }}
+                    transition={{ duration: 0.8, delay: i * 0.08, ease: "easeOut" }}
                     style={{
-                      width: `${Math.min((p.value / p.who_limit) * 100, 100)}%`,
                       backgroundColor: exceeded ? "#EF4444" : "#10B981",
                     }}
                   />
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

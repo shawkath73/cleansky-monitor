@@ -11,6 +11,25 @@ import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
   CartesianGrid, ReferenceLine, ReferenceArea,
 } from "recharts";
+import { motion } from "framer-motion";
+import { AlertTriangle, BarChart3, ArrowDown, ArrowUp, Clock } from "lucide-react";
+
+const stagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.1 } },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const } },
+};
+
+const STAT_ICONS: Record<string, React.ReactNode> = {
+  "Average AQI": <BarChart3 className="w-5 h-5 text-[#6366F1]" />,
+  "Minimum": <ArrowDown className="w-5 h-5 text-[#10B981]" />,
+  "Maximum": <ArrowUp className="w-5 h-5 text-[#EF4444]" />,
+  "Hours Covered": <Clock className="w-5 h-5 text-[#818CF8]" />,
+};
 
 export default function ForecastPage() {
   const { city } = useCity();
@@ -57,7 +76,7 @@ export default function ForecastPage() {
     return (
       <GlassCard>
         <div className="text-center py-12">
-          <span className="text-4xl mb-4 block">⚠️</span>
+          <AlertTriangle className="w-10 h-10 text-[#FF7E00] mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-[#F9FAFB] mb-2">Connection Error</h2>
           <p className="text-[#9CA3AF]">{error}</p>
         </div>
@@ -77,98 +96,105 @@ export default function ForecastPage() {
   });
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      className="space-y-6"
+      variants={stagger}
+      initial="hidden"
+      animate="show"
+    >
       {/* Header */}
-      <div className="animate-fade-in">
+      <motion.div variants={fadeUp}>
         <h1 className="text-2xl font-bold text-[#F9FAFB]">48-Hour AQI Forecast</h1>
         <p className="text-[#9CA3AF] text-sm mt-1">
           Predictive air quality trends for <span className="text-[#6366F1]">{city}</span>
         </p>
-      </div>
+      </motion.div>
 
       {/* Summary stats */}
       {summary && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade-in-delay-1">
+        <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-4" variants={fadeUp}>
           {[
-            { label: "Average AQI", value: summary.avg_aqi, icon: "📊" },
-            { label: "Minimum", value: summary.min_aqi, icon: "⬇️" },
-            { label: "Maximum", value: summary.max_aqi, icon: "⬆️" },
-            { label: "Hours Covered", value: summary.hours, icon: "🕐" },
+            { label: "Average AQI", value: summary.avg_aqi },
+            { label: "Minimum", value: summary.min_aqi },
+            { label: "Maximum", value: summary.max_aqi },
+            { label: "Hours Covered", value: summary.hours },
           ].map((stat) => (
             <GlassCard key={stat.label} animate={false} className="text-center py-4">
-              <span className="text-xl">{stat.icon}</span>
+              <div className="flex justify-center">{STAT_ICONS[stat.label]}</div>
               <p className="text-2xl font-bold text-[#F9FAFB] mt-1">
                 {typeof stat.value === "number" ? Math.round(stat.value) : stat.value}
               </p>
               <p className="text-xs text-[#9CA3AF] mt-1">{stat.label}</p>
             </GlassCard>
           ))}
-        </div>
+        </motion.div>
       )}
 
       {/* Large chart */}
-      <GlassCard delay={2}>
-        <h2 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-4">
-          AQI Trend Over Time
-        </h2>
-        <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData}>
-              <defs>
-                <linearGradient id="forecastGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#6366F1" stopOpacity={0.4} />
-                  <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
-              {/* AQI Zone backgrounds */}
-              <ReferenceArea y1={0} y2={50} fill="#00E400" fillOpacity={0.04} />
-              <ReferenceArea y1={50} y2={100} fill="#92D050" fillOpacity={0.04} />
-              <ReferenceArea y1={100} y2={200} fill="#FFFF00" fillOpacity={0.04} />
-              <ReferenceArea y1={200} y2={300} fill="#FF7E00" fillOpacity={0.04} />
-              <ReferenceArea y1={300} y2={500} fill="#FF0000" fillOpacity={0.04} />
-              {/* Reference lines for boundaries */}
-              <ReferenceLine y={50} stroke="#00E400" strokeDasharray="3 3" strokeOpacity={0.3} />
-              <ReferenceLine y={100} stroke="#92D050" strokeDasharray="3 3" strokeOpacity={0.3} />
-              <ReferenceLine y={200} stroke="#FFFF00" strokeDasharray="3 3" strokeOpacity={0.3} />
-              <ReferenceLine y={300} stroke="#FF7E00" strokeDasharray="3 3" strokeOpacity={0.3} />
-              <XAxis
-                dataKey="time"
-                stroke="#6B7280"
-                tick={{ fill: "#9CA3AF", fontSize: 11 }}
-                interval={Math.floor(chartData.length / 8)}
-              />
-              <YAxis
-                stroke="#6B7280"
-                tick={{ fill: "#9CA3AF", fontSize: 11 }}
-                domain={[0, "auto"]}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#111827",
-                  border: "1px solid #1F2937",
-                  borderRadius: "8px",
-                  color: "#F9FAFB",
-                }}
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                formatter={(value: any) => [`${value}`, "AQI"]}
-              />
-              <Area
-                type="monotone"
-                dataKey="aqi"
-                stroke="#6366F1"
-                strokeWidth={2}
-                fill="url(#forecastGrad)"
-                dot={false}
-                activeDot={{ r: 5, fill: "#6366F1" }}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </GlassCard>
+      <motion.div variants={fadeUp}>
+        <GlassCard delay={2}>
+          <h2 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-4">
+            AQI Trend Over Time
+          </h2>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient id="forecastGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#6366F1" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+                {/* AQI Zone backgrounds */}
+                <ReferenceArea y1={0} y2={50} fill="#00E400" fillOpacity={0.04} />
+                <ReferenceArea y1={50} y2={100} fill="#92D050" fillOpacity={0.04} />
+                <ReferenceArea y1={100} y2={200} fill="#FFFF00" fillOpacity={0.04} />
+                <ReferenceArea y1={200} y2={300} fill="#FF7E00" fillOpacity={0.04} />
+                <ReferenceArea y1={300} y2={500} fill="#FF0000" fillOpacity={0.04} />
+                {/* Reference lines for boundaries */}
+                <ReferenceLine y={50} stroke="#00E400" strokeDasharray="3 3" strokeOpacity={0.3} />
+                <ReferenceLine y={100} stroke="#92D050" strokeDasharray="3 3" strokeOpacity={0.3} />
+                <ReferenceLine y={200} stroke="#FFFF00" strokeDasharray="3 3" strokeOpacity={0.3} />
+                <ReferenceLine y={300} stroke="#FF7E00" strokeDasharray="3 3" strokeOpacity={0.3} />
+                <XAxis
+                  dataKey="time"
+                  stroke="#6B7280"
+                  tick={{ fill: "#9CA3AF", fontSize: 11 }}
+                  interval={Math.floor(chartData.length / 8)}
+                />
+                <YAxis
+                  stroke="#6B7280"
+                  tick={{ fill: "#9CA3AF", fontSize: 11 }}
+                  domain={[0, "auto"]}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#111827",
+                    border: "1px solid #1F2937",
+                    borderRadius: "8px",
+                    color: "#F9FAFB",
+                  }}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  formatter={(value: any) => [`${value}`, "AQI"]}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="aqi"
+                  stroke="#6366F1"
+                  strokeWidth={2}
+                  fill="url(#forecastGrad)"
+                  dot={false}
+                  activeDot={{ r: 5, fill: "#6366F1" }}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </GlassCard>
+      </motion.div>
 
       {/* Hourly cards */}
-      <div>
+      <motion.div variants={fadeUp}>
         <h2 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-4">
           Hourly Breakdown
         </h2>
@@ -178,9 +204,13 @@ export default function ForecastPage() {
             const category = item.category || getAQICategory(item.aqi);
             const color = getAQIColorByValue(item.aqi);
             return (
-              <div
+              <motion.div
                 key={idx}
-                className="glass-light p-3 text-center hover:scale-105 transition-transform duration-200 cursor-default"
+                className="glass-light p-3 text-center cursor-default"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, delay: idx * 0.02 }}
+                whileHover={{ scale: 1.05 }}
               >
                 <p className="text-xs text-[#6B7280]">
                   {dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
@@ -192,11 +222,11 @@ export default function ForecastPage() {
                   {getAQIEmoji(category)}
                 </p>
                 <p className="text-[10px] text-[#6B7280] mt-0.5">{category}</p>
-              </div>
+              </motion.div>
             );
           })}
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

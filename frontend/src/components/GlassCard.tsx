@@ -1,4 +1,7 @@
+"use client";
+
 import { ReactNode } from "react";
+import { motion } from "framer-motion";
 
 interface GlassCardProps {
   children: ReactNode;
@@ -13,22 +16,23 @@ export default function GlassCard({
   animate = true,
   delay = 0,
 }: GlassCardProps) {
-  const animClass = animate
-    ? delay > 0
-      ? `animate-fade-in-delay-${delay}`
-      : "animate-fade-in"
-    : "";
+  if (!animate) {
+    return <div className={`glass p-6 ${className}`}>{children}</div>;
+  }
 
   return (
-    <div
-      className={`glass p-6 ${animClass} ${className}`}
-      style={
-        delay > 0 && delay > 3
-          ? { animation: `fadeInUp 0.5s ease-out ${delay * 0.1}s forwards`, opacity: 0 }
-          : undefined
-      }
+    <motion.div
+      className={`glass p-6 ${className}`}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.5,
+        delay: delay * 0.1,
+        ease: [0.25, 0.46, 0.45, 0.94] as const,
+      }}
+      whileHover={{ scale: 1.01, transition: { duration: 0.2 } }}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }

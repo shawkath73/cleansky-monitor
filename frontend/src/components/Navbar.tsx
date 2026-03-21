@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { useCity } from "@/context/CityContext";
 import { fetchCities } from "@/lib/api";
 import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { CloudSun, MapPin, ChevronDown, Menu, X, Building2 } from "lucide-react";
 
 const NAV_LINKS = [
   { href: "/", label: "Dashboard" },
@@ -63,7 +65,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <span className="text-2xl">🌤</span>
+            <CloudSun className="w-6 h-6 text-[#6366F1]" />
             <span className="text-xl font-bold text-[#F9FAFB] tracking-tight">
               Clean<span className="text-[#6366F1]">Sky</span>
             </span>
@@ -94,55 +96,62 @@ export default function Navbar() {
               className="flex items-center gap-2 glass-light px-3 py-2 cursor-pointer min-w-[180px]"
               onClick={() => setOpen(!open)}
             >
-              <span className="text-sm">📍</span>
+              <MapPin className="w-4 h-4 text-[#6366F1]" />
               <span className="text-sm text-[#F9FAFB] font-medium">{city}</span>
-              <svg
-                className={`w-4 h-4 text-[#9CA3AF] ml-auto transition-transform ${open ? "rotate-180" : ""
-                  }`}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+              <motion.div
+                animate={{ rotate: open ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
+                className="ml-auto"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+                <ChevronDown className="w-4 h-4 text-[#9CA3AF]" />
+              </motion.div>
             </div>
 
-            {open && (
-              <div className="absolute right-0 top-12 w-64 glass border border-[#1F2937] rounded-xl overflow-hidden shadow-2xl">
-                <div className="p-2">
-                  <input
-                    type="text"
-                    placeholder="Search city…"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="w-full bg-[#0A0F1E] border border-[#1F2937] rounded-lg px-3 py-2 text-sm text-[#F9FAFB] placeholder-[#6B7280] outline-none focus:border-[#6366F1] transition-colors"
-                    autoFocus
-                  />
-                </div>
-                <ul className="max-h-52 overflow-y-auto">
-                  {filtered.map((c) => (
-                    <li key={c}>
-                      <button
-                        className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${c === city
-                          ? "bg-[#6366F1]/20 text-[#818CF8]"
-                          : "text-[#9CA3AF] hover:bg-[#1F2937] hover:text-[#F9FAFB]"
-                          }`}
-                        onClick={() => {
-                          setCity(c);
-                          setOpen(false);
-                          setSearch("");
-                        }}
-                      >
-                        🏙️ {c}
-                      </button>
-                    </li>
-                  ))}
-                  {filtered.length === 0 && (
-                    <li className="px-4 py-3 text-sm text-[#6B7280]">No cities found</li>
-                  )}
-                </ul>
-              </div>
-            )}
+            <AnimatePresence>
+              {open && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  className="absolute right-0 top-12 w-64 glass border border-[#1F2937] rounded-xl overflow-hidden shadow-2xl"
+                >
+                  <div className="p-2">
+                    <input
+                      type="text"
+                      placeholder="Search city…"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      className="w-full bg-[#0A0F1E] border border-[#1F2937] rounded-lg px-3 py-2 text-sm text-[#F9FAFB] placeholder-[#6B7280] outline-none focus:border-[#6366F1] transition-colors"
+                      autoFocus
+                    />
+                  </div>
+                  <ul className="max-h-52 overflow-y-auto">
+                    {filtered.map((c) => (
+                      <li key={c}>
+                        <button
+                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center gap-2 ${c === city
+                            ? "bg-[#6366F1]/20 text-[#818CF8]"
+                            : "text-[#9CA3AF] hover:bg-[#1F2937] hover:text-[#F9FAFB]"
+                            }`}
+                          onClick={() => {
+                            setCity(c);
+                            setOpen(false);
+                            setSearch("");
+                          }}
+                        >
+                          <Building2 className="w-3.5 h-3.5 opacity-50" />
+                          {c}
+                        </button>
+                      </li>
+                    ))}
+                    {filtered.length === 0 && (
+                      <li className="px-4 py-3 text-sm text-[#6B7280]">No cities found</li>
+                    )}
+                  </ul>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Mobile hamburger */}
@@ -150,38 +159,63 @@ export default function Navbar() {
             className="md:hidden p-2 rounded-lg text-[#9CA3AF] hover:text-[#F9FAFB] hover:bg-[#1F2937]"
             onClick={() => setMobileOpen(!mobileOpen)}
           >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <AnimatePresence mode="wait" initial={false}>
               {mobileOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <motion.div
+                  key="close"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <X className="w-6 h-6" />
+                </motion.div>
               ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <motion.div
+                  key="menu"
+                  initial={{ rotate: 90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Menu className="w-6 h-6" />
+                </motion.div>
               )}
-            </svg>
+            </AnimatePresence>
           </button>
         </div>
 
         {/* Mobile menu */}
-        {mobileOpen && (
-          <div className="md:hidden pb-4 border-t border-[#1F2937] mt-2 pt-3 flex flex-col gap-1">
-            {NAV_LINKS.map((link) => {
-              const active = pathname === link.href;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${active
-                    ? "bg-[#6366F1]/20 text-[#818CF8]"
-                    : "text-[#9CA3AF] hover:text-[#F9FAFB] hover:bg-[#1F2937]/50"
-                    }`}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-
-          </div>
-        )}
+        <AnimatePresence>
+          {mobileOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="md:hidden overflow-hidden border-t border-[#1F2937]"
+            >
+              <div className="pb-4 mt-2 pt-3 flex flex-col gap-1">
+                {NAV_LINKS.map((link) => {
+                  const active = pathname === link.href;
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setMobileOpen(false)}
+                      className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${active
+                        ? "bg-[#6366F1]/20 text-[#818CF8]"
+                        : "text-[#9CA3AF] hover:text-[#F9FAFB] hover:bg-[#1F2937]/50"
+                        }`}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </nav>
   );
