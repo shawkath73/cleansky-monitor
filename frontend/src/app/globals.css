@@ -105,6 +105,17 @@ body {
   animation: pulseGlow 3s ease-in-out infinite;
 }
 
+/* ── Loading Bar ───────────────────────── */
+@keyframes loadingBar {
+  0% { transform: translateX(-100%); width: 40%; }
+  50% { transform: translateX(100%); width: 60%; }
+  100% { transform: translateX(-100%); width: 40%; }
+}
+
+.animate-loading-bar {
+  animation: loadingBar 1.5s ease-in-out infinite;
+}
+
 /* ── Scrollbar ──────────────────────────── */
 ::-webkit-scrollbar {
   width: 6px;
