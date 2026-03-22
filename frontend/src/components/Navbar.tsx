@@ -212,6 +212,44 @@ export default function Navbar() {
                     </Link>
                   );
                 })}
+
+                {/* City selector — only shown in mobile drawer on xs screens */}
+                <div className="sm:hidden mt-3 px-2">
+                  <div className="flex items-center gap-2 mb-2 px-2">
+                    <MapPin className="w-4 h-4 text-[#0DF09E]" />
+                    <span className="text-xs text-[#6EE7B7] uppercase tracking-widest font-medium">Select City</span>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search city…"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full bg-[#020B07] border border-[#0A4D30] rounded-lg px-3 py-2 text-sm text-[#E8F5EE] placeholder-[#3B7A5A] outline-none focus:border-[#0DF09E] transition-colors mb-1"
+                  />
+                  <ul className="max-h-44 overflow-y-auto rounded-lg border border-[#0A4D30]/40 bg-[#020B07]/80">
+                    {filtered.map((c) => (
+                      <li key={c}>
+                        <button
+                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center gap-2 ${c === city
+                            ? "bg-[#0DF09E]/15 text-[#0DF09E]"
+                            : "text-[#6EE7B7] hover:bg-[#0A4D30]/30 hover:text-[#E8F5EE]"
+                            }`}
+                          onClick={() => {
+                            setCity(c);
+                            setSearch("");
+                            setMobileOpen(false);
+                          }}
+                        >
+                          <Building2 className="w-3.5 h-3.5 opacity-50" />
+                          {c}
+                        </button>
+                      </li>
+                    ))}
+                    {filtered.length === 0 && (
+                      <li className="px-4 py-3 text-sm text-[#3B7A5A]">No cities found</li>
+                    )}
+                  </ul>
+                </div>
               </div>
             </motion.div>
           )}

@@ -8,11 +8,24 @@ import type { ForecastItem, ForecastSummary } from "@/lib/types";
 import GlassCard from "@/components/GlassCard";
 import { ChartSkeleton, CardSkeleton } from "@/components/LoadingSkeleton";
 import {
-  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  CartesianGrid, ReferenceLine, ReferenceArea,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  ReferenceLine,
+  ReferenceArea,
 } from "recharts";
 import { motion } from "framer-motion";
-import { AlertTriangle, BarChart3, ArrowDown, ArrowUp, Clock } from "lucide-react";
+import {
+  AlertTriangle,
+  BarChart3,
+  ArrowDown,
+  ArrowUp,
+  Clock,
+} from "lucide-react";
 
 const stagger = {
   hidden: {},
@@ -21,13 +34,17 @@ const stagger = {
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const } },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const },
+  },
 };
 
 const STAT_ICONS: Record<string, React.ReactNode> = {
   "Average AQI": <BarChart3 className="w-5 h-5 text-[#0DF09E]" />,
-  "Minimum": <ArrowDown className="w-5 h-5 text-[#34D399]" />,
-  "Maximum": <ArrowUp className="w-5 h-5 text-[#EF4444]" />,
+  Minimum: <ArrowDown className="w-5 h-5 text-[#34D399]" />,
+  Maximum: <ArrowUp className="w-5 h-5 text-[#EF4444]" />,
   "Hours Covered": <Clock className="w-5 h-5 text-[#6EE7B7]" />,
 };
 
@@ -51,14 +68,17 @@ export default function ForecastPage() {
         setForecast(res.forecast);
         setSummary(res.summary);
       } catch (e) {
-        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load forecast");
+        if (!cancelled)
+          setError(e instanceof Error ? e.message : "Failed to load forecast");
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
 
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [city]);
 
   if (loading) {
@@ -66,7 +86,9 @@ export default function ForecastPage() {
       <div className="space-y-6">
         <ChartSkeleton />
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => <CardSkeleton key={i} />)}
+          {Array.from({ length: 6 }).map((_, i) => (
+            <CardSkeleton key={i} />
+          ))}
         </div>
       </div>
     );
@@ -77,7 +99,9 @@ export default function ForecastPage() {
       <GlassCard>
         <div className="text-center py-12">
           <AlertTriangle className="w-10 h-10 text-[#F97316] mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-[#E8F5EE] mb-2">Connection Error</h2>
+          <h2 className="text-xl font-semibold text-[#E8F5EE] mb-2">
+            Connection Error
+          </h2>
           <p className="text-[#6EE7B7]">{error}</p>
         </div>
       </GlassCard>
@@ -105,7 +129,7 @@ export default function ForecastPage() {
       {/* Header */}
       <motion.div variants={fadeUp}>
         <h1 className="text-3xl md:text-4xl font-bold text-[#E8F5EE] leading-tight">
-          48-Hour AQI <span className="gradient-text italic font-light">Forecast</span>
+          48-Hour AQI <span>Forecast</span>
         </h1>
         <p className="text-[#3B7A5A] text-sm mt-2 uppercase tracking-widest">
           Predictive trends · <span className="text-[#0DF09E]">{city}</span>
@@ -114,19 +138,32 @@ export default function ForecastPage() {
 
       {/* Summary stats */}
       {summary && (
-        <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-4" variants={fadeUp}>
+        <motion.div
+          className="grid grid-cols-2 md:grid-cols-4 gap-4"
+          variants={fadeUp}
+        >
           {[
             { label: "Average AQI", value: summary.avg_aqi },
             { label: "Minimum", value: summary.min_aqi },
             { label: "Maximum", value: summary.max_aqi },
             { label: "Hours Covered", value: summary.hours },
           ].map((stat) => (
-            <GlassCard key={stat.label} animate={false} className="text-center py-4">
-              <div className="flex justify-center">{STAT_ICONS[stat.label]}</div>
+            <GlassCard
+              key={stat.label}
+              animate={false}
+              className="text-center py-4"
+            >
+              <div className="flex justify-center">
+                {STAT_ICONS[stat.label]}
+              </div>
               <p className="text-2xl font-bold text-[#E8F5EE] mt-1">
-                {typeof stat.value === "number" ? Math.round(stat.value) : stat.value}
+                {typeof stat.value === "number"
+                  ? Math.round(stat.value)
+                  : stat.value}
               </p>
-              <p className="text-xs text-[#3B7A5A] mt-1 uppercase tracking-wider">{stat.label}</p>
+              <p className="text-xs text-[#3B7A5A] mt-1 uppercase tracking-wider">
+                {stat.label}
+              </p>
             </GlassCard>
           ))}
         </motion.div>
@@ -150,23 +187,74 @@ export default function ForecastPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData}>
                   <defs>
-                    <linearGradient id="forecastGrad" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient
+                      id="forecastGrad"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
                       <stop offset="5%" stopColor="#0DF09E" stopOpacity={0.4} />
                       <stop offset="95%" stopColor="#0DF09E" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#06331F" />
                   {/* AQI Zone backgrounds */}
-                  <ReferenceArea y1={0} y2={50} fill="#0DF09E" fillOpacity={0.03} />
-                  <ReferenceArea y1={50} y2={100} fill="#34D399" fillOpacity={0.03} />
-                  <ReferenceArea y1={100} y2={200} fill="#FBBF24" fillOpacity={0.03} />
-                  <ReferenceArea y1={200} y2={300} fill="#F97316" fillOpacity={0.03} />
-                  <ReferenceArea y1={300} y2={500} fill="#EF4444" fillOpacity={0.03} />
+                  <ReferenceArea
+                    y1={0}
+                    y2={50}
+                    fill="#0DF09E"
+                    fillOpacity={0.03}
+                  />
+                  <ReferenceArea
+                    y1={50}
+                    y2={100}
+                    fill="#34D399"
+                    fillOpacity={0.03}
+                  />
+                  <ReferenceArea
+                    y1={100}
+                    y2={200}
+                    fill="#FBBF24"
+                    fillOpacity={0.03}
+                  />
+                  <ReferenceArea
+                    y1={200}
+                    y2={300}
+                    fill="#F97316"
+                    fillOpacity={0.03}
+                  />
+                  <ReferenceArea
+                    y1={300}
+                    y2={500}
+                    fill="#EF4444"
+                    fillOpacity={0.03}
+                  />
                   {/* Reference lines for boundaries */}
-                  <ReferenceLine y={50} stroke="#0DF09E" strokeDasharray="3 3" strokeOpacity={0.2} />
-                  <ReferenceLine y={100} stroke="#34D399" strokeDasharray="3 3" strokeOpacity={0.2} />
-                  <ReferenceLine y={200} stroke="#FBBF24" strokeDasharray="3 3" strokeOpacity={0.2} />
-                  <ReferenceLine y={300} stroke="#F97316" strokeDasharray="3 3" strokeOpacity={0.2} />
+                  <ReferenceLine
+                    y={50}
+                    stroke="#0DF09E"
+                    strokeDasharray="3 3"
+                    strokeOpacity={0.2}
+                  />
+                  <ReferenceLine
+                    y={100}
+                    stroke="#34D399"
+                    strokeDasharray="3 3"
+                    strokeOpacity={0.2}
+                  />
+                  <ReferenceLine
+                    y={200}
+                    stroke="#FBBF24"
+                    strokeDasharray="3 3"
+                    strokeOpacity={0.2}
+                  />
+                  <ReferenceLine
+                    y={300}
+                    stroke="#F97316"
+                    strokeDasharray="3 3"
+                    strokeOpacity={0.2}
+                  />
                   <XAxis
                     dataKey="time"
                     stroke="#3B7A5A"
@@ -224,14 +312,15 @@ export default function ForecastPage() {
                 whileHover={{ scale: 1.05 }}
               >
                 <p className="text-xs text-[#3B7A5A]">
-                  {dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  {dt.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </p>
                 <p className="text-xl font-bold mt-1" style={{ color }}>
                   {Math.round(item.aqi)}
                 </p>
-                <p className="text-xs mt-1">
-                  {getAQIEmoji(category)}
-                </p>
+                <p className="text-xs mt-1">{getAQIEmoji(category)}</p>
                 <p className="text-[10px] text-[#3B7A5A] mt-0.5">{category}</p>
               </motion.div>
             );
