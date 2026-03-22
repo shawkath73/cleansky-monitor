@@ -191,45 +191,54 @@ export default function Dashboard() {
             <TrendingUp className="w-4 h-4 text-[#6366F1]" />
             24-Hour AQI Forecast
           </h2>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="aqiGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366F1" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
-                <XAxis
-                  dataKey="time"
-                  stroke="#6B7280"
-                  tick={{ fill: "#9CA3AF", fontSize: 11 }}
-                  interval="preserveStartEnd"
-                />
-                <YAxis
-                  stroke="#6B7280"
-                  tick={{ fill: "#9CA3AF", fontSize: 11 }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#111827",
-                    border: "1px solid #1F2937",
-                    borderRadius: "8px",
-                    color: "#F9FAFB",
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="aqi"
-                  stroke="#6366F1"
-                  strokeWidth={2}
-                  fill="url(#aqiGrad)"
-                  dot={false}
-                  activeDot={{ r: 5, fill: "#6366F1" }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+          <div
+            className="overflow-x-auto"
+            style={{
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+          >
+            <style>{`.overflow-x-auto::-webkit-scrollbar { display: none; }`}</style>
+            <div className="h-64" style={{ minWidth: "600px" }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="aqiGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#6366F1" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+                  <XAxis
+                    dataKey="time"
+                    stroke="#6B7280"
+                    tick={{ fill: "#9CA3AF", fontSize: 11 }}
+                    interval="preserveStartEnd"
+                  />
+                  <YAxis
+                    stroke="#6B7280"
+                    tick={{ fill: "#9CA3AF", fontSize: 11 }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#111827",
+                      border: "1px solid #1F2937",
+                      borderRadius: "8px",
+                      color: "#F9FAFB",
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="aqi"
+                    stroke="#6366F1"
+                    strokeWidth={2}
+                    fill="url(#aqiGrad)"
+                    dot={false}
+                    activeDot={{ r: 5, fill: "#6366F1" }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </GlassCard>
       </motion.div>
