@@ -297,34 +297,98 @@ export default function ForecastPage() {
         <h2 className="text-sm font-medium text-[#3B7A5A] uppercase tracking-widest mb-4">
           Hourly Breakdown
         </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-          {forecast.map((item, idx) => {
-            const dt = new Date(item.datetime || item.timestamp);
-            const category = item.category || getAQICategory(item.aqi);
-            const color = getAQIColorByValue(item.aqi);
-            return (
-              <motion.div
-                key={idx}
-                className="glass-light p-3 text-center cursor-default rounded-xl"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, delay: idx * 0.02 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                <p className="text-xs text-[#3B7A5A]">
-                  {dt.toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
-                <p className="text-xl font-bold mt-1" style={{ color }}>
-                  {Math.round(item.aqi)}
-                </p>
-                <p className="text-xs mt-1">{getAQIEmoji(category)}</p>
-                <p className="text-[10px] text-[#3B7A5A] mt-0.5">{category}</p>
-              </motion.div>
-            );
-          })}
+
+        {/* Mobile: horizontal scroll | Laptop+: wrapping grid */}
+        {/* Mobile scroll strip */}
+        <div
+          className="md:hidden overflow-x-auto pb-3"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          <style>{`.hourly-strip::-webkit-scrollbar { display: none; }`}</style>
+          <div className="hourly-strip flex gap-2 w-max">
+            {forecast.map((item, idx) => {
+              const dt = new Date(item.datetime || item.timestamp);
+              const category = item.category || getAQICategory(item.aqi);
+              const color = getAQIColorByValue(item.aqi);
+              const barPct = Math.min(Math.round((item.aqi / 500) * 100), 100);
+              return (
+                <motion.div
+                  key={idx}
+                  className="flex flex-col items-center gap-1 glass-light rounded-2xl pt-3 pb-2 px-3 cursor-default relative overflow-hidden"
+                  style={{ minWidth: "68px" }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25, delay: idx * 0.015 }}
+                  whileHover={{ scale: 1.06, y: -3 }}
+                >
+                  <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl" style={{ background: color }} />
+                  <span className="text-[10px] text-[#3B7A5A] font-medium tabular-nums">
+                    {dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                  <div className="flex items-end gap-1.5 mt-1">
+                    <div className="w-1.5 bg-[#0A4D30]/40 rounded-full h-8 flex items-end overflow-hidden">
+                      <div className="w-full rounded-full transition-all" style={{ height: `${barPct}%`, background: color }} />
+                    </div>
+                    <span className="text-lg font-bold leading-none" style={{ color }}>{Math.round(item.aqi)}</span>
+                  </div>
+                  <span className="text-sm leading-none mt-0.5">{getAQIEmoji(category)}</span>
+                  <span className="text-[9px] text-[#3B7A5A] font-medium uppercase tracking-wide mt-0.5 text-center leading-tight">{category}</span>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Laptop+ wrapping grid — groups by day */}
+        <div className="hidden md:block space-y-5">
+          {Array.from(
+            forecast.reduce((acc, item) => {
+              const dt = new Date(item.datetime || item.timestamp);
+              const key = dt.toDateString();
+              if (!acc.has(key)) acc.set(key, { label: dt.toLocaleDateString([], { weekday: "long", month: "short", day: "numeric" }), items: [] });
+              acc.get(key)!.items.push(item);
+              return acc;
+            }, new Map<string, { label: string; items: typeof forecast }>())
+          ).map(([key, group]) => (
+            <div key={key}>
+              {/* Day label */}
+              <p className="text-xs text-[#0DF09E] font-semibold uppercase tracking-widest mb-3 flex items-center gap-2">
+                <span className="inline-block w-4 h-px bg-[#0DF09E]/40" />
+                {group.label}
+              </p>
+              <div className="grid grid-cols-6 lg:grid-cols-8 xl:grid-cols-12 gap-2">
+                {group.items.map((item, idx) => {
+                  const dt = new Date(item.datetime || item.timestamp);
+                  const category = item.category || getAQICategory(item.aqi);
+                  const color = getAQIColorByValue(item.aqi);
+                  const barPct = Math.min(Math.round((item.aqi / 500) * 100), 100);
+                  return (
+                    <motion.div
+                      key={idx}
+                      className="flex flex-col items-center gap-1 glass-light rounded-2xl pt-3 pb-2 px-2 cursor-default relative overflow-hidden"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.25, delay: idx * 0.02 }}
+                      whileHover={{ scale: 1.05, y: -3 }}
+                    >
+                      <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl" style={{ background: color }} />
+                      <span className="text-[10px] text-[#3B7A5A] font-medium tabular-nums">
+                        {dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      </span>
+                      <div className="flex items-end gap-1 mt-1">
+                        <div className="w-1.5 bg-[#0A4D30]/40 rounded-full h-7 flex items-end overflow-hidden">
+                          <div className="w-full rounded-full transition-all" style={{ height: `${barPct}%`, background: color }} />
+                        </div>
+                        <span className="text-base font-bold leading-none" style={{ color }}>{Math.round(item.aqi)}</span>
+                      </div>
+                      <span className="text-sm leading-none mt-0.5">{getAQIEmoji(category)}</span>
+                      <span className="text-[9px] text-[#3B7A5A] font-medium uppercase tracking-wide mt-0.5 text-center leading-tight">{category}</span>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </motion.div>
     </motion.div>
