@@ -13,7 +13,7 @@ import {
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
 
-const CHART_COLORS = ["#6366F1", "#818CF8", "#A78BFA", "#C084FC", "#E879F9", "#F472B6", "#FB923C"];
+const CHART_COLORS = ["#0DF09E", "#34D399", "#6EE7B7", "#A7F3D0", "#D1FAE5", "#10B981", "#059669"];
 
 const stagger = {
   hidden: {},
@@ -63,9 +63,9 @@ export default function PollutantsPage() {
     return (
       <GlassCard>
         <div className="text-center py-12">
-          <AlertTriangle className="w-10 h-10 text-[#FF7E00] mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-[#F9FAFB] mb-2">Connection Error</h2>
-          <p className="text-[#9CA3AF]">{error}</p>
+          <AlertTriangle className="w-10 h-10 text-[#F97316] mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-[#E8F5EE] mb-2">Connection Error</h2>
+          <p className="text-[#6EE7B7]">{error}</p>
         </div>
       </GlassCard>
     );
@@ -93,11 +93,13 @@ export default function PollutantsPage() {
     >
       {/* Header */}
       <motion.div variants={fadeUp}>
-        <h1 className="text-2xl font-bold text-[#F9FAFB]">Pollution Contributors</h1>
-        <p className="text-[#9CA3AF] text-sm mt-1">
-          Pollutant breakdown for <span className="text-[#6366F1]">{city}</span>
+        <h1 className="text-3xl md:text-4xl font-bold text-[#E8F5EE] leading-tight">
+          Pollution <span >Contributors</span>
+        </h1>
+        <p className="text-[#3B7A5A] text-sm mt-2 uppercase tracking-widest">
+          Breakdown · <span className="text-[#0DF09E]">{city}</span>
           {dominantPollutant && (
-            <> · Dominant: <span className="text-[#FF7E00]">{dominantPollutant}</span></>
+            <> · Dominant: <span className="text-[#F97316]">{dominantPollutant}</span></>
           )}
         </p>
       </motion.div>
@@ -106,7 +108,7 @@ export default function PollutantsPage() {
       <motion.div className="grid grid-cols-1 lg:grid-cols-2 gap-6" variants={fadeUp}>
         {/* Donut Chart */}
         <GlassCard delay={1}>
-          <h2 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-4">
+          <h2 className="text-sm font-medium text-[#3B7A5A] uppercase tracking-widest mb-4">
             Contribution Breakdown
           </h2>
           <div className="h-72">
@@ -128,10 +130,10 @@ export default function PollutantsPage() {
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#111827",
-                    border: "1px solid #1F2937",
-                    borderRadius: "8px",
-                    color: "#F9FAFB",
+                    backgroundColor: "#041F15",
+                    border: "1px solid #0A4D30",
+                    borderRadius: "12px",
+                    color: "#E8F5EE",
                   }}
                   
                   formatter={(value) => [`${Number(value).toFixed(1)}%`, "Share"]}
@@ -147,7 +149,7 @@ export default function PollutantsPage() {
                   className="w-3 h-3 rounded-sm"
                   style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
                 />
-                <span className="text-xs text-[#9CA3AF]">
+                <span className="text-xs text-[#6EE7B7]">
                   {d.name} ({d.value.toFixed(0)}%)
                 </span>
               </div>
@@ -157,35 +159,35 @@ export default function PollutantsPage() {
 
         {/* Bar Chart — vs WHO */}
         <GlassCard delay={2}>
-          <h2 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-4">
+          <h2 className="text-sm font-medium text-[#3B7A5A] uppercase tracking-widest mb-4">
             Actual vs WHO Limits
           </h2>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={barData} barGap={4}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#06331F" />
                 <XAxis
                   dataKey="name"
-                  stroke="#6B7280"
-                  tick={{ fill: "#9CA3AF", fontSize: 11 }}
+                  stroke="#3B7A5A"
+                  tick={{ fill: "#6EE7B7", fontSize: 11 }}
                 />
                 <YAxis
-                  stroke="#6B7280"
-                  tick={{ fill: "#9CA3AF", fontSize: 11 }}
+                  stroke="#3B7A5A"
+                  tick={{ fill: "#6EE7B7", fontSize: 11 }}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#111827",
-                    border: "1px solid #1F2937",
-                    borderRadius: "8px",
-                    color: "#F9FAFB",
+                    backgroundColor: "#041F15",
+                    border: "1px solid #0A4D30",
+                    borderRadius: "12px",
+                    color: "#E8F5EE",
                   }}
                 />
                 <Legend
-                  wrapperStyle={{ color: "#9CA3AF", fontSize: 12 }}
+                  wrapperStyle={{ color: "#6EE7B7", fontSize: 12 }}
                 />
-                <Bar dataKey="Actual" fill="#6366F1" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="WHO Limit" fill="#374151" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Actual" fill="#0DF09E" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="WHO Limit" fill="#0A4D30" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -194,7 +196,7 @@ export default function PollutantsPage() {
 
       {/* Row 2: Pollutant detail cards */}
       <motion.div variants={fadeUp}>
-        <h2 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-4">
+        <h2 className="text-sm font-medium text-[#3B7A5A] uppercase tracking-widest mb-4">
           Pollutant Details
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -203,43 +205,43 @@ export default function PollutantsPage() {
             return (
               <motion.div
                 key={p.name}
-                className="glass-light p-4"
+                className="glass-light p-4 rounded-xl"
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: i * 0.06 }}
                 whileHover={{ scale: 1.02 }}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-semibold text-[#F9FAFB]">{p.name}</span>
+                  <span className="text-sm font-semibold text-[#E8F5EE]">{p.name}</span>
                   <span
                     className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                       exceeded
                         ? "bg-red-500/20 text-red-400"
-                        : "bg-green-500/20 text-green-400"
+                        : "bg-[#0DF09E]/15 text-[#0DF09E]"
                     }`}
                   >
                     {exceeded ? "Exceeded" : "Safe"}
                   </span>
                 </div>
-                <p className="text-2xl font-bold text-[#F9FAFB]">
+                <p className="text-2xl font-bold text-[#E8F5EE]">
                   {p.value.toFixed(1)}{" "}
-                  <span className="text-xs font-normal text-[#6B7280]">{p.unit}</span>
+                  <span className="text-xs font-normal text-[#3B7A5A]">{p.unit}</span>
                 </p>
-                <div className="flex items-center justify-between mt-2 text-xs text-[#6B7280]">
+                <div className="flex items-center justify-between mt-2 text-xs text-[#3B7A5A]">
                   <span>WHO Limit: {p.who_limit} {p.unit}</span>
                   {exceeded && (
                     <span className="text-red-400">+{p.exceeded_by.toFixed(1)}</span>
                   )}
                 </div>
                 {/* Percentage bar */}
-                <div className="h-1.5 bg-[#1F2937] rounded-full mt-2 overflow-hidden">
+                <div className="h-1.5 bg-[#06331F] rounded-full mt-2 overflow-hidden">
                   <motion.div
                     className="h-full rounded-full"
                     initial={{ width: 0 }}
                     animate={{ width: `${Math.min((p.value / p.who_limit) * 100, 100)}%` }}
                     transition={{ duration: 0.8, delay: i * 0.08, ease: "easeOut" }}
                     style={{
-                      backgroundColor: exceeded ? "#EF4444" : "#10B981",
+                      backgroundColor: exceeded ? "#EF4444" : "#0DF09E",
                     }}
                   />
                 </div>
