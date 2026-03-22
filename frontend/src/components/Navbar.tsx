@@ -60,14 +60,14 @@ export default function Navbar() {
   );
 
   return (
-    <nav className="sticky top-0 z-50 glass border-b border-[#1F2937]" style={{ borderRadius: 0 }}>
+    <nav className="sticky top-0 z-50 glass border-b border-[#0A4D30]/30" style={{ borderRadius: 0 }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 shrink-0">
-            <CloudSun className="w-6 h-6 text-[#6366F1]" />
-            <span className="text-xl font-bold text-[#F9FAFB] tracking-tight">
-              Clean<span className="text-[#6366F1]">Sky</span>
+          <Link href="/" className="flex items-center gap-2.5 shrink-0">
+            <CloudSun className="w-6 h-6 text-[#0DF09E]" />
+            <span className="text-xl font-bold text-[#E8F5EE] tracking-widest uppercase">
+              Clean<span className="text-[#0DF09E]">Sky</span>
             </span>
           </Link>
 
@@ -80,8 +80,8 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${active
-                    ? "bg-[#6366F1]/20 text-[#818CF8]"
-                    : "text-[#9CA3AF] hover:text-[#F9FAFB] hover:bg-[#1F2937]/50"
+                    ? "bg-[#0DF09E]/15 text-[#0DF09E]"
+                    : "text-[#6EE7B7] hover:text-[#E8F5EE] hover:bg-[#0A4D30]/30"
                     }`}
                 >
                   {link.label}
@@ -96,14 +96,14 @@ export default function Navbar() {
               className="flex items-center gap-2 glass-light px-3 py-2 cursor-pointer min-w-[180px]"
               onClick={() => setOpen(!open)}
             >
-              <MapPin className="w-4 h-4 text-[#6366F1]" />
-              <span className="text-sm text-[#F9FAFB] font-medium">{city}</span>
+              <MapPin className="w-4 h-4 text-[#0DF09E]" />
+              <span className="text-sm text-[#E8F5EE] font-medium">{city}</span>
               <motion.div
                 animate={{ rotate: open ? 180 : 0 }}
                 transition={{ duration: 0.2 }}
                 className="ml-auto"
               >
-                <ChevronDown className="w-4 h-4 text-[#9CA3AF]" />
+                <ChevronDown className="w-4 h-4 text-[#6EE7B7]" />
               </motion.div>
             </div>
 
@@ -114,7 +114,7 @@ export default function Navbar() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.96 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
-                  className="absolute right-0 top-12 w-64 glass border border-[#1F2937] rounded-xl overflow-hidden shadow-2xl"
+                  className="absolute right-0 top-12 w-64 glass border border-[#0A4D30]/50 rounded-xl overflow-hidden shadow-2xl"
                 >
                   <div className="p-2">
                     <input
@@ -122,7 +122,7 @@ export default function Navbar() {
                       placeholder="Search city…"
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
-                      className="w-full bg-[#0A0F1E] border border-[#1F2937] rounded-lg px-3 py-2 text-sm text-[#F9FAFB] placeholder-[#6B7280] outline-none focus:border-[#6366F1] transition-colors"
+                      className="w-full bg-[#020B07] border border-[#0A4D30] rounded-lg px-3 py-2 text-sm text-[#E8F5EE] placeholder-[#3B7A5A] outline-none focus:border-[#0DF09E] transition-colors"
                       autoFocus
                     />
                   </div>
@@ -131,8 +131,8 @@ export default function Navbar() {
                       <li key={c}>
                         <button
                           className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center gap-2 ${c === city
-                            ? "bg-[#6366F1]/20 text-[#818CF8]"
-                            : "text-[#9CA3AF] hover:bg-[#1F2937] hover:text-[#F9FAFB]"
+                            ? "bg-[#0DF09E]/15 text-[#0DF09E]"
+                            : "text-[#6EE7B7] hover:bg-[#0A4D30]/30 hover:text-[#E8F5EE]"
                             }`}
                           onClick={() => {
                             setCity(c);
@@ -146,7 +146,7 @@ export default function Navbar() {
                       </li>
                     ))}
                     {filtered.length === 0 && (
-                      <li className="px-4 py-3 text-sm text-[#6B7280]">No cities found</li>
+                      <li className="px-4 py-3 text-sm text-[#3B7A5A]">No cities found</li>
                     )}
                   </ul>
                 </motion.div>
@@ -156,7 +156,7 @@ export default function Navbar() {
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden p-2 rounded-lg text-[#9CA3AF] hover:text-[#F9FAFB] hover:bg-[#1F2937]"
+            className="md:hidden p-2 rounded-lg text-[#6EE7B7] hover:text-[#E8F5EE] hover:bg-[#0A4D30]/30"
             onClick={() => setMobileOpen(!mobileOpen)}
           >
             <AnimatePresence mode="wait" initial={false}>
@@ -193,7 +193,7 @@ export default function Navbar() {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="md:hidden overflow-hidden border-t border-[#1F2937]"
+              className="md:hidden overflow-hidden border-t border-[#0A4D30]/30"
             >
               <div className="pb-4 mt-2 pt-3 flex flex-col gap-1">
                 {NAV_LINKS.map((link) => {
@@ -204,14 +204,52 @@ export default function Navbar() {
                       href={link.href}
                       onClick={() => setMobileOpen(false)}
                       className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${active
-                        ? "bg-[#6366F1]/20 text-[#818CF8]"
-                        : "text-[#9CA3AF] hover:text-[#F9FAFB] hover:bg-[#1F2937]/50"
+                        ? "bg-[#0DF09E]/15 text-[#0DF09E]"
+                        : "text-[#6EE7B7] hover:text-[#E8F5EE] hover:bg-[#0A4D30]/30"
                         }`}
                     >
                       {link.label}
                     </Link>
                   );
                 })}
+
+                {/* City selector — only shown in mobile drawer on xs screens */}
+                <div className="sm:hidden mt-3 px-2">
+                  <div className="flex items-center gap-2 mb-2 px-2">
+                    <MapPin className="w-4 h-4 text-[#0DF09E]" />
+                    <span className="text-xs text-[#6EE7B7] uppercase tracking-widest font-medium">Select City</span>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search city…"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full bg-[#020B07] border border-[#0A4D30] rounded-lg px-3 py-2 text-sm text-[#E8F5EE] placeholder-[#3B7A5A] outline-none focus:border-[#0DF09E] transition-colors mb-1"
+                  />
+                  <ul className="max-h-44 overflow-y-auto rounded-lg border border-[#0A4D30]/40 bg-[#020B07]/80">
+                    {filtered.map((c) => (
+                      <li key={c}>
+                        <button
+                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center gap-2 ${c === city
+                            ? "bg-[#0DF09E]/15 text-[#0DF09E]"
+                            : "text-[#6EE7B7] hover:bg-[#0A4D30]/30 hover:text-[#E8F5EE]"
+                            }`}
+                          onClick={() => {
+                            setCity(c);
+                            setSearch("");
+                            setMobileOpen(false);
+                          }}
+                        >
+                          <Building2 className="w-3.5 h-3.5 opacity-50" />
+                          {c}
+                        </button>
+                      </li>
+                    ))}
+                    {filtered.length === 0 && (
+                      <li className="px-4 py-3 text-sm text-[#3B7A5A]">No cities found</li>
+                    )}
+                  </ul>
+                </div>
               </div>
             </motion.div>
           )}

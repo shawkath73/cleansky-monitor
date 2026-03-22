@@ -113,9 +113,12 @@ export default function HealthPage() {
     >
       {/* Header */}
       <motion.div variants={fadeUp}>
-        <h1 className="text-2xl font-bold text-[#F9FAFB]">Health Risk Analysis</h1>
-        <p className="text-[#9CA3AF] text-sm mt-1">
-          Health advisory for <span className="text-[#6366F1]">{city}</span> based on current AQI
+        <h1 className="text-3xl md:text-4xl font-bold text-[#E8F5EE] leading-tight">
+          Health Risk{" "}
+          <span >Analysis</span>
+        </h1>
+        <p className="text-[#3B7A5A] text-sm mt-2 uppercase tracking-widest">
+          Advisory · <span className="text-[#0DF09E]">{city}</span> · Based on current AQI
         </p>
       </motion.div>
 
@@ -137,18 +140,18 @@ export default function HealthPage() {
               {health.emoji}
             </div>
             <div>
-              <p className="text-sm text-[#6B7280] uppercase tracking-wider">Risk Level</p>
+              <p className="text-[#3B7A5A] text-sm uppercase tracking-widest font-medium">Risk Level</p>
               <h2 className="text-3xl font-bold mt-1" style={{ color }}>
                 {health.category}
               </h2>
-              <p className="text-[#9CA3AF] text-sm mt-1">
-                AQI: <span className="font-semibold text-[#F9FAFB]">{Math.round(health.aqi)}</span>
+              <p className="text-[#6EE7B7] text-sm mt-1">
+                AQI: <span className="font-semibold text-[#E8F5EE]">{Math.round(health.aqi)}</span>
                 {health.range && <> · Range: {health.range}</>}
               </p>
             </div>
           </div>
           {health.recommendation && (
-            <p className="relative text-[#9CA3AF] mt-4 text-sm leading-relaxed border-t border-[#1F2937] pt-4">
+            <p className="relative text-[#6EE7B7] mt-4 text-sm leading-relaxed border-t border-[#06331F] pt-4">
               {health.recommendation}
             </p>
           )}
@@ -159,8 +162,8 @@ export default function HealthPage() {
       <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-6" variants={fadeUp}>
         {/* Who is affected */}
         <GlassCard delay={2}>
-          <h2 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-4 flex items-center gap-2">
-            <Users className="w-4 h-4 text-[#6366F1]" />
+          <h2 className="text-sm font-medium text-[#3B7A5A] uppercase tracking-widest mb-4 flex items-center gap-2">
+            <Users className="w-4 h-4 text-[#0DF09E]" />
             Who is Affected?
           </h2>
           {health.sensitive_groups.length > 0 ? (
@@ -176,18 +179,18 @@ export default function HealthPage() {
                   <motion.div
                     key={group}
                     variants={listItem}
-                    className="flex items-center gap-3 p-3 rounded-xl bg-[#0A0F1E]/50 border border-[#1F2937]"
+                    className="flex items-center gap-3 p-3 rounded-xl bg-[#041F15]/50 border border-[#06331F]"
                   >
                     <Icon className="w-5 h-5 shrink-0" style={{ color }} />
-                    <span className="text-sm text-[#F9FAFB]">{group}</span>
+                    <span className="text-sm text-[#E8F5EE]">{group}</span>
                   </motion.div>
                 );
               })}
             </motion.div>
           ) : (
             <div className="text-center py-8">
-              <PartyPopper className="w-10 h-10 text-[#10B981] mx-auto" />
-              <p className="text-[#9CA3AF] mt-2 text-sm">
+              <PartyPopper className="w-10 h-10 text-[#0DF09E] mx-auto" />
+              <p className="text-[#6EE7B7] mt-2 text-sm">
                 No sensitive groups currently at risk!
               </p>
             </div>
@@ -196,8 +199,8 @@ export default function HealthPage() {
 
         {/* Suggested Actions */}
         <GlassCard delay={3}>
-          <h2 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-4 flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-[#10B981]" />
+          <h2 className="text-sm font-medium text-[#3B7A5A] uppercase tracking-widest mb-4 flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-[#0DF09E]" />
             Suggested Actions
           </h2>
           <motion.div
@@ -212,10 +215,10 @@ export default function HealthPage() {
                 <motion.div
                   key={i}
                   variants={listItem}
-                  className="flex items-start gap-3 p-3 rounded-xl bg-[#0A0F1E]/50 border border-[#1F2937]"
+                  className="flex items-start gap-3 p-3 rounded-xl bg-[#041F15]/50 border border-[#06331F]"
                 >
-                  <Icon className="w-5 h-5 mt-0.5 shrink-0 text-[#6366F1]" />
-                  <span className="text-sm text-[#F9FAFB]">{action}</span>
+                  <Icon className="w-5 h-5 mt-0.5 shrink-0 text-[#0DF09E]" />
+                  <span className="text-sm text-[#E8F5EE]">{action}</span>
                 </motion.div>
               );
             })}
@@ -226,7 +229,7 @@ export default function HealthPage() {
       {/* AQI Scale Legend */}
       <motion.div variants={fadeUp}>
         <GlassCard>
-          <h2 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-4">
+          <h2 className="text-sm font-medium text-[#3B7A5A] uppercase tracking-widest mb-4">
             AQI Scale Reference
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
@@ -263,8 +266,8 @@ export default function HealthPage() {
                     className="w-4 h-4 rounded-full mx-auto mb-1"
                     style={{ backgroundColor: item.color }}
                   />
-                  <p className="text-xs font-medium text-[#F9FAFB]">{item.label}</p>
-                  <p className="text-[10px] text-[#6B7280]">{item.range}</p>
+                  <p className="text-xs font-medium text-[#E8F5EE]">{item.label}</p>
+                  <p className="text-[10px] text-[#6EE7B7]">{item.range}</p>
                 </motion.div>
               );
             })}
