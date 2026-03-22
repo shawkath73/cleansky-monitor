@@ -13,7 +13,15 @@ import {
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
 
-const CHART_COLORS = ["#0DF09E", "#34D399", "#6EE7B7", "#A7F3D0", "#D1FAE5", "#10B981", "#059669"];
+const CHART_COLORS = [
+  "#86EFAC", // Pale Green
+  "#93C5FD", // Pale Blue
+  "#FCD34D", // Pale Gold/Amber
+  "#F9A8D4", // Pale Pink
+  "#C4B5FD", // Pale Violet
+  "#5EEAD4", // Pale Teal
+  "#FDA4AF"  // Pale Rose
+];
 
 const stagger = {
   hidden: {},
