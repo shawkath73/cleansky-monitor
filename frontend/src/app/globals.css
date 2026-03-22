@@ -102,6 +102,11 @@ body {
 }
 
 /* ── Recharts overrides ─────────────────── */
+.recharts-wrapper,
+.recharts-wrapper svg {
+  outline: none !important;
+}
+
 .recharts-cartesian-grid-horizontal line,
 .recharts-cartesian-grid-vertical line {
   stroke: #1F2937;

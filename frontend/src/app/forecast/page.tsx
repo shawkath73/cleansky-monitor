@@ -136,59 +136,68 @@ export default function ForecastPage() {
           <h2 className="text-sm font-medium text-[#9CA3AF] uppercase tracking-wider mb-4">
             AQI Trend Over Time
           </h2>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="forecastGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366F1" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
-                {/* AQI Zone backgrounds */}
-                <ReferenceArea y1={0} y2={50} fill="#00E400" fillOpacity={0.04} />
-                <ReferenceArea y1={50} y2={100} fill="#92D050" fillOpacity={0.04} />
-                <ReferenceArea y1={100} y2={200} fill="#FFFF00" fillOpacity={0.04} />
-                <ReferenceArea y1={200} y2={300} fill="#FF7E00" fillOpacity={0.04} />
-                <ReferenceArea y1={300} y2={500} fill="#FF0000" fillOpacity={0.04} />
-                {/* Reference lines for boundaries */}
-                <ReferenceLine y={50} stroke="#00E400" strokeDasharray="3 3" strokeOpacity={0.3} />
-                <ReferenceLine y={100} stroke="#92D050" strokeDasharray="3 3" strokeOpacity={0.3} />
-                <ReferenceLine y={200} stroke="#FFFF00" strokeDasharray="3 3" strokeOpacity={0.3} />
-                <ReferenceLine y={300} stroke="#FF7E00" strokeDasharray="3 3" strokeOpacity={0.3} />
-                <XAxis
-                  dataKey="time"
-                  stroke="#6B7280"
-                  tick={{ fill: "#9CA3AF", fontSize: 11 }}
-                  interval={Math.floor(chartData.length / 8)}
-                />
-                <YAxis
-                  stroke="#6B7280"
-                  tick={{ fill: "#9CA3AF", fontSize: 11 }}
-                  domain={[0, "auto"]}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#111827",
-                    border: "1px solid #1F2937",
-                    borderRadius: "8px",
-                    color: "#F9FAFB",
-                  }}
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  formatter={(value: any) => [`${value}`, "AQI"]}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="aqi"
-                  stroke="#6366F1"
-                  strokeWidth={2}
-                  fill="url(#forecastGrad)"
-                  dot={false}
-                  activeDot={{ r: 5, fill: "#6366F1" }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+          <div
+            className="overflow-x-auto"
+            style={{
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+          >
+            <style>{`.overflow-x-auto::-webkit-scrollbar { display: none; }`}</style>
+            <div className="h-80" style={{ minWidth: "600px" }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="forecastGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#6366F1" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+                  {/* AQI Zone backgrounds */}
+                  <ReferenceArea y1={0} y2={50} fill="#00E400" fillOpacity={0.04} />
+                  <ReferenceArea y1={50} y2={100} fill="#92D050" fillOpacity={0.04} />
+                  <ReferenceArea y1={100} y2={200} fill="#FFFF00" fillOpacity={0.04} />
+                  <ReferenceArea y1={200} y2={300} fill="#FF7E00" fillOpacity={0.04} />
+                  <ReferenceArea y1={300} y2={500} fill="#FF0000" fillOpacity={0.04} />
+                  {/* Reference lines for boundaries */}
+                  <ReferenceLine y={50} stroke="#00E400" strokeDasharray="3 3" strokeOpacity={0.3} />
+                  <ReferenceLine y={100} stroke="#92D050" strokeDasharray="3 3" strokeOpacity={0.3} />
+                  <ReferenceLine y={200} stroke="#FFFF00" strokeDasharray="3 3" strokeOpacity={0.3} />
+                  <ReferenceLine y={300} stroke="#FF7E00" strokeDasharray="3 3" strokeOpacity={0.3} />
+                  <XAxis
+                    dataKey="time"
+                    stroke="#6B7280"
+                    tick={{ fill: "#9CA3AF", fontSize: 11 }}
+                    interval={Math.floor(chartData.length / 8)}
+                  />
+                  <YAxis
+                    stroke="#6B7280"
+                    tick={{ fill: "#9CA3AF", fontSize: 11 }}
+                    domain={[0, "auto"]}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#111827",
+                      border: "1px solid #1F2937",
+                      borderRadius: "8px",
+                      color: "#F9FAFB",
+                    }}
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    formatter={(value: any) => [`${value}`, "AQI"]}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="aqi"
+                    stroke="#6366F1"
+                    strokeWidth={2}
+                    fill="url(#forecastGrad)"
+                    dot={false}
+                    activeDot={{ r: 5, fill: "#6366F1" }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </GlassCard>
       </motion.div>
