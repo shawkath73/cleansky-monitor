@@ -7,8 +7,17 @@ import type { PollutantDetail } from "@/lib/types";
 import GlassCard from "@/components/GlassCard";
 import { DashboardSkeleton } from "@/components/LoadingSkeleton";
 import {
-  PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend,
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Legend,
 } from "recharts";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
@@ -20,7 +29,7 @@ const CHART_COLORS = [
   "#F9A8D4", // Pale Pink
   "#C4B5FD", // Pale Violet
   "#5EEAD4", // Pale Teal
-  "#FDA4AF"  // Pale Rose
+  "#FDA4AF", // Pale Rose
 ];
 
 const stagger = {
@@ -30,7 +39,11 @@ const stagger = {
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const } },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const },
+  },
 };
 
 export default function PollutantsPage() {
@@ -55,14 +68,17 @@ export default function PollutantsPage() {
         setDominantPollutant(res.dominant_pollutant);
         setCurrentAQI(res.current_aqi);
       } catch (e) {
-        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load");
+        if (!cancelled)
+          setError(e instanceof Error ? e.message : "Failed to load");
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
 
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [city]);
 
   if (loading) return <DashboardSkeleton />;
@@ -72,7 +88,9 @@ export default function PollutantsPage() {
       <GlassCard>
         <div className="text-center py-12">
           <AlertTriangle className="w-10 h-10 text-[#F97316] mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-[#E8F5EE] mb-2">Connection Error</h2>
+          <h2 className="text-xl font-semibold text-[#E8F5EE] mb-2">
+            Connection Error
+          </h2>
           <p className="text-[#6EE7B7]">{error}</p>
         </div>
       </GlassCard>
@@ -102,18 +120,25 @@ export default function PollutantsPage() {
       {/* Header */}
       <motion.div variants={fadeUp}>
         <h1 className="text-3xl md:text-4xl font-bold text-[#E8F5EE] leading-tight">
-          Pollution <span >Contributors</span>
+          Pollution <span>Contributors</span>
         </h1>
         <p className="text-[#3B7A5A] text-sm mt-2 uppercase tracking-widest">
-          Breakdown · <span className="text-[#0DF09E]">{city}</span>
+          Breakdown <span className="text-[#0DF09E]">{city}</span>
           {dominantPollutant && (
-            <> · Dominant: <span className="text-[#F97316]">{dominantPollutant}</span></>
+            <>
+              {" "}
+              Dominant:{" "}
+              <span className="text-[#F97316]">{dominantPollutant}</span>
+            </>
           )}
         </p>
       </motion.div>
 
       {/* Row 1: Donut + Bar */}
-      <motion.div className="grid grid-cols-1 lg:grid-cols-2 gap-6" variants={fadeUp}>
+      <motion.div
+        className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+        variants={fadeUp}
+      >
         {/* Donut Chart */}
         <GlassCard delay={1}>
           <h2 className="text-sm font-medium text-[#3B7A5A] uppercase tracking-widest mb-4">
@@ -133,7 +158,10 @@ export default function PollutantsPage() {
                   stroke="none"
                 >
                   {donutData.map((_, idx) => (
-                    <Cell key={idx} fill={CHART_COLORS[idx % CHART_COLORS.length]} />
+                    <Cell
+                      key={idx}
+                      fill={CHART_COLORS[idx % CHART_COLORS.length]}
+                    />
                   ))}
                 </Pie>
                 <Tooltip
@@ -143,8 +171,10 @@ export default function PollutantsPage() {
                     borderRadius: "12px",
                     color: "#E8F5EE",
                   }}
-                  
-                  formatter={(value) => [`${Number(value).toFixed(1)}%`, "Share"]}
+                  formatter={(value) => [
+                    `${Number(value).toFixed(1)}%`,
+                    "Share",
+                  ]}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -155,7 +185,9 @@ export default function PollutantsPage() {
               <div key={d.name} className="flex items-center gap-1.5">
                 <div
                   className="w-3 h-3 rounded-sm"
-                  style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
+                  style={{
+                    backgroundColor: CHART_COLORS[i % CHART_COLORS.length],
+                  }}
                 />
                 <span className="text-xs text-[#6EE7B7]">
                   {d.name} ({d.value.toFixed(0)}%)
@@ -191,9 +223,7 @@ export default function PollutantsPage() {
                     color: "#E8F5EE",
                   }}
                 />
-                <Legend
-                  wrapperStyle={{ color: "#6EE7B7", fontSize: 12 }}
-                />
+                <Legend wrapperStyle={{ color: "#6EE7B7", fontSize: 12 }} />
                 <Bar dataKey="Actual" fill="#0DF09E" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="WHO Limit" fill="#0A4D30" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -220,7 +250,9 @@ export default function PollutantsPage() {
                 whileHover={{ scale: 1.02 }}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-semibold text-[#E8F5EE]">{p.name}</span>
+                  <span className="text-sm font-semibold text-[#E8F5EE]">
+                    {p.name}
+                  </span>
                   <span
                     className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                       exceeded
@@ -233,12 +265,18 @@ export default function PollutantsPage() {
                 </div>
                 <p className="text-2xl font-bold text-[#E8F5EE]">
                   {p.value.toFixed(1)}{" "}
-                  <span className="text-xs font-normal text-[#3B7A5A]">{p.unit}</span>
+                  <span className="text-xs font-normal text-[#3B7A5A]">
+                    {p.unit}
+                  </span>
                 </p>
                 <div className="flex items-center justify-between mt-2 text-xs text-[#3B7A5A]">
-                  <span>WHO Limit: {p.who_limit} {p.unit}</span>
+                  <span>
+                    WHO Limit: {p.who_limit} {p.unit}
+                  </span>
                   {exceeded && (
-                    <span className="text-red-400">+{p.exceeded_by.toFixed(1)}</span>
+                    <span className="text-red-400">
+                      +{p.exceeded_by.toFixed(1)}
+                    </span>
                   )}
                 </div>
                 {/* Percentage bar */}
@@ -246,8 +284,14 @@ export default function PollutantsPage() {
                   <motion.div
                     className="h-full rounded-full"
                     initial={{ width: 0 }}
-                    animate={{ width: `${Math.min((p.value / p.who_limit) * 100, 100)}%` }}
-                    transition={{ duration: 0.8, delay: i * 0.08, ease: "easeOut" }}
+                    animate={{
+                      width: `${Math.min((p.value / p.who_limit) * 100, 100)}%`,
+                    }}
+                    transition={{
+                      duration: 0.8,
+                      delay: i * 0.08,
+                      ease: "easeOut",
+                    }}
                     style={{
                       backgroundColor: exceeded ? "#EF4444" : "#0DF09E",
                     }}

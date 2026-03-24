@@ -2,15 +2,30 @@
 
 import { useEffect, useState } from "react";
 import { useCity } from "@/context/CityContext";
-import { fetchCurrentAQI, fetchForecast, fetchHealthRisk, fetchPollutants } from "@/lib/api";
+import {
+  fetchCurrentAQI,
+  fetchForecast,
+  fetchHealthRisk,
+  fetchPollutants,
+} from "@/lib/api";
 import { getAQICategory, getAQIColorByValue, getAQIEmoji } from "@/lib/aqi";
-import type { AQIData, ForecastItem, HealthRiskData, PollutantDetail } from "@/lib/types";
+import type {
+  AQIData,
+  ForecastItem,
+  HealthRiskData,
+  PollutantDetail,
+} from "@/lib/types";
 import GlassCard from "@/components/GlassCard";
 import AQIGauge from "@/components/AQIGauge";
 import { DashboardSkeleton } from "@/components/LoadingSkeleton";
 import {
-   XAxis, YAxis, Tooltip, ResponsiveContainer,
-  CartesianGrid, Area, AreaChart,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  Area,
+  AreaChart,
 } from "recharts";
 import { motion } from "framer-motion";
 import { AlertTriangle, TrendingUp, ChevronRight } from "lucide-react";
@@ -22,7 +37,11 @@ const stagger = {
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const } },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const },
+  },
 };
 
 export default function Dashboard() {
@@ -58,7 +77,8 @@ export default function Dashboard() {
         const healthRes = await fetchHealthRisk(aqiRes.data.aqi);
         if (!cancelled) setHealthRisk(healthRes.data);
       } catch (e) {
-        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load data");
+        if (!cancelled)
+          setError(e instanceof Error ? e.message : "Failed to load data");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -79,9 +99,13 @@ export default function Dashboard() {
       <GlassCard>
         <div className="text-center py-12">
           <AlertTriangle className="w-10 h-10 text-[#F97316] mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-[#E8F5EE] mb-2">Connection Error</h2>
+          <h2 className="text-xl font-semibold text-[#E8F5EE] mb-2">
+            Connection Error
+          </h2>
           <p className="text-[#6EE7B7]">{error}</p>
-          <p className="text-[#3B7A5A] text-sm mt-2">Make sure the Flask backend is running on port 5000</p>
+          <p className="text-[#3B7A5A] text-sm mt-2">
+            Make sure the Flask backend is running on port 5000
+          </p>
         </div>
       </GlassCard>
     );
@@ -102,7 +126,10 @@ export default function Dashboard() {
 
   // Top pollutants for bars
   const topPollutants = pollutants.slice(0, 5);
-  const maxPollutantPct = Math.max(...topPollutants.map((p) => p.percentage), 1);
+  const maxPollutantPct = Math.max(
+    ...topPollutants.map((p) => p.percentage),
+    1,
+  );
 
   return (
     <motion.div
@@ -115,17 +142,23 @@ export default function Dashboard() {
       <motion.div variants={fadeUp}>
         <h1 className="text-3xl md:text-4xl font-bold text-[#E8F5EE] leading-tight">
           Real-time Air Quality
-          
         </h1>
         <p className="text-[#3B7A5A] text-sm mt-2 uppercase tracking-widest">
-          Monitoring · <span className="text-[#0DF09E]">{city}</span> · Updated every 5 minutes
+          Monitoring <span className="text-[#0DF09E]">{city}</span> Updated
+          every 5 minutes
         </p>
       </motion.div>
 
       {/* Row 1: AQI Gauge + Health Risk */}
-      <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-6" variants={fadeUp}>
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        variants={fadeUp}
+      >
         {/* AQI Gauge card */}
-        <GlassCard className="flex flex-col items-center justify-center" delay={1}>
+        <GlassCard
+          className="flex flex-col items-center justify-center"
+          delay={1}
+        >
           <h2 className="text-sm font-medium text-[#3B7A5A] uppercase tracking-widest mb-4">
             Current AQI
           </h2>
@@ -139,7 +172,10 @@ export default function Dashboard() {
             </span>
             {aqiData?.dominant_pollutant && (
               <p className="text-[#3B7A5A] text-xs mt-2">
-                Dominant pollutant: <span className="text-[#6EE7B7]">{aqiData.dominant_pollutant}</span>
+                Dominant pollutant:{" "}
+                <span className="text-[#6EE7B7]">
+                  {aqiData.dominant_pollutant}
+                </span>
               </p>
             )}
           </div>
@@ -154,12 +190,19 @@ export default function Dashboard() {
             <div className="space-y-4">
               <div
                 className="flex items-center gap-3 p-4 rounded-xl"
-                style={{ backgroundColor: `${color}15`, borderLeft: `4px solid ${color}` }}
+                style={{
+                  backgroundColor: `${color}15`,
+                  borderLeft: `4px solid ${color}`,
+                }}
               >
                 <span className="text-3xl">{healthRisk.emoji}</span>
                 <div>
-                  <p className="text-lg font-semibold text-[#E8F5EE]">{healthRisk.category} Risk</p>
-                  <p className="text-sm text-[#6EE7B7]">AQI: {Math.round(aqi)}</p>
+                  <p className="text-lg font-semibold text-[#E8F5EE]">
+                    {healthRisk.category} Risk
+                  </p>
+                  <p className="text-sm text-[#6EE7B7]">
+                    AQI: {Math.round(aqi)}
+                  </p>
                 </div>
               </div>
 
@@ -173,8 +216,14 @@ export default function Dashboard() {
                 </p>
                 <ul className="space-y-1.5">
                   {healthRisk.actions.slice(0, 3).map((action, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-[#6EE7B7]">
-                      <ChevronRight className="w-4 h-4 mt-0.5 shrink-0" style={{ color }} />
+                    <li
+                      key={i}
+                      className="flex items-start gap-2 text-sm text-[#6EE7B7]"
+                    >
+                      <ChevronRight
+                        className="w-4 h-4 mt-0.5 shrink-0"
+                        style={{ color }}
+                      />
                       {action}
                     </li>
                   ))}
@@ -254,19 +303,29 @@ export default function Dashboard() {
             {topPollutants.map((pol, i) => (
               <div key={pol.name}>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium text-[#E8F5EE]">{pol.name}</span>
+                  <span className="text-sm font-medium text-[#E8F5EE]">
+                    {pol.name}
+                  </span>
                   <span className="text-xs text-[#6EE7B7]">
-                    {pol.value.toFixed(1)} {pol.unit} · {pol.percentage.toFixed(0)}%
+                    {pol.value.toFixed(1)} {pol.unit} ·{" "}
+                    {pol.percentage.toFixed(0)}%
                   </span>
                 </div>
                 <div className="h-2 bg-[#06331F] rounded-full overflow-hidden">
                   <motion.div
                     className="h-full rounded-full"
                     initial={{ width: 0 }}
-                    animate={{ width: `${(pol.percentage / maxPollutantPct) * 100}%` }}
-                    transition={{ duration: 0.8, delay: i * 0.1, ease: "easeOut" }}
+                    animate={{
+                      width: `${(pol.percentage / maxPollutantPct) * 100}%`,
+                    }}
+                    transition={{
+                      duration: 0.8,
+                      delay: i * 0.1,
+                      ease: "easeOut",
+                    }}
                     style={{
-                      backgroundColor: pol.status === "exceeded" ? "#F97316" : "#0DF09E",
+                      backgroundColor:
+                        pol.status === "exceeded" ? "#F97316" : "#0DF09E",
                     }}
                   />
                 </div>

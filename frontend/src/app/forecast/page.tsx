@@ -132,7 +132,7 @@ export default function ForecastPage() {
           48-Hour AQI <span>Forecast</span>
         </h1>
         <p className="text-[#3B7A5A] text-sm mt-2 uppercase tracking-widest">
-          Predictive trends · <span className="text-[#0DF09E]">{city}</span>
+          Predictive trends <span className="text-[#0DF09E]">{city}</span>
         </p>
       </motion.div>
 
@@ -321,18 +321,36 @@ export default function ForecastPage() {
                   transition={{ duration: 0.25, delay: idx * 0.015 }}
                   whileHover={{ scale: 1.06, y: -3 }}
                 >
-                  <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl" style={{ background: color }} />
+                  <div
+                    className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl"
+                    style={{ background: color }}
+                  />
                   <span className="text-[10px] text-[#3B7A5A] font-medium tabular-nums">
-                    {dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    {dt.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </span>
                   <div className="flex items-end gap-1.5 mt-1">
                     <div className="w-1.5 bg-[#0A4D30]/40 rounded-full h-8 flex items-end overflow-hidden">
-                      <div className="w-full rounded-full transition-all" style={{ height: `${barPct}%`, background: color }} />
+                      <div
+                        className="w-full rounded-full transition-all"
+                        style={{ height: `${barPct}%`, background: color }}
+                      />
                     </div>
-                    <span className="text-lg font-bold leading-none" style={{ color }}>{Math.round(item.aqi)}</span>
+                    <span
+                      className="text-lg font-bold leading-none"
+                      style={{ color }}
+                    >
+                      {Math.round(item.aqi)}
+                    </span>
                   </div>
-                  <span className="text-sm leading-none mt-0.5">{getAQIEmoji(category)}</span>
-                  <span className="text-[9px] text-[#3B7A5A] font-medium uppercase tracking-wide mt-0.5 text-center leading-tight">{category}</span>
+                  <span className="text-sm leading-none mt-0.5">
+                    {getAQIEmoji(category)}
+                  </span>
+                  <span className="text-[9px] text-[#3B7A5A] font-medium uppercase tracking-wide mt-0.5 text-center leading-tight">
+                    {category}
+                  </span>
                 </motion.div>
               );
             })}
@@ -345,10 +363,18 @@ export default function ForecastPage() {
             forecast.reduce((acc, item) => {
               const dt = new Date(item.datetime || item.timestamp);
               const key = dt.toDateString();
-              if (!acc.has(key)) acc.set(key, { label: dt.toLocaleDateString([], { weekday: "long", month: "short", day: "numeric" }), items: [] });
+              if (!acc.has(key))
+                acc.set(key, {
+                  label: dt.toLocaleDateString([], {
+                    weekday: "long",
+                    month: "short",
+                    day: "numeric",
+                  }),
+                  items: [],
+                });
               acc.get(key)!.items.push(item);
               return acc;
-            }, new Map<string, { label: string; items: typeof forecast }>())
+            }, new Map<string, { label: string; items: typeof forecast }>()),
           ).map(([key, group]) => (
             <div key={key}>
               {/* Day label */}
@@ -361,7 +387,10 @@ export default function ForecastPage() {
                   const dt = new Date(item.datetime || item.timestamp);
                   const category = item.category || getAQICategory(item.aqi);
                   const color = getAQIColorByValue(item.aqi);
-                  const barPct = Math.min(Math.round((item.aqi / 500) * 100), 100);
+                  const barPct = Math.min(
+                    Math.round((item.aqi / 500) * 100),
+                    100,
+                  );
                   return (
                     <motion.div
                       key={idx}
@@ -371,18 +400,36 @@ export default function ForecastPage() {
                       transition={{ duration: 0.25, delay: idx * 0.02 }}
                       whileHover={{ scale: 1.05, y: -3 }}
                     >
-                      <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl" style={{ background: color }} />
+                      <div
+                        className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl"
+                        style={{ background: color }}
+                      />
                       <span className="text-[10px] text-[#3B7A5A] font-medium tabular-nums">
-                        {dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        {dt.toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                       </span>
                       <div className="flex items-end gap-1 mt-1">
                         <div className="w-1.5 bg-[#0A4D30]/40 rounded-full h-7 flex items-end overflow-hidden">
-                          <div className="w-full rounded-full transition-all" style={{ height: `${barPct}%`, background: color }} />
+                          <div
+                            className="w-full rounded-full transition-all"
+                            style={{ height: `${barPct}%`, background: color }}
+                          />
                         </div>
-                        <span className="text-base font-bold leading-none" style={{ color }}>{Math.round(item.aqi)}</span>
+                        <span
+                          className="text-base font-bold leading-none"
+                          style={{ color }}
+                        >
+                          {Math.round(item.aqi)}
+                        </span>
                       </div>
-                      <span className="text-sm leading-none mt-0.5">{getAQIEmoji(category)}</span>
-                      <span className="text-[9px] text-[#3B7A5A] font-medium uppercase tracking-wide mt-0.5 text-center leading-tight">{category}</span>
+                      <span className="text-sm leading-none mt-0.5">
+                        {getAQIEmoji(category)}
+                      </span>
+                      <span className="text-[9px] text-[#3B7A5A] font-medium uppercase tracking-wide mt-0.5 text-center leading-tight">
+                        {category}
+                      </span>
                     </motion.div>
                   );
                 })}

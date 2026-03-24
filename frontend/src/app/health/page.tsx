@@ -9,9 +9,25 @@ import GlassCard from "@/components/GlassCard";
 import { DashboardSkeleton } from "@/components/LoadingSkeleton";
 import { motion } from "framer-motion";
 import {
-  AlertTriangle, Baby, UserRound, HardHat, Users, Siren, Stethoscope,
-  HeartPulse, Activity, ShieldCheck, Home, DoorClosed, Phone,
-  Ban, Lock, Wind, Eye, PartyPopper, type LucideIcon,
+  AlertTriangle,
+  Baby,
+  UserRound,
+  HardHat,
+  Users,
+  Siren,
+  Stethoscope,
+  HeartPulse,
+  Activity,
+  ShieldCheck,
+  Home,
+  DoorClosed,
+  Phone,
+  Ban,
+  Lock,
+  Wind,
+  Eye,
+  PartyPopper,
+  type LucideIcon,
 } from "lucide-react";
 
 const stagger = {
@@ -21,7 +37,11 @@ const stagger = {
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const } },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const },
+  },
 };
 
 const listItem = {
@@ -46,14 +66,17 @@ export default function HealthPage() {
         const healthRes = await fetchHealthRisk(aqiRes.data.aqi);
         if (!cancelled) setHealth(healthRes.data);
       } catch (e) {
-        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load");
+        if (!cancelled)
+          setError(e instanceof Error ? e.message : "Failed to load");
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
 
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [city]);
 
   if (loading) return <DashboardSkeleton />;
@@ -63,7 +86,9 @@ export default function HealthPage() {
       <GlassCard>
         <div className="text-center py-12">
           <AlertTriangle className="w-10 h-10 text-[#FF7E00] mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-[#F9FAFB] mb-2">Connection Error</h2>
+          <h2 className="text-xl font-semibold text-[#F9FAFB] mb-2">
+            Connection Error
+          </h2>
           <p className="text-[#9CA3AF]">{error}</p>
         </div>
       </GlassCard>
@@ -75,11 +100,11 @@ export default function HealthPage() {
   const color = getAQIColorByValue(health.aqi);
 
   const groupIcons: Record<string, LucideIcon> = {
-    "Children": Baby,
-    "Elderly": UserRound,
+    Children: Baby,
+    Elderly: UserRound,
     "Pregnant women": HeartPulse,
     "Outdoor workers": HardHat,
-    "Everyone": Users,
+    Everyone: Users,
     "Everyone — Emergency conditions": Siren,
     "People with respiratory issues": Stethoscope,
     "People with heart/lung disease": Activity,
@@ -114,11 +139,11 @@ export default function HealthPage() {
       {/* Header */}
       <motion.div variants={fadeUp}>
         <h1 className="text-3xl md:text-4xl font-bold text-[#E8F5EE] leading-tight">
-          Health Risk{" "}
-          <span >Analysis</span>
+          Health Risk <span>Analysis</span>
         </h1>
         <p className="text-[#3B7A5A] text-sm mt-2 uppercase tracking-widest">
-          Advisory · <span className="text-[#0DF09E]">{city}</span> · Based on current AQI
+          Advisory <span className="text-[#0DF09E]">{city}</span> Based on
+          current AQI
         </p>
       </motion.div>
 
@@ -140,12 +165,17 @@ export default function HealthPage() {
               {health.emoji}
             </div>
             <div>
-              <p className="text-[#3B7A5A] text-sm uppercase tracking-widest font-medium">Risk Level</p>
+              <p className="text-[#3B7A5A] text-sm uppercase tracking-widest font-medium">
+                Risk Level
+              </p>
               <h2 className="text-3xl font-bold mt-1" style={{ color }}>
                 {health.category}
               </h2>
               <p className="text-[#6EE7B7] text-sm mt-1">
-                AQI: <span className="font-semibold text-[#E8F5EE]">{Math.round(health.aqi)}</span>
+                AQI:{" "}
+                <span className="font-semibold text-[#E8F5EE]">
+                  {Math.round(health.aqi)}
+                </span>
                 {health.range && <> · Range: {health.range}</>}
               </p>
             </div>
@@ -159,7 +189,10 @@ export default function HealthPage() {
       </motion.div>
 
       {/* Row: Affected Groups + Actions */}
-      <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-6" variants={fadeUp}>
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        variants={fadeUp}
+      >
         {/* Who is affected */}
         <GlassCard delay={2}>
           <h2 className="text-sm font-medium text-[#3B7A5A] uppercase tracking-widest mb-4 flex items-center gap-2">
@@ -169,7 +202,10 @@ export default function HealthPage() {
           {health.sensitive_groups.length > 0 ? (
             <motion.div
               className="space-y-3"
-              variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
+              variants={{
+                hidden: {},
+                show: { transition: { staggerChildren: 0.08 } },
+              }}
               initial="hidden"
               animate="show"
             >
@@ -205,7 +241,10 @@ export default function HealthPage() {
           </h2>
           <motion.div
             className="space-y-3"
-            variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
+            variants={{
+              hidden: {},
+              show: { transition: { staggerChildren: 0.08 } },
+            }}
             initial="hidden"
             animate="show"
           >
@@ -258,7 +297,10 @@ export default function HealthPage() {
                     borderStyle: "solid",
                   }}
                   initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: isActive ? 1 : 0.5, scale: isActive ? 1.05 : 1 }}
+                  animate={{
+                    opacity: isActive ? 1 : 0.5,
+                    scale: isActive ? 1.05 : 1,
+                  }}
                   transition={{ duration: 0.4, delay: i * 0.05 }}
                   whileHover={{ opacity: 0.9 }}
                 >
@@ -266,7 +308,9 @@ export default function HealthPage() {
                     className="w-4 h-4 rounded-full mx-auto mb-1"
                     style={{ backgroundColor: item.color }}
                   />
-                  <p className="text-xs font-medium text-[#E8F5EE]">{item.label}</p>
+                  <p className="text-xs font-medium text-[#E8F5EE]">
+                    {item.label}
+                  </p>
                   <p className="text-[10px] text-[#6EE7B7]">{item.range}</p>
                 </motion.div>
               );
