@@ -79,12 +79,12 @@ export default function FeaturesSection() {
         transition={{ duration: 0.5 }}
         className="mb-8"
       >
-        <p className="text-[#3B7A5A] text-xs uppercase tracking-[0.2em] mb-2">
+        <p className="text-[#64748B] text-xs uppercase tracking-[0.2em] mb-2">
           What We Offer
         </p>
-        <h2 className="text-2xl md:text-3xl font-bold text-[#E8F5EE]">
+        <h2 className="text-2xl md:text-3xl font-bold text-[#E2E8F0]">
           Platform{" "}
-          <span className="text-[#0DF09E] italic font-light">Features</span>
+          <span className="text-[#7C9CFF] italic font-light">Features</span>
         </h2>
       </motion.div>
 
@@ -104,21 +104,21 @@ export default function FeaturesSection() {
             >
               {/* Top row: Icon + Number */}
               <div className="flex items-start justify-between mb-5">
-                <div className="w-11 h-11 rounded-xl bg-[#0DF09E]/10 border border-[#0DF09E]/15 flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-[#0DF09E]" strokeWidth={1.8} />
+                <div className="w-11 h-11 rounded-xl bg-[#7C9CFF]/10 border border-[#7C9CFF]/15 flex items-center justify-center">
+                  <Icon className="w-5 h-5 text-[#7C9CFF]" strokeWidth={1.8} />
                 </div>
-                <span className="text-[#3B7A5A]/40 text-xs font-mono tracking-wider">
+                <span className="text-[#64748B]/40 text-xs font-mono tracking-wider">
                   {String(index + 1).padStart(2, "0")}
                 </span>
               </div>
 
               {/* Title */}
-              <h3 className="text-[#E8F5EE] text-lg font-semibold mb-2 group-hover:text-[#0DF09E] transition-colors duration-300">
+              <h3 className="text-[#E2E8F0] text-lg font-semibold mb-2 group-hover:text-[#7C9CFF] transition-colors duration-300">
                 {feature.title}
               </h3>
 
               {/* Description */}
-              <p className="text-[#6EE7B7]/70 text-sm leading-relaxed">
+              <p className="text-[#94A3B8]/70 text-sm leading-relaxed">
                 {feature.description}
               </p>
             </motion.div>

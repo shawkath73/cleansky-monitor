@@ -103,11 +103,11 @@ export default function Dashboard() {
       <GlassCard>
         <div className="text-center py-12">
           <AlertTriangle className="w-10 h-10 text-[#F97316] mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-[#E8F5EE] mb-2">
+          <h2 className="text-xl font-semibold text-[#E2E8F0] mb-2">
             Connection Error
           </h2>
-          <p className="text-[#6EE7B7]">{error}</p>
-          <p className="text-[#3B7A5A] text-sm mt-2">
+          <p className="text-[#94A3B8]">{error}</p>
+          <p className="text-[#64748B] text-sm mt-2">
             Make sure the Flask backend is running on port 5000
           </p>
         </div>
@@ -144,11 +144,11 @@ export default function Dashboard() {
     >
       {/* Hero Header */}
       <motion.div variants={fadeUp}>
-        <h1 className="text-3xl md:text-4xl font-bold text-[#E8F5EE] leading-tight">
+        <h1 className="text-3xl md:text-4xl font-bold text-[#E2E8F0] leading-tight">
           Real-time Air Quality
         </h1>
-        <p className="text-[#3B7A5A] text-sm mt-2 uppercase tracking-widest">
-          Monitoring <span className="text-[#0DF09E]">{city}</span> Updated
+        <p className="text-[#64748B] text-sm mt-2 uppercase tracking-widest">
+          Monitoring <span className="text-[#7C9CFF]">{city}</span> Updated
           every 5 minutes
         </p>
       </motion.div>
@@ -163,7 +163,7 @@ export default function Dashboard() {
           className="flex flex-col items-center justify-center"
           delay={1}
         >
-          <h2 className="text-sm font-medium text-[#3B7A5A] uppercase tracking-widest mb-4">
+          <h2 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4">
             Current AQI
           </h2>
           <AQIGauge aqi={aqi} size={220} />
@@ -175,9 +175,9 @@ export default function Dashboard() {
               {getAQIEmoji(category)} {category}
             </span>
             {aqiData?.dominant_pollutant && (
-              <p className="text-[#3B7A5A] text-xs mt-2">
+              <p className="text-[#64748B] text-xs mt-2">
                 Dominant pollutant:{" "}
-                <span className="text-[#6EE7B7]">
+                <span className="text-[#94A3B8]">
                   {aqiData.dominant_pollutant}
                 </span>
               </p>
@@ -187,7 +187,7 @@ export default function Dashboard() {
 
         {/* Health Risk card */}
         <GlassCard delay={2}>
-          <h2 className="text-sm font-medium text-[#3B7A5A] uppercase tracking-widest mb-4">
+          <h2 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4">
             Health Risk
           </h2>
           {healthRisk && (
@@ -201,28 +201,28 @@ export default function Dashboard() {
               >
                 <span className="text-3xl">{healthRisk.emoji}</span>
                 <div>
-                  <p className="text-lg font-semibold text-[#E8F5EE]">
+                  <p className="text-lg font-semibold text-[#E2E8F0]">
                     {healthRisk.category} Risk
                   </p>
-                  <p className="text-sm text-[#6EE7B7]">
+                  <p className="text-sm text-[#94A3B8]">
                     AQI: {Math.round(aqi)}
                   </p>
                 </div>
               </div>
 
-              <p className="text-[#6EE7B7] text-sm leading-relaxed">
+              <p className="text-[#94A3B8] text-sm leading-relaxed">
                 {healthRisk.recommendation}
               </p>
 
               <div>
-                <p className="text-xs font-medium text-[#3B7A5A] uppercase tracking-widest mb-2">
+                <p className="text-xs font-medium text-[#64748B] uppercase tracking-widest mb-2">
                   Suggested Actions
                 </p>
                 <ul className="space-y-1.5">
                   {healthRisk.actions.slice(0, 3).map((action, i) => (
                     <li
                       key={i}
-                      className="flex items-start gap-2 text-sm text-[#6EE7B7]"
+                      className="flex items-start gap-2 text-sm text-[#94A3B8]"
                     >
                       <ChevronRight
                         className="w-4 h-4 mt-0.5 shrink-0"
@@ -241,8 +241,8 @@ export default function Dashboard() {
       {/* Row 2: Forecast chart */}
       <motion.div variants={fadeUp}>
         <GlassCard delay={3}>
-          <h2 className="text-sm font-medium text-[#3B7A5A] uppercase tracking-widest mb-4 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-[#0DF09E]" />
+          <h2 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-[#7C9CFF]" />
             24-Hour AQI Forecast
           </h2>
           <div
@@ -258,37 +258,37 @@ export default function Dashboard() {
                 <AreaChart data={chartData}>
                   <defs>
                     <linearGradient id="aqiGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#0DF09E" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#0DF09E" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#7C9CFF" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#7C9CFF" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#06331F" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
                   <XAxis
                     dataKey="time"
-                    stroke="#3B7A5A"
-                    tick={{ fill: "#6EE7B7", fontSize: 11 }}
+                    stroke="#64748B"
+                    tick={{ fill: "#94A3B8", fontSize: 11 }}
                     interval="preserveStartEnd"
                   />
                   <YAxis
-                    stroke="#3B7A5A"
-                    tick={{ fill: "#6EE7B7", fontSize: 11 }}
+                    stroke="#64748B"
+                    tick={{ fill: "#94A3B8", fontSize: 11 }}
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#041F15",
-                      border: "1px solid #0A4D30",
+                      backgroundColor: "#0F172A",
+                      border: "1px solid #1E293B",
                       borderRadius: "12px",
-                      color: "#E8F5EE",
+                      color: "#E2E8F0",
                     }}
                   />
                   <Area
                     type="monotone"
                     dataKey="aqi"
-                    stroke="#0DF09E"
+                    stroke="#7C9CFF"
                     strokeWidth={2}
                     fill="url(#aqiGrad)"
                     dot={false}
-                    activeDot={{ r: 5, fill: "#0DF09E" }}
+                    activeDot={{ r: 5, fill: "#7C9CFF" }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -300,22 +300,22 @@ export default function Dashboard() {
       {/* Row 3: Pollutant breakdown */}
       <motion.div variants={fadeUp}>
         <GlassCard>
-          <h2 className="text-sm font-medium text-[#3B7A5A] uppercase tracking-widest mb-4">
+          <h2 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4">
             Pollutant Breakdown
           </h2>
           <div className="space-y-3">
             {topPollutants.map((pol, i) => (
               <div key={pol.name}>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium text-[#E8F5EE]">
+                  <span className="text-sm font-medium text-[#E2E8F0]">
                     {pol.name}
                   </span>
-                  <span className="text-xs text-[#6EE7B7]">
+                  <span className="text-xs text-[#94A3B8]">
                     {pol.value.toFixed(1)} {pol.unit} ·{" "}
                     {pol.percentage.toFixed(0)}%
                   </span>
                 </div>
-                <div className="h-2 bg-[#06331F] rounded-full overflow-hidden">
+                <div className="h-2 bg-[#1E293B] rounded-full overflow-hidden">
                   <motion.div
                     className="h-full rounded-full"
                     initial={{ width: 0 }}
@@ -329,7 +329,7 @@ export default function Dashboard() {
                     }}
                     style={{
                       backgroundColor:
-                        pol.status === "exceeded" ? "#F97316" : "#0DF09E",
+                        pol.status === "exceeded" ? "#F97316" : "#7C9CFF",
                     }}
                   />
                 </div>

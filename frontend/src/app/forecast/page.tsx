@@ -42,10 +42,10 @@ const fadeUp = {
 };
 
 const STAT_ICONS: Record<string, React.ReactNode> = {
-  "Average AQI": <BarChart3 className="w-5 h-5 text-[#0DF09E]" />,
+  "Average AQI": <BarChart3 className="w-5 h-5 text-[#7C9CFF]" />,
   Minimum: <ArrowDown className="w-5 h-5 text-[#34D399]" />,
   Maximum: <ArrowUp className="w-5 h-5 text-[#EF4444]" />,
-  "Hours Covered": <Clock className="w-5 h-5 text-[#6EE7B7]" />,
+  "Hours Covered": <Clock className="w-5 h-5 text-[#94A3B8]" />,
 };
 
 export default function ForecastPage() {
@@ -99,10 +99,10 @@ export default function ForecastPage() {
       <GlassCard>
         <div className="text-center py-12">
           <AlertTriangle className="w-10 h-10 text-[#F97316] mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-[#E8F5EE] mb-2">
+          <h2 className="text-xl font-semibold text-[#E2E8F0] mb-2">
             Connection Error
           </h2>
-          <p className="text-[#6EE7B7]">{error}</p>
+          <p className="text-[#94A3B8]">{error}</p>
         </div>
       </GlassCard>
     );
@@ -128,11 +128,11 @@ export default function ForecastPage() {
     >
       {/* Header */}
       <motion.div variants={fadeUp}>
-        <h1 className="text-3xl md:text-4xl font-bold text-[#E8F5EE] leading-tight">
+        <h1 className="text-3xl md:text-4xl font-bold text-[#E2E8F0] leading-tight">
           48-Hour AQI <span>Forecast</span>
         </h1>
-        <p className="text-[#3B7A5A] text-sm mt-2 uppercase tracking-widest">
-          Predictive trends <span className="text-[#0DF09E]">{city}</span>
+        <p className="text-[#64748B] text-sm mt-2 uppercase tracking-widest">
+          Predictive trends <span className="text-[#7C9CFF]">{city}</span>
         </p>
       </motion.div>
 
@@ -156,12 +156,12 @@ export default function ForecastPage() {
               <div className="flex justify-center">
                 {STAT_ICONS[stat.label]}
               </div>
-              <p className="text-2xl font-bold text-[#E8F5EE] mt-1">
+              <p className="text-2xl font-bold text-[#E2E8F0] mt-1">
                 {typeof stat.value === "number"
                   ? Math.round(stat.value)
                   : stat.value}
               </p>
-              <p className="text-xs text-[#3B7A5A] mt-1 uppercase tracking-wider">
+              <p className="text-xs text-[#64748B] mt-1 uppercase tracking-wider">
                 {stat.label}
               </p>
             </GlassCard>
@@ -172,7 +172,7 @@ export default function ForecastPage() {
       {/* Large chart */}
       <motion.div variants={fadeUp}>
         <GlassCard delay={2}>
-          <h2 className="text-sm font-medium text-[#3B7A5A] uppercase tracking-widest mb-4">
+          <h2 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4">
             AQI Trend Over Time
           </h2>
           <div
@@ -194,16 +194,16 @@ export default function ForecastPage() {
                       x2="0"
                       y2="1"
                     >
-                      <stop offset="5%" stopColor="#0DF09E" stopOpacity={0.4} />
-                      <stop offset="95%" stopColor="#0DF09E" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#7C9CFF" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#7C9CFF" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#06331F" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
                   {/* AQI Zone backgrounds */}
                   <ReferenceArea
                     y1={0}
                     y2={50}
-                    fill="#0DF09E"
+                    fill="#7C9CFF"
                     fillOpacity={0.03}
                   />
                   <ReferenceArea
@@ -233,7 +233,7 @@ export default function ForecastPage() {
                   {/* Reference lines for boundaries */}
                   <ReferenceLine
                     y={50}
-                    stroke="#0DF09E"
+                    stroke="#7C9CFF"
                     strokeDasharray="3 3"
                     strokeOpacity={0.2}
                   />
@@ -257,21 +257,21 @@ export default function ForecastPage() {
                   />
                   <XAxis
                     dataKey="time"
-                    stroke="#3B7A5A"
-                    tick={{ fill: "#6EE7B7", fontSize: 11 }}
+                    stroke="#64748B"
+                    tick={{ fill: "#94A3B8", fontSize: 11 }}
                     interval={Math.floor(chartData.length / 8)}
                   />
                   <YAxis
-                    stroke="#3B7A5A"
-                    tick={{ fill: "#6EE7B7", fontSize: 11 }}
+                    stroke="#64748B"
+                    tick={{ fill: "#94A3B8", fontSize: 11 }}
                     domain={[0, "auto"]}
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#041F15",
-                      border: "1px solid #0A4D30",
+                      backgroundColor: "#0F172A",
+                      border: "1px solid #1E293B",
                       borderRadius: "12px",
-                      color: "#E8F5EE",
+                      color: "#E2E8F0",
                     }}
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     formatter={(value: any) => [`${value}`, "AQI"]}
@@ -279,11 +279,11 @@ export default function ForecastPage() {
                   <Area
                     type="monotone"
                     dataKey="aqi"
-                    stroke="#0DF09E"
+                    stroke="#7C9CFF"
                     strokeWidth={2}
                     fill="url(#forecastGrad)"
                     dot={false}
-                    activeDot={{ r: 5, fill: "#0DF09E" }}
+                    activeDot={{ r: 5, fill: "#7C9CFF" }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -294,7 +294,7 @@ export default function ForecastPage() {
 
       {/* Hourly cards */}
       <motion.div variants={fadeUp}>
-        <h2 className="text-sm font-medium text-[#3B7A5A] uppercase tracking-widest mb-4">
+        <h2 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4">
           Hourly Breakdown
         </h2>
 
@@ -325,14 +325,14 @@ export default function ForecastPage() {
                     className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl"
                     style={{ background: color }}
                   />
-                  <span className="text-[10px] text-[#3B7A5A] font-medium tabular-nums">
+                  <span className="text-[10px] text-[#64748B] font-medium tabular-nums">
                     {dt.toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
                   </span>
                   <div className="flex items-end gap-1.5 mt-1">
-                    <div className="w-1.5 bg-[#0A4D30]/40 rounded-full h-8 flex items-end overflow-hidden">
+                    <div className="w-1.5 bg-[#1E293B]/40 rounded-full h-8 flex items-end overflow-hidden">
                       <div
                         className="w-full rounded-full transition-all"
                         style={{ height: `${barPct}%`, background: color }}
@@ -348,7 +348,7 @@ export default function ForecastPage() {
                   <span className="text-sm leading-none mt-0.5">
                     {getAQIEmoji(category)}
                   </span>
-                  <span className="text-[9px] text-[#3B7A5A] font-medium uppercase tracking-wide mt-0.5 text-center leading-tight">
+                  <span className="text-[9px] text-[#64748B] font-medium uppercase tracking-wide mt-0.5 text-center leading-tight">
                     {category}
                   </span>
                 </motion.div>
@@ -378,8 +378,8 @@ export default function ForecastPage() {
           ).map(([key, group]) => (
             <div key={key}>
               {/* Day label */}
-              <p className="text-xs text-[#0DF09E] font-semibold uppercase tracking-widest mb-3 flex items-center gap-2">
-                <span className="inline-block w-4 h-px bg-[#0DF09E]/40" />
+              <p className="text-xs text-[#7C9CFF] font-semibold uppercase tracking-widest mb-3 flex items-center gap-2">
+                <span className="inline-block w-4 h-px bg-[#7C9CFF]/40" />
                 {group.label}
               </p>
               <div className="grid grid-cols-6 lg:grid-cols-8 xl:grid-cols-12 gap-2">
@@ -404,14 +404,14 @@ export default function ForecastPage() {
                         className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl"
                         style={{ background: color }}
                       />
-                      <span className="text-[10px] text-[#3B7A5A] font-medium tabular-nums">
+                      <span className="text-[10px] text-[#64748B] font-medium tabular-nums">
                         {dt.toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
                       </span>
                       <div className="flex items-end gap-1 mt-1">
-                        <div className="w-1.5 bg-[#0A4D30]/40 rounded-full h-7 flex items-end overflow-hidden">
+                        <div className="w-1.5 bg-[#1E293B]/40 rounded-full h-7 flex items-end overflow-hidden">
                           <div
                             className="w-full rounded-full transition-all"
                             style={{ height: `${barPct}%`, background: color }}
@@ -427,7 +427,7 @@ export default function ForecastPage() {
                       <span className="text-sm leading-none mt-0.5">
                         {getAQIEmoji(category)}
                       </span>
-                      <span className="text-[9px] text-[#3B7A5A] font-medium uppercase tracking-wide mt-0.5 text-center leading-tight">
+                      <span className="text-[9px] text-[#64748B] font-medium uppercase tracking-wide mt-0.5 text-center leading-tight">
                         {category}
                       </span>
                     </motion.div>

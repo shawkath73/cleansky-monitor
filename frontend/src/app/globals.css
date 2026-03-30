@@ -42,7 +42,7 @@ body {
   background-image:
     radial-gradient(
       ellipse at 50% 0%,
-      rgba(13, 240, 158, 0.15) 0%,
+      rgba(124, 156, 255, 0.08) 0%,
       transparent 60%
     ),
     linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
@@ -166,11 +166,11 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #0df09e;
+  background: #7c9cff;
   border-radius: 8px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #079d66;
+  background: #6182e6;
 }
 
 /* ── Recharts overrides ─────────────────── */
