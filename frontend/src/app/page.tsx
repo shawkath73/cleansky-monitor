@@ -18,6 +18,7 @@ import type {
 import GlassCard from "@/components/GlassCard";
 import AQIGauge from "@/components/AQIGauge";
 import { DashboardSkeleton } from "@/components/LoadingSkeleton";
+import LoadingScreen from "./loading";
 import {
   XAxis,
   YAxis,
@@ -92,7 +93,10 @@ export default function Dashboard() {
     };
   }, [city]);
 
-  if (loading) return <DashboardSkeleton />;
+  if (loading) {
+    if (!aqiData) return <LoadingScreen />;
+    return <DashboardSkeleton />;
+  }
 
   if (error) {
     return (
