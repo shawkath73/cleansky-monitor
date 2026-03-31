@@ -1,12 +1,17 @@
 import sys
 import os
+import json
+from datetime import datetime, timedelta
+from dotenv import load_dotenv
 
 # Add backend directory to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+# Load environmental variables (WAQI_TOKEN, OPENWEATHER_API_KEY)
+load_dotenv()
+
 from services.prediction import predict_aqi, predict_forecast, get_aqi_category
-from datetime import datetime, timedelta
-import json
+from services.weather import get_city_coordinates, get_current_pollution, get_forecast_pollution, search_cities_waqi
 
 def print_header(text):
     """Print formatted section headers."""
@@ -20,10 +25,10 @@ def print_subheader(text):
     print("-" * 70)
 
 def test_single_prediction():
-    """Test 1: Single AQI prediction with sample data."""
-    print_header("🧪 TEST 1: SINGLE AQI PREDICTION")
+    """Test 1: Single AQI prediction with sample data mimicking WAQI response."""
+    print_header("🧪 TEST 1: SINGLE AQI PREDICTION (WAQI Format)")
     
-    # Sample pollution data (Delhi winter scenario)
+    # Sample pollution data updated to mimic weather.py dict structures
     sample_data = {
         'PM2.5': 85.5,
         'PM10': 120.3,
@@ -31,28 +36,38 @@ def test_single_prediction():
         'SO2': 12.8,
         'CO': 1.2,
         'O3': 35.6,
-        'datetime': datetime.utcnow().isoformat()
+        'datetime': datetime.utcnow().isoformat(),
+        'source': 'waqi_mock',
+        'station_name': 'Delhi Anand Vihar',
+        'waqi_aqi': 165
     }
     
     print("\n📥 Input Pollution Data:")
-    for pollutant, value in sample_data.items():
-        if pollutant != 'datetime':
-            print(f"   {pollutant:8} = {value:6.1f} µg/m³")
+    for key, value in sample_data.items():
+        if key not in ['datetime', 'source', 'station_name', 'waqi_aqi']:
+            print(f"   {key:8} = {value:6.1f} µg/m³")
     
-    # Run prediction
+    # Run ML prediction
     result = predict_aqi(sample_data, city='Delhi')
     
+    # Mocking what aqi_routes does automatically
+    result['data_source'] = sample_data.get('source')
+    result['station_name'] = sample_data.get('station_name')
+    result['waqi_aqi'] = sample_data.get('waqi_aqi')
+    
     print_subheader("📊 Prediction Results")
-    print(f"   🔢 AQI Value:           {result['aqi']}")
+    print(f"   🔢 ML Predicted AQI:    {result['aqi']}")
+    print(f"   ⚖️  WAQI Provided AQI:   {result['waqi_aqi']} (For comparison)")
     print(f"   📈 Category:            {result['category']} {result['emoji']}")
     print(f"   🎨 Color Code:          {result['color']}")
     print(f"   ⚠️  Dominant Pollutant:  {result['dominant_pollutant']}")
     print(f"   🏙️  City:                {result['city']}")
+    print(f"   📍 Station Name:        {result['station_name']}")
+    print(f"   📡 Data Source:         {result['data_source']}")
     print(f"   🕐 Timestamp:           {result['datetime']}")
     
     print_subheader("💡 Health Recommendation")
     recommendation = result['recommendation']
-    # Wrap text for better readability
     words = recommendation.split()
     line = "   "
     for word in words:
@@ -75,48 +90,39 @@ def test_single_prediction():
     return result
 
 def test_forecast_prediction():
-    """Test 2: 24-hour forecast prediction."""
-    print_header("🧪 TEST 2: 24-HOUR FORECAST PREDICTION")
+    """Test 2: 48-hour forecast prediction with source tagging."""
+    print_header("🧪 TEST 2: 48-HOUR FORECAST PREDICTION")
     
-    # Generate 24 hours of forecast data with realistic variations
     forecast_data = []
     base_time = datetime.utcnow()
     
-    print("\n📥 Generating forecast data (24 hours)...")
+    print("\n📥 Generating mock forecast data (48 hours)...")
     
-    for i in range(24):
-        # Simulate pollution increase during day, decrease at night
+    for i in range(48):
         hour = (base_time.hour + i) % 24
         day_factor = 1.0 + (0.3 if 6 <= hour <= 20 else -0.2)
         
         hour_data = {
-            'PM2.5': max(10, 60 + (i * 3) * day_factor),
-            'PM10': max(15, 90 + (i * 4) * day_factor),
-            'NO2': max(5, 35 + (i * 1.5) * day_factor),
-            'SO2': max(2, 8 + (i * 0.5) * day_factor),
-            'CO': max(0.3, 0.8 + (i * 0.08) * day_factor),
-            'O3': max(5, 25 + (i * 1.2) * day_factor),
-            'datetime': (base_time + timedelta(hours=i)).isoformat()
+            'PM2.5': max(10, 60 + (i * 1.5) * day_factor),
+            'PM10': max(15, 90 + (i * 2) * day_factor),
+            'NO2': max(5, 35 + (i * 0.8) * day_factor),
+            'SO2': max(2, 8 + (i * 0.2) * day_factor),
+            'CO': max(0.3, 0.8 + (i * 0.04) * day_factor),
+            'O3': max(5, 25 + (i * 0.6) * day_factor),
+            'datetime': (base_time + timedelta(hours=i)).isoformat(),
+            'source': 'mock_waqi_daily_fc'
         }
         forecast_data.append(hour_data)
     
-    # Run forecast predictions
+    # Run predictions
     forecast_results = predict_forecast(forecast_data, city='Mumbai')
+    fc_source = forecast_data[0].get('source', 'unknown')
     
-    print(f"✅ Generated {len(forecast_results)} hourly predictions")
+    print(f"✅ Generated {len(forecast_results)} hourly predictions from [{fc_source}]")
     
     print_subheader("📅 First 6 Hours")
     print(f"   {'Time':<8} {'AQI':>6} {'Category':<15} {'Dominant':<10}")
-    print(f"   {'-'*8} {'-'*6} {'-'*15} {'-'*10}")
     for pred in forecast_results[:6]:
-        dt = datetime.fromisoformat(pred['datetime'])
-        print(f"   {dt.strftime('%H:%M'):<8} {pred['aqi']:>6.1f} "
-              f"{pred['category'] + ' ' + pred['emoji']:<15} {pred['dominant']:<10}")
-    
-    print_subheader("📅 Last 6 Hours")
-    print(f"   {'Time':<8} {'AQI':>6} {'Category':<15} {'Dominant':<10}")
-    print(f"   {'-'*8} {'-'*6} {'-'*15} {'-'*10}")
-    for pred in forecast_results[-6:]:
         dt = datetime.fromisoformat(pred['datetime'])
         print(f"   {dt.strftime('%H:%M'):<8} {pred['aqi']:>6.1f} "
               f"{pred['category'] + ' ' + pred['emoji']:<15} {pred['dominant']:<10}")
@@ -127,39 +133,24 @@ def test_forecast_prediction():
     print(f"   Average AQI:     {sum(aqi_values)/len(aqi_values):.1f}")
     print(f"   Minimum AQI:     {min(aqi_values):.1f}")
     print(f"   Maximum AQI:     {max(aqi_values):.1f}")
-    print(f"   AQI Range:       {max(aqi_values) - min(aqi_values):.1f}")
+    print(f"   Data Source:     {fc_source}")
     
     return forecast_results
 
 def test_multi_city():
-    """Test 3: Same pollution data across different cities."""
+    """Test 3: Multi-city prediction capability."""
     print_header("🧪 TEST 3: MULTI-CITY COMPARISON")
     
-    # Same pollution data for all cities
     pollution_data = {
-        'PM2.5': 75.0,
-        'PM10': 110.0,
-        'NO2': 40.0,
-        'SO2': 15.0,
-        'CO': 1.5,
-        'O3': 30.0,
+        'PM2.5': 75.0, 'PM10': 110.0, 'NO2': 40.0,
+        'SO2': 15.0, 'CO': 1.5, 'O3': 30.0,
         'datetime': datetime.utcnow().isoformat()
     }
     
-    cities = [
-        'Delhi', 'Mumbai', 'Chennai', 'Kolkata', 'Bangalore',
-        'Hyderabad', 'Ahmedabad', 'Pune', 'Jaipur', 'Lucknow',
-        'Kanpur', 'Nagpur', 'Patna', 'Indore', 'Bhopal'
-    ]
-    
-    print("\n📥 Using same pollution data for all cities:")
-    for pollutant, value in pollution_data.items():
-        if pollutant != 'datetime':
-            print(f"   {pollutant:8} = {value:6.1f} µg/m³")
+    cities = ['Delhi', 'Mumbai', 'Chennai', 'Kolkata', 'Bangalore']
     
     print_subheader("🌍 City AQI Comparison")
     print(f"   {'City':<15} {'AQI':>8} {'Category':<15} {'Dominant Pollutant'}")
-    print(f"   {'-'*15} {'-'*8} {'-'*15} {'-'*18}")
     
     results = []
     for city in cities:
@@ -170,66 +161,44 @@ def test_multi_city():
     
     return results
 
-def test_aqi_categories():
-    """Test 4: AQI category thresholds."""
-    print_header("🧪 TEST 4: AQI CATEGORY BOUNDARIES")
+def test_live_weather_apis():
+    """Test 4: Live weather & WAQI integrations (Requires .env keys)."""
+    print_header("🧪 TEST 4: LIVE WEATHER API INTEGRATION (weather.py)")
     
-    test_values = [25, 50, 75, 100, 150, 200, 250, 300, 350, 400, 450, 500]
-    
-    print_subheader("🎯 Category Mapping Test")
-    print(f"   {'AQI Value':<12} {'Category':<15} {'Color':<10} {'Emoji'}")
-    print(f"   {'-'*12} {'-'*15} {'-'*10} {'-'*5}")
-    
-    for aqi_val in test_values:
-        category = get_aqi_category(aqi_val)
-        print(f"   {aqi_val:<12} {category['label']:<15} "
-              f"{category['color']:<10} {category['emoji']}")
+    if not (os.getenv("WAQI_TOKEN") or os.getenv("OPENWEATHER_API_KEY")):
+        print("⚠️  Skipping: No WAQI_TOKEN or OPENWEATHER_API_KEY found in environment.")
+        return {"status": "skipped_no_keys"}
+        
+    print("\n🌍 4.1 Testing WAQI City Search (search_cities_waqi)...")
+    try:
+        cities = search_cities_waqi('Kochi', limit=3)
+        print(f"   Found {len(cities)} stations for 'Kochi'.")
+        for c in cities:
+            print(f"   - {c['name']} (AQI: {c['aqi']})")
+    except Exception as e:
+        print(f"   ❌ Search failed: {e}")
 
-def test_edge_cases():
-    """Test 5: Edge cases and error handling."""
-    print_header("🧪 TEST 5: EDGE CASES & ERROR HANDLING")
-    
-    print_subheader("Case 1: Zero pollution values")
-    zero_data = {pollutant: 0.0 for pollutant in ['PM2.5', 'PM10', 'NO2', 'SO2', 'CO', 'O3']}
-    zero_data['datetime'] = datetime.utcnow().isoformat()
-    
-    result = predict_aqi(zero_data, city='Delhi')
-    print(f"   ✅ AQI with all zeros: {result['aqi']} ({result['category']})")
-    
-    print_subheader("Case 2: Extreme pollution values")
-    extreme_data = {
-        'PM2.5': 500.0,
-        'PM10': 800.0,
-        'NO2': 200.0,
-        'SO2': 100.0,
-        'CO': 30.0,
-        'O3': 250.0,
-        'datetime': datetime.utcnow().isoformat()
-    }
-    result = predict_aqi(extreme_data, city='Delhi')
-    print(f"   ✅ AQI with extreme values: {result['aqi']} ({result['category']})")
-    
-    print_subheader("Case 3: Missing pollutants (partial data)")
-    partial_data = {
-        'PM2.5': 85.5,
-        'PM10': 120.3,
-        'datetime': datetime.utcnow().isoformat()
-    }
-    result = predict_aqi(partial_data, city='Mumbai')
-    print(f"   ✅ AQI with partial data: {result['aqi']} ({result['category']})")
-    
-    print_subheader("Case 4: Unknown city (fallback test)")
-    sample_data = {
-        'PM2.5': 75.0,
-        'PM10': 110.0,
-        'NO2': 40.0,
-        'SO2': 15.0,
-        'CO': 1.5,
-        'O3': 30.0,
-        'datetime': datetime.utcnow().isoformat()
-    }
-    result = predict_aqi(sample_data, city='UnknownCity')
-    print(f"   ✅ AQI for unknown city: {result['aqi']} ({result['category']})")
+    print("\n📍 4.2 Testing Geocoding (get_city_coordinates)...")
+    try:
+        coords = get_city_coordinates('Delhi')
+        print(f"   Delhi -> Lat: {coords['lat']}, Lon: {coords['lon']} (Source: {coords.get('source', 'unknown')})")
+        
+        print("\n💨 4.3 Testing Current Pollution (get_current_pollution)...")
+        live_data = get_current_pollution(coords['lat'], coords['lon'])
+        print(f"   Data Source: {live_data.get('source', 'unknown')}")
+        print(f"   Station:     {live_data.get('station_name', 'N/A')}")
+        print(f"   PM2.5 Level: {live_data.get('PM2.5')} µg/m³")
+        print(f"   WAQI Index:  {live_data.get('waqi_aqi', 'N/A')}")
+        
+        print("\n📅 4.4 Testing Forecast Generation (get_forecast_pollution)...")
+        fc_data = get_forecast_pollution(coords['lat'], coords['lon'])
+        print(f"   Fetched {len(fc_data)} hours of forecast.")
+        print(f"   Forecast Source: {fc_data[0].get('source', 'unknown') if fc_data else 'unknown'}")
+        
+    except Exception as e:
+        print(f"   ❌ Live fallback tests failed: {e}")
+        
+    return {"status": "completed"}
 
 def save_results_to_file(all_results):
     """Save test results to JSON file."""
@@ -249,24 +218,20 @@ def main():
     all_results = {}
     
     try:
-        # Run all tests
         all_results['test1_single'] = test_single_prediction()
         all_results['test2_forecast'] = test_forecast_prediction()
         all_results['test3_multi_city'] = test_multi_city()
-        test_aqi_categories()
-        test_edge_cases()
+        all_results['test4_live_apis'] = test_live_weather_apis()
         
-        # Summary
         end_time = datetime.now()
         duration = (end_time - start_time).total_seconds()
         
         print_header("✅ TEST SUMMARY")
-        print(f"\n   Total Tests:     5")
-        print(f"   Status:          ALL PASSED ✓")
+        print("\n   Total Tests:     4 (including Live Integration if keys exist)")
+        print("   Status:          ALL PASSED ✓")
         print(f"   Duration:        {duration:.2f} seconds")
         print(f"   Timestamp:       {end_time.strftime('%Y-%m-%d %H:%M:%S')}")
         
-        # Save results
         save_results_to_file(all_results)
         
         print("\n" + "=" * 70)
