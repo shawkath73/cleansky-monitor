@@ -1,10 +1,10 @@
 {
   "test1_single": {
-    "aqi": 166.5,
-    "category": "Moderate",
-    "color": "#ffff00",
-    "emoji": "\ud83d\udfe0",
-    "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+    "aqi": 237.5,
+    "category": "Poor",
+    "color": "#ff7e00",
+    "emoji": "\ud83d\udd34",
+    "recommendation": "Everyone may experience effects. Limit prolonged outdoor exertion.",
     "dominant_pollutant": "PM10",
     "pollutants": {
       "PM2.5": 85.5,
@@ -29,220 +29,220 @@
       "O3": 11.8
     },
     "city": "Delhi",
-    "datetime": "2026-03-28T17:01:06.563286"
+    "datetime": "2026-03-31T05:22:59.187734"
   },
   "test2_forecast": [
     {
-      "datetime": "2026-03-28T17:01:06.629680",
-      "hour": 17,
-      "aqi": 153.3,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-03-28T18:01:06.629680",
-      "hour": 18,
-      "aqi": 155.3,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-03-28T19:01:06.629680",
-      "hour": 19,
-      "aqi": 157.4,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-03-28T20:01:06.629680",
-      "hour": 20,
-      "aqi": 159.4,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-03-28T21:01:06.629680",
-      "hour": 21,
-      "aqi": 158.3,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-03-28T22:01:06.629680",
-      "hour": 22,
-      "aqi": 159.5,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-03-28T23:01:06.629680",
-      "hour": 23,
-      "aqi": 160.8,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-03-29T00:01:06.629680",
-      "hour": 0,
-      "aqi": 162.0,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-03-29T01:01:06.629680",
-      "hour": 1,
-      "aqi": 163.2,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-03-29T02:01:06.629680",
-      "hour": 2,
-      "aqi": 164.5,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-03-29T03:01:06.629680",
-      "hour": 3,
-      "aqi": 165.7,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-03-29T04:01:06.629680",
-      "hour": 4,
-      "aqi": 167.0,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-03-29T05:01:06.629680",
+      "datetime": "2026-03-31T05:22:59.217549",
       "hour": 5,
-      "aqi": 168.2,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
+      "aqi": 213.6,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-03-29T06:01:06.629680",
+      "datetime": "2026-03-31T06:22:59.217549",
       "hour": 6,
-      "aqi": 179.5,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
+      "aqi": 224.4,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-03-29T07:01:06.629680",
+      "datetime": "2026-03-31T07:22:59.217549",
       "hour": 7,
-      "aqi": 181.5,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
+      "aqi": 223.8,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-03-29T08:01:06.629680",
+      "datetime": "2026-03-31T08:22:59.217549",
       "hour": 8,
-      "aqi": 183.5,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
+      "aqi": 240.9,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-03-29T09:01:06.629680",
+      "datetime": "2026-03-31T09:22:59.217549",
       "hour": 9,
-      "aqi": 185.5,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
+      "aqi": 241.1,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-03-29T10:01:06.629680",
+      "datetime": "2026-03-31T10:22:59.217549",
       "hour": 10,
-      "aqi": 187.6,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
+      "aqi": 250.3,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-03-29T11:01:06.629680",
+      "datetime": "2026-03-31T11:22:59.217549",
       "hour": 11,
-      "aqi": 189.6,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
+      "aqi": 246.0,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-03-29T12:01:06.629680",
+      "datetime": "2026-03-31T12:22:59.217549",
       "hour": 12,
-      "aqi": 191.6,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
+      "aqi": 245.6,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-03-29T13:01:06.629680",
+      "datetime": "2026-03-31T13:22:59.217549",
       "hour": 13,
-      "aqi": 193.6,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
+      "aqi": 233.4,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-03-29T14:01:06.629680",
+      "datetime": "2026-03-31T14:22:59.217549",
       "hour": 14,
-      "aqi": 195.6,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
+      "aqi": 220.5,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-03-29T15:01:06.629680",
+      "datetime": "2026-03-31T15:22:59.217549",
       "hour": 15,
-      "aqi": 197.6,
+      "aqi": 231.5,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-31T16:22:59.217549",
+      "hour": 16,
+      "aqi": 229.7,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-31T17:22:59.217549",
+      "hour": 17,
+      "aqi": 202.2,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-31T18:22:59.217549",
+      "hour": 18,
+      "aqi": 206.3,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-31T19:22:59.217549",
+      "hour": 19,
+      "aqi": 205.7,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-31T20:22:59.217549",
+      "hour": 20,
+      "aqi": 194.7,
       "category": "Moderate",
       "color": "#ffff00",
       "emoji": "\ud83d\udfe0",
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-03-29T16:01:06.629680",
-      "hour": 16,
-      "aqi": 199.6,
+      "datetime": "2026-03-31T21:22:59.217549",
+      "hour": 21,
+      "aqi": 225.9,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-31T22:22:59.217549",
+      "hour": 22,
+      "aqi": 229.5,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-03-31T23:22:59.217549",
+      "hour": 23,
+      "aqi": 223.1,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-01T00:22:59.217549",
+      "hour": 0,
+      "aqi": 198.5,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-01T01:22:59.217549",
+      "hour": 1,
+      "aqi": 200.1,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-01T02:22:59.217549",
+      "hour": 2,
+      "aqi": 198.9,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-01T03:22:59.217549",
+      "hour": 3,
+      "aqi": 200.6,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-01T04:22:59.217549",
+      "hour": 4,
+      "aqi": 196.8,
       "category": "Moderate",
       "color": "#ffff00",
       "emoji": "\ud83d\udfe0",
@@ -251,11 +251,11 @@
   ],
   "test3_multi_city": [
     {
-      "aqi": 161.1,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+      "aqi": 231.2,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "recommendation": "Everyone may experience effects. Limit prolonged outdoor exertion.",
       "dominant_pollutant": "PM10",
       "pollutants": {
         "PM2.5": 75.0,
@@ -280,14 +280,14 @@
         "O3": 11.0
       },
       "city": "Delhi",
-      "datetime": "2026-03-28T17:01:07.164408"
+      "datetime": "2026-03-31T05:22:59.543848"
     },
     {
-      "aqi": 161.1,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+      "aqi": 229.8,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "recommendation": "Everyone may experience effects. Limit prolonged outdoor exertion.",
       "dominant_pollutant": "PM10",
       "pollutants": {
         "PM2.5": 75.0,
@@ -312,14 +312,14 @@
         "O3": 11.0
       },
       "city": "Mumbai",
-      "datetime": "2026-03-28T17:01:07.164408"
+      "datetime": "2026-03-31T05:22:59.543848"
     },
     {
-      "aqi": 161.1,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+      "aqi": 233.5,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "recommendation": "Everyone may experience effects. Limit prolonged outdoor exertion.",
       "dominant_pollutant": "PM10",
       "pollutants": {
         "PM2.5": 75.0,
@@ -344,14 +344,14 @@
         "O3": 11.0
       },
       "city": "Chennai",
-      "datetime": "2026-03-28T17:01:07.164408"
+      "datetime": "2026-03-31T05:22:59.543848"
     },
     {
-      "aqi": 161.1,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+      "aqi": 229.7,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "recommendation": "Everyone may experience effects. Limit prolonged outdoor exertion.",
       "dominant_pollutant": "PM10",
       "pollutants": {
         "PM2.5": 75.0,
@@ -376,14 +376,14 @@
         "O3": 11.0
       },
       "city": "Kolkata",
-      "datetime": "2026-03-28T17:01:07.164408"
+      "datetime": "2026-03-31T05:22:59.543848"
     },
     {
-      "aqi": 161.1,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+      "aqi": 239.5,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "recommendation": "Everyone may experience effects. Limit prolonged outdoor exertion.",
       "dominant_pollutant": "PM10",
       "pollutants": {
         "PM2.5": 75.0,
@@ -408,14 +408,14 @@
         "O3": 11.0
       },
       "city": "Bangalore",
-      "datetime": "2026-03-28T17:01:07.164408"
+      "datetime": "2026-03-31T05:22:59.543848"
     },
     {
-      "aqi": 161.1,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+      "aqi": 229.1,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "recommendation": "Everyone may experience effects. Limit prolonged outdoor exertion.",
       "dominant_pollutant": "PM10",
       "pollutants": {
         "PM2.5": 75.0,
@@ -440,14 +440,14 @@
         "O3": 11.0
       },
       "city": "Hyderabad",
-      "datetime": "2026-03-28T17:01:07.164408"
+      "datetime": "2026-03-31T05:22:59.543848"
     },
     {
-      "aqi": 161.1,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+      "aqi": 239.5,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "recommendation": "Everyone may experience effects. Limit prolonged outdoor exertion.",
       "dominant_pollutant": "PM10",
       "pollutants": {
         "PM2.5": 75.0,
@@ -472,14 +472,14 @@
         "O3": 11.0
       },
       "city": "Ahmedabad",
-      "datetime": "2026-03-28T17:01:07.164408"
+      "datetime": "2026-03-31T05:22:59.543848"
     },
     {
-      "aqi": 161.1,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+      "aqi": 226.3,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "recommendation": "Everyone may experience effects. Limit prolonged outdoor exertion.",
       "dominant_pollutant": "PM10",
       "pollutants": {
         "PM2.5": 75.0,
@@ -504,14 +504,14 @@
         "O3": 11.0
       },
       "city": "Pune",
-      "datetime": "2026-03-28T17:01:07.164408"
+      "datetime": "2026-03-31T05:22:59.543848"
     },
     {
-      "aqi": 161.1,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+      "aqi": 228.0,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "recommendation": "Everyone may experience effects. Limit prolonged outdoor exertion.",
       "dominant_pollutant": "PM10",
       "pollutants": {
         "PM2.5": 75.0,
@@ -536,14 +536,14 @@
         "O3": 11.0
       },
       "city": "Jaipur",
-      "datetime": "2026-03-28T17:01:07.164408"
+      "datetime": "2026-03-31T05:22:59.543848"
     },
     {
-      "aqi": 161.1,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+      "aqi": 239.5,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "recommendation": "Everyone may experience effects. Limit prolonged outdoor exertion.",
       "dominant_pollutant": "PM10",
       "pollutants": {
         "PM2.5": 75.0,
@@ -568,14 +568,14 @@
         "O3": 11.0
       },
       "city": "Lucknow",
-      "datetime": "2026-03-28T17:01:07.164408"
+      "datetime": "2026-03-31T05:22:59.543848"
     },
     {
-      "aqi": 161.1,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+      "aqi": 239.5,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "recommendation": "Everyone may experience effects. Limit prolonged outdoor exertion.",
       "dominant_pollutant": "PM10",
       "pollutants": {
         "PM2.5": 75.0,
@@ -600,14 +600,14 @@
         "O3": 11.0
       },
       "city": "Kanpur",
-      "datetime": "2026-03-28T17:01:07.164408"
+      "datetime": "2026-03-31T05:22:59.543848"
     },
     {
-      "aqi": 161.1,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+      "aqi": 239.5,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "recommendation": "Everyone may experience effects. Limit prolonged outdoor exertion.",
       "dominant_pollutant": "PM10",
       "pollutants": {
         "PM2.5": 75.0,
@@ -632,14 +632,14 @@
         "O3": 11.0
       },
       "city": "Nagpur",
-      "datetime": "2026-03-28T17:01:07.164408"
+      "datetime": "2026-03-31T05:22:59.543848"
     },
     {
-      "aqi": 161.1,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+      "aqi": 239.5,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "recommendation": "Everyone may experience effects. Limit prolonged outdoor exertion.",
       "dominant_pollutant": "PM10",
       "pollutants": {
         "PM2.5": 75.0,
@@ -664,14 +664,14 @@
         "O3": 11.0
       },
       "city": "Patna",
-      "datetime": "2026-03-28T17:01:07.164408"
+      "datetime": "2026-03-31T05:22:59.543848"
     },
     {
-      "aqi": 161.1,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+      "aqi": 239.5,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "recommendation": "Everyone may experience effects. Limit prolonged outdoor exertion.",
       "dominant_pollutant": "PM10",
       "pollutants": {
         "PM2.5": 75.0,
@@ -696,14 +696,14 @@
         "O3": 11.0
       },
       "city": "Indore",
-      "datetime": "2026-03-28T17:01:07.164408"
+      "datetime": "2026-03-31T05:22:59.543848"
     },
     {
-      "aqi": 161.1,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+      "aqi": 239.5,
+      "category": "Poor",
+      "color": "#ff7e00",
+      "emoji": "\ud83d\udd34",
+      "recommendation": "Everyone may experience effects. Limit prolonged outdoor exertion.",
       "dominant_pollutant": "PM10",
       "pollutants": {
         "PM2.5": 75.0,
@@ -728,7 +728,7 @@
         "O3": 11.0
       },
       "city": "Bhopal",
-      "datetime": "2026-03-28T17:01:07.164408"
+      "datetime": "2026-03-31T05:22:59.543848"
     }
   ]
 }
