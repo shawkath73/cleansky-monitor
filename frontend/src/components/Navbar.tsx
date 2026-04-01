@@ -6,7 +6,14 @@ import { useCity } from "@/context/CityContext";
 import { fetchCities } from "@/lib/api";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CloudSun, MapPin, ChevronDown, Menu, X, Building2 } from "lucide-react";
+import {
+  CloudSun,
+  MapPin,
+  ChevronDown,
+  Menu,
+  X,
+  Building2,
+} from "lucide-react";
 
 const NAV_LINKS = [
   { href: "/", label: "Dashboard" },
@@ -27,7 +34,13 @@ export default function Navbar() {
 
   useEffect(() => {
     fetchCities()
-      .then((res) => setCities(res.cities))
+      .then((res) => {
+        const cityNames = res.cities.map(
+          (c: { city: string; [key: string]: unknown } | string) =>
+            typeof c === "string" ? c : c.city,
+        );
+        setCities(Array.from(new Set(cityNames)));
+      })
       .catch(() =>
         setCities([
           "Delhi",
@@ -40,14 +53,17 @@ export default function Navbar() {
           "Pune",
           "Jaipur",
           "Lucknow",
-        ])
+        ]),
       );
   }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     }
@@ -55,12 +71,16 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const filtered = cities.filter((c) =>
-    typeof c === 'string' && c.toLowerCase().includes(search.toLowerCase())
+  const filtered = cities.filter(
+    (c) =>
+      typeof c === "string" && c.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
-    <nav className="sticky top-0 z-50 glass border-b border-[#1E293B]/30" style={{ borderRadius: 0 }}>
+    <nav
+      className="sticky top-0 z-50 glass border-b border-[#1E293B]/30"
+      style={{ borderRadius: 0 }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -79,10 +99,11 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${active
-                    ? "bg-[#7C9CFF]/15 text-[#7C9CFF]"
-                    : "text-[#94A3B8] hover:text-[#E2E8F0] hover:bg-[#1E293B]/30"
-                    }`}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    active
+                      ? "bg-[#7C9CFF]/15 text-[#7C9CFF]"
+                      : "text-[#94A3B8] hover:text-[#E2E8F0] hover:bg-[#1E293B]/30"
+                  }`}
                 >
                   {link.label}
                 </Link>
@@ -130,10 +151,11 @@ export default function Navbar() {
                     {filtered.map((c) => (
                       <li key={c}>
                         <button
-                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center gap-2 ${c === city
-                            ? "bg-[#7C9CFF]/15 text-[#7C9CFF]"
-                            : "text-[#94A3B8] hover:bg-[#1E293B]/30 hover:text-[#E2E8F0]"
-                            }`}
+                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center gap-2 ${
+                            c === city
+                              ? "bg-[#7C9CFF]/15 text-[#7C9CFF]"
+                              : "text-[#94A3B8] hover:bg-[#1E293B]/30 hover:text-[#E2E8F0]"
+                          }`}
                           onClick={() => {
                             setCity(c);
                             setOpen(false);
@@ -146,7 +168,9 @@ export default function Navbar() {
                       </li>
                     ))}
                     {filtered.length === 0 && (
-                      <li className="px-4 py-3 text-sm text-[#64748B]">No cities found</li>
+                      <li className="px-4 py-3 text-sm text-[#64748B]">
+                        No cities found
+                      </li>
                     )}
                   </ul>
                 </motion.div>
@@ -203,10 +227,11 @@ export default function Navbar() {
                       key={link.href}
                       href={link.href}
                       onClick={() => setMobileOpen(false)}
-                      className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${active
-                        ? "bg-[#7C9CFF]/15 text-[#7C9CFF]"
-                        : "text-[#94A3B8] hover:text-[#E2E8F0] hover:bg-[#1E293B]/30"
-                        }`}
+                      className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                        active
+                          ? "bg-[#7C9CFF]/15 text-[#7C9CFF]"
+                          : "text-[#94A3B8] hover:text-[#E2E8F0] hover:bg-[#1E293B]/30"
+                      }`}
                     >
                       {link.label}
                     </Link>
@@ -217,7 +242,9 @@ export default function Navbar() {
                 <div className="sm:hidden mt-3 px-2">
                   <div className="flex items-center gap-2 mb-2 px-2">
                     <MapPin className="w-4 h-4 text-[#7C9CFF]" />
-                    <span className="text-xs text-[#94A3B8] uppercase tracking-widest font-medium">Select City</span>
+                    <span className="text-xs text-[#94A3B8] uppercase tracking-widest font-medium">
+                      Select City
+                    </span>
                   </div>
                   <input
                     type="text"
@@ -230,10 +257,11 @@ export default function Navbar() {
                     {filtered.map((c) => (
                       <li key={c}>
                         <button
-                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center gap-2 ${c === city
-                            ? "bg-[#7C9CFF]/15 text-[#7C9CFF]"
-                            : "text-[#94A3B8] hover:bg-[#1E293B]/30 hover:text-[#E2E8F0]"
-                            }`}
+                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center gap-2 ${
+                            c === city
+                              ? "bg-[#7C9CFF]/15 text-[#7C9CFF]"
+                              : "text-[#94A3B8] hover:bg-[#1E293B]/30 hover:text-[#E2E8F0]"
+                          }`}
                           onClick={() => {
                             setCity(c);
                             setSearch("");
@@ -246,7 +274,9 @@ export default function Navbar() {
                       </li>
                     ))}
                     {filtered.length === 0 && (
-                      <li className="px-4 py-3 text-sm text-[#64748B]">No cities found</li>
+                      <li className="px-4 py-3 text-sm text-[#64748B]">
+                        No cities found
+                      </li>
                     )}
                   </ul>
                 </div>

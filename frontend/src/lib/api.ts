@@ -47,7 +47,7 @@ export async function fetchPollutants(city: string) {
 export async function fetchCities() {
   return fetchJSON<{
     success: boolean;
-    cities: string[];
+    cities: { city: string; state?: string; lat: number; lon: number }[];
   }>(`${API_BASE}/cities`);
 }
 
