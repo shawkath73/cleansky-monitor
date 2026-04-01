@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCity } from "@/context/CityContext";
-import { fetchCities } from "@/lib/api";
-import { useState, useEffect, useRef } from "react";
+import { fetchCities, searchCities } from "@/lib/api";
+import type { CitySearchResult } from "@/lib/api";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CloudSun,
@@ -13,6 +14,8 @@ import {
   Menu,
   X,
   Building2,
+  Loader2,
+  Radio,
 } from "lucide-react";
 
 const NAV_LINKS = [
@@ -22,40 +25,151 @@ const NAV_LINKS = [
   { href: "/health", label: "Health" },
 ];
 
+// Debounce hook
+function useDebounce(value: string, delay: number) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  return debounced;
+}
+
+// AQI badge color helper
+function getAQIBadgeColor(aqi: number | string): string {
+  const val = typeof aqi === "string" ? parseInt(aqi, 10) : aqi;
+  if (isNaN(val) || val <= 0) return "#64748B";
+  if (val <= 50) return "#22C55E";
+  if (val <= 100) return "#EAB308";
+  if (val <= 200) return "#F97316";
+  if (val <= 300) return "#EF4444";
+  return "#7C3AED";
+}
+
+// City item component (shared between desktop and mobile)
+function CityItem({
+  result,
+  isActive,
+  onSelect,
+}: {
+  result: CitySearchResult;
+  isActive: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center gap-3 ${
+        isActive
+          ? "bg-[#7C9CFF]/15 text-[#7C9CFF]"
+          : "text-[#94A3B8] hover:bg-[#1E293B]/30 hover:text-[#E2E8F0]"
+      }`}
+      onClick={onSelect}
+    >
+      <Building2 className="w-3.5 h-3.5 opacity-50 shrink-0" />
+      <div className="flex-1 min-w-0">
+        <span className="block truncate font-medium">{result.city}</span>
+        {result.state && (
+          <span className="block text-xs text-[#64748B] truncate">
+            {result.state}
+          </span>
+        )}
+      </div>
+      {result.station_name && (
+        <div className="flex items-center gap-1.5 shrink-0">
+          <Radio className="w-3 h-3 text-[#64748B]" />
+          <span
+            className="text-xs font-mono px-1.5 py-0.5 rounded-md"
+            style={{
+              backgroundColor: `${getAQIBadgeColor(result.aqi)}20`,
+              color: getAQIBadgeColor(result.aqi),
+            }}
+          >
+            {result.aqi}
+          </span>
+        </div>
+      )}
+    </button>
+  );
+}
+
 export default function Navbar() {
   const pathname = usePathname();
   const { city, setCity } = useCity();
 
-  const [cities, setCities] = useState<string[]>([]);
+  // Default cities (loaded once)
+  const [defaultCities, setDefaultCities] = useState<CitySearchResult[]>([]);
+  // Dynamic search results
+  const [searchResults, setSearchResults] = useState<CitySearchResult[]>([]);
   const [search, setSearch] = useState("");
+  const [searching, setSearching] = useState(false);
   const [open, setOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const debouncedSearch = useDebounce(search, 300);
+
+  // Load default cities on mount
   useEffect(() => {
     fetchCities()
       .then((res) => {
-        const cityNames = res.cities.map(
-          (c: { city: string; [key: string]: unknown } | string) =>
-            typeof c === "string" ? c : c.city,
-        );
-        setCities(Array.from(new Set(cityNames)));
+        const defaults: CitySearchResult[] = res.cities.map((c) => ({
+          city: typeof c === "string" ? c : c.city,
+          state: typeof c === "string" ? "" : c.state || "",
+          lat: typeof c === "string" ? 0 : c.lat,
+          lon: typeof c === "string" ? 0 : c.lon,
+          station_name: "",
+          aqi: "-",
+        }));
+        setDefaultCities(defaults);
       })
-      .catch(() =>
-        setCities([
-          "Delhi",
-          "Mumbai",
-          "Chennai",
-          "Kolkata",
-          "Bangalore",
-          "Hyderabad",
-          "Ahmedabad",
-          "Pune",
-          "Jaipur",
-          "Lucknow",
-        ]),
-      );
+      .catch(() => {
+        setDefaultCities(
+          ["Delhi", "Mumbai", "Chennai", "Kolkata", "Bangalore",
+           "Hyderabad", "Ahmedabad", "Pune", "Jaipur", "Lucknow"].map(
+            (name) => ({
+              city: name, state: "", lat: 0, lon: 0,
+              station_name: "", aqi: "-",
+            })
+          )
+        );
+      });
   }, []);
+
+  // Dynamic search when user types
+  useEffect(() => {
+    if (debouncedSearch.length < 2) {
+      // Clear state asynchronously to avoid React cascading render warnings
+      const t = setTimeout(() => {
+        setSearchResults([]);
+        setSearching(false);
+      }, 0);
+      return () => clearTimeout(t);
+    }
+
+    let cancelled = false;
+    const t2 = setTimeout(() => {
+      if (!cancelled) setSearching(true);
+    }, 0);
+
+    searchCities(debouncedSearch)
+      .then((res) => {
+        if (!cancelled) {
+          setSearchResults(res.results);
+          setSearching(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setSearchResults([]);
+          setSearching(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+      clearTimeout(t2);
+    };
+  }, [debouncedSearch]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -71,9 +185,19 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const filtered = cities.filter(
-    (c) =>
-      typeof c === "string" && c.toLowerCase().includes(search.toLowerCase()),
+  // Which list to show: search results if actively searching, otherwise defaults
+  const displayList =
+    search.length >= 2 ? searchResults : defaultCities;
+
+  const handleSelect = useCallback(
+    (name: string) => {
+      setCity(name);
+      setOpen(false);
+      setMobileOpen(false);
+      setSearch("");
+      setSearchResults([]);
+    },
+    [setCity]
   );
 
   return (
@@ -111,7 +235,7 @@ export default function Navbar() {
             })}
           </div>
 
-          {/* City search */}
+          {/* City search — Desktop */}
           <div className="relative hidden sm:block" ref={dropdownRef}>
             <div
               className="flex items-center gap-2 glass-light px-3 py-2 cursor-pointer min-w-[180px]"
@@ -135,41 +259,54 @@ export default function Navbar() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.96 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
-                  className="absolute right-0 top-12 w-64 glass border border-[#1E293B]/50 rounded-xl overflow-hidden shadow-2xl"
+                  className="absolute right-0 top-12 w-80 glass border border-[#1E293B]/50 rounded-xl overflow-hidden shadow-2xl"
                 >
                   <div className="p-2">
-                    <input
-                      type="text"
-                      placeholder="Search city…"
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      className="w-full bg-[#020617] border border-[#1E293B] rounded-lg px-3 py-2 text-sm text-[#E2E8F0] placeholder-[#64748B] outline-none focus:border-[#7C9CFF] transition-colors"
-                      autoFocus
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Search any Indian city…"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="w-full bg-[#020617] border border-[#1E293B] rounded-lg px-3 py-2 text-sm text-[#E2E8F0] placeholder-[#64748B] outline-none focus:border-[#7C9CFF] transition-colors pr-8"
+                        autoFocus
+                      />
+                      {searching && (
+                        <Loader2 className="absolute right-3 top-2.5 w-4 h-4 text-[#7C9CFF] animate-spin" />
+                      )}
+                    </div>
                   </div>
-                  <ul className="max-h-52 overflow-y-auto">
-                    {filtered.map((c) => (
-                      <li key={c}>
-                        <button
-                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center gap-2 ${
-                            c === city
-                              ? "bg-[#7C9CFF]/15 text-[#7C9CFF]"
-                              : "text-[#94A3B8] hover:bg-[#1E293B]/30 hover:text-[#E2E8F0]"
-                          }`}
-                          onClick={() => {
-                            setCity(c);
-                            setOpen(false);
-                            setSearch("");
-                          }}
-                        >
-                          <Building2 className="w-3.5 h-3.5 opacity-50" />
-                          {c}
-                        </button>
+
+                  {/* Section label */}
+                  <div className="px-4 py-1.5">
+                    <span className="text-[10px] text-[#64748B] uppercase tracking-widest font-medium">
+                      {search.length >= 2
+                        ? `Search results`
+                        : "Popular cities"}
+                    </span>
+                  </div>
+
+                  <ul className="max-h-64 overflow-y-auto">
+                    {displayList.map((result, i) => (
+                      <li key={`${result.city}-${result.lat}-${i}`}>
+                        <CityItem
+                          result={result}
+                          isActive={result.city === city}
+                          onSelect={() => handleSelect(result.city)}
+                        />
                       </li>
                     ))}
-                    {filtered.length === 0 && (
+                    {displayList.length === 0 && !searching && (
                       <li className="px-4 py-3 text-sm text-[#64748B]">
-                        No cities found
+                        {search.length >= 2
+                          ? "No cities found"
+                          : "Type to search…"}
+                      </li>
+                    )}
+                    {searching && displayList.length === 0 && (
+                      <li className="px-4 py-3 text-sm text-[#64748B] flex items-center gap-2">
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        Searching…
                       </li>
                     )}
                   </ul>
@@ -238,7 +375,7 @@ export default function Navbar() {
                   );
                 })}
 
-                {/* City selector — only shown in mobile drawer on xs screens */}
+                {/* City selector — mobile */}
                 <div className="sm:hidden mt-3 px-2">
                   <div className="flex items-center gap-2 mb-2 px-2">
                     <MapPin className="w-4 h-4 text-[#7C9CFF]" />
@@ -246,36 +383,39 @@ export default function Navbar() {
                       Select City
                     </span>
                   </div>
-                  <input
-                    type="text"
-                    placeholder="Search city…"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="w-full bg-[#020617] border border-[#1E293B] rounded-lg px-3 py-2 text-sm text-[#E2E8F0] placeholder-[#64748B] outline-none focus:border-[#7C9CFF] transition-colors mb-1"
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search any Indian city…"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      className="w-full bg-[#020617] border border-[#1E293B] rounded-lg px-3 py-2 text-sm text-[#E2E8F0] placeholder-[#64748B] outline-none focus:border-[#7C9CFF] transition-colors mb-1 pr-8"
+                    />
+                    {searching && (
+                      <Loader2 className="absolute right-3 top-2.5 w-4 h-4 text-[#7C9CFF] animate-spin" />
+                    )}
+                  </div>
                   <ul className="max-h-44 overflow-y-auto rounded-lg border border-[#1E293B]/40 bg-[#020617]/80">
-                    {filtered.map((c) => (
-                      <li key={c}>
-                        <button
-                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center gap-2 ${
-                            c === city
-                              ? "bg-[#7C9CFF]/15 text-[#7C9CFF]"
-                              : "text-[#94A3B8] hover:bg-[#1E293B]/30 hover:text-[#E2E8F0]"
-                          }`}
-                          onClick={() => {
-                            setCity(c);
-                            setSearch("");
-                            setMobileOpen(false);
-                          }}
-                        >
-                          <Building2 className="w-3.5 h-3.5 opacity-50" />
-                          {c}
-                        </button>
+                    {displayList.map((result, i) => (
+                      <li key={`mobile-${result.city}-${result.lat}-${i}`}>
+                        <CityItem
+                          result={result}
+                          isActive={result.city === city}
+                          onSelect={() => handleSelect(result.city)}
+                        />
                       </li>
                     ))}
-                    {filtered.length === 0 && (
+                    {displayList.length === 0 && !searching && (
                       <li className="px-4 py-3 text-sm text-[#64748B]">
-                        No cities found
+                        {search.length >= 2
+                          ? "No cities found"
+                          : "Type to search…"}
+                      </li>
+                    )}
+                    {searching && displayList.length === 0 && (
+                      <li className="px-4 py-3 text-sm text-[#64748B] flex items-center gap-2">
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        Searching…
                       </li>
                     )}
                   </ul>

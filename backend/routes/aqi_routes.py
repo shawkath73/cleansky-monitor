@@ -3,7 +3,10 @@ from services.weather import (
     get_current_pollution,
     get_forecast_pollution,
     get_city_coordinates,
-    search_cities_waqi,          # ← new
+)
+from services.geocoding import (
+    search_city_with_station,
+    get_default_cities,
 )
 from services.prediction import predict_aqi, predict_forecast
 from services.database import save_aqi_reading, save_forecast
@@ -16,10 +19,6 @@ aqi_bp = Blueprint('aqi', __name__)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 with open(os.path.join(BASE_DIR, 'models', 'model_metadata.json')) as f:
     metadata = json.load(f)
-
-# Load Indian cities database (lat/lon + state)
-with open(os.path.join(BASE_DIR, 'data', 'indian_cities.json')) as f:
-    INDIAN_CITIES = json.load(f)
 
 
 # ─────────────────────────────────────────
@@ -240,44 +239,40 @@ def pollutants():
 
 # ─────────────────────────────────────────
 # GET /api/cities
-# GET /api/cities?state=Kerala
-# Returns all Indian cities with lat/lon
+# Returns default popular Indian cities
 # ─────────────────────────────────────────
 @aqi_bp.route('/cities', methods=['GET'])
 def cities():
-    state_filter = request.args.get('state', '').strip()
-
-    if state_filter:
-        filtered = [c for c in INDIAN_CITIES if c['state'].lower() == state_filter.lower()]
-    else:
-        filtered = INDIAN_CITIES
-
+    defaults = get_default_cities()
     return jsonify({
         'success': True,
-        'count':   len(filtered),
-        'cities':  filtered
+        'count':   len(defaults),
+        'cities':  defaults
     }), 200
 
 
 # ─────────────────────────────────────────
 # GET /api/search-cities?q=kochi
-# WAQI-powered station search (all India)
+# Geocode + WAQI station matching search
 # ─────────────────────────────────────────
 @aqi_bp.route('/search-cities', methods=['GET'])
 def search_cities():
     """
-    Search Indian AQI stations by keyword via WAQI.
-    Returns station name, lat/lon, and live AQI.
-    Use this for frontend city autocomplete.
+    Search Indian cities by keyword using geocode.maps.co
+    and match with nearest WAQI monitoring station.
+    Returns city name, state, lat/lon, station name, and live AQI.
     """
     try:
         keyword = request.args.get('q', '').strip()
-        limit   = int(request.args.get('limit', 10))
+        limit   = int(request.args.get('limit', 5))
 
         if not keyword:
             return jsonify({'success': False, 'error': 'Query param ?q= is required'}), 400
 
-        results = search_cities_waqi(keyword, limit=limit)
+        if len(keyword) < 2:
+            return jsonify({'success': True, 'query': keyword, 'count': 0, 'results': []}), 200
+
+        results = search_city_with_station(keyword, limit=limit)
 
         return jsonify({
             'success': True,

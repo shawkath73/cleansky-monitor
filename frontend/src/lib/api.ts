@@ -51,6 +51,24 @@ export async function fetchCities() {
   }>(`${API_BASE}/cities`);
 }
 
+export interface CitySearchResult {
+  city: string;
+  state: string;
+  lat: number;
+  lon: number;
+  station_name: string;
+  aqi: number | string;
+}
+
+export async function searchCities(query: string) {
+  return fetchJSON<{
+    success: boolean;
+    query: string;
+    count: number;
+    results: CitySearchResult[];
+  }>(`${API_BASE}/search-cities?q=${encodeURIComponent(query)}`);
+}
+
 /* ── Auth ─────────────────────────────────── */
 
 export async function loginUser(email: string, password: string) {
