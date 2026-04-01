@@ -67,7 +67,7 @@ function CityItem({
     >
       <Building2 className="w-3.5 h-3.5 opacity-50 shrink-0" />
       <div className="flex-1 min-w-0">
-        <span className="block truncate font-medium">{result.city}</span>
+        <span className="block truncate font-medium">{result.city || result.name}</span>
         {result.state && (
           <span className="block text-xs text-[#64748B] truncate">
             {result.state}
@@ -186,8 +186,14 @@ export default function Navbar() {
   }, []);
 
   // Which list to show: search results if actively searching, otherwise defaults
+  const filteredDefaults = defaultCities.filter((c) =>
+    c.city.toLowerCase().includes(search.toLowerCase())
+  );
+
   const displayList =
-    search.length >= 2 ? searchResults : defaultCities;
+    search.length >= 2 && searchResults.length > 0
+      ? searchResults
+      : filteredDefaults;
 
   const handleSelect = useCallback(
     (name: string) => {

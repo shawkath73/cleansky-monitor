@@ -58,6 +58,7 @@ export interface CitySearchResult {
   lon: number;
   station_name: string;
   aqi: number | string;
+  name?: string;
 }
 
 export async function searchCities(query: string) {
