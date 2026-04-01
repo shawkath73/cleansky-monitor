@@ -56,7 +56,7 @@ export default function Navbar() {
   }, []);
 
   const filtered = cities.filter((c) =>
-    c.toLowerCase().includes(search.toLowerCase())
+    typeof c === 'string' && c.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
