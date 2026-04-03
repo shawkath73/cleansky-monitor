@@ -20,6 +20,7 @@ import {
 
 const NAV_LINKS = [
   { href: "/", label: "Dashboard" },
+  { href: "/map", label: "Map" },
   { href: "/forecast", label: "Forecast" },
   { href: "/pollutants", label: "Pollutants" },
   { href: "/health", label: "Health" },
