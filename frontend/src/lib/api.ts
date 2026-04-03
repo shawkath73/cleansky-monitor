@@ -11,20 +11,24 @@ async function fetchJSON<T>(url: string, options?: RequestInit): Promise<T> {
 
 /* ── AQI ─────────────────────────────────── */
 
-export async function fetchCurrentAQI(city: string) {
+export async function fetchCurrentAQI(city: string, lat?: number, lon?: number) {
+  let url = `${API_BASE}/current-aqi?city=${encodeURIComponent(city)}`;
+  if (lat !== undefined && lon !== undefined) url += `&lat=${lat}&lon=${lon}`;
   return fetchJSON<{
     success: boolean;
     data: import("./types").AQIData;
-  }>(`${API_BASE}/current-aqi?city=${encodeURIComponent(city)}`);
+  }>(url);
 }
 
-export async function fetchForecast(city: string) {
+export async function fetchForecast(city: string, lat?: number, lon?: number) {
+  let url = `${API_BASE}/forecast?city=${encodeURIComponent(city)}`;
+  if (lat !== undefined && lon !== undefined) url += `&lat=${lat}&lon=${lon}`;
   return fetchJSON<{
     success: boolean;
     city: string;
     summary: import("./types").ForecastSummary;
     forecast: import("./types").ForecastItem[];
-  }>(`${API_BASE}/forecast?city=${encodeURIComponent(city)}`);
+  }>(url);
 }
 
 export async function fetchHealthRisk(aqi: number) {
@@ -34,14 +38,16 @@ export async function fetchHealthRisk(aqi: number) {
   }>(`${API_BASE}/health-risk?aqi=${aqi}`);
 }
 
-export async function fetchPollutants(city: string) {
+export async function fetchPollutants(city: string, lat?: number, lon?: number) {
+  let url = `${API_BASE}/pollutants?city=${encodeURIComponent(city)}`;
+  if (lat !== undefined && lon !== undefined) url += `&lat=${lat}&lon=${lon}`;
   return fetchJSON<{
     success: boolean;
     city: string;
     current_aqi: number;
     dominant_pollutant: string;
     pollutants: import("./types").PollutantDetail[];
-  }>(`${API_BASE}/pollutants?city=${encodeURIComponent(city)}`);
+  }>(url);
 }
 
 export async function fetchCities() {

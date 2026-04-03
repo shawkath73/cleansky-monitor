@@ -49,7 +49,7 @@ const STAT_ICONS: Record<string, React.ReactNode> = {
 };
 
 export default function ForecastPage() {
-  const { city } = useCity();
+  const { city, lat, lon } = useCity();
   const [forecast, setForecast] = useState<ForecastItem[]>([]);
   const [summary, setSummary] = useState<ForecastSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,7 +63,7 @@ export default function ForecastPage() {
       setError(null);
 
       try {
-        const res = await fetchForecast(city);
+        const res = await fetchForecast(city, lat, lon);
         if (cancelled) return;
         setForecast(res.forecast);
         setSummary(res.summary);
@@ -79,7 +79,7 @@ export default function ForecastPage() {
     return () => {
       cancelled = true;
     };
-  }, [city]);
+  }, [city, lat, lon]);
 
   if (loading) {
     return (

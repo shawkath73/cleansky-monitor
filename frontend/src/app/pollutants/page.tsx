@@ -47,7 +47,7 @@ const fadeUp = {
 };
 
 export default function PollutantsPage() {
-  const { city } = useCity();
+  const { city, lat, lon } = useCity();
   const [pollutants, setPollutants] = useState<PollutantDetail[]>([]);
   const [dominantPollutant, setDominantPollutant] = useState("");
   const [, setCurrentAQI] = useState(0);
@@ -62,7 +62,7 @@ export default function PollutantsPage() {
       setError(null);
 
       try {
-        const res = await fetchPollutants(city);
+        const res = await fetchPollutants(city, lat, lon);
         if (cancelled) return;
         setPollutants(res.pollutants);
         setDominantPollutant(res.dominant_pollutant);
@@ -79,7 +79,7 @@ export default function PollutantsPage() {
     return () => {
       cancelled = true;
     };
-  }, [city]);
+  }, [city, lat, lon]);
 
   if (loading) return <DashboardSkeleton />;
 

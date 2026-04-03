@@ -179,11 +179,17 @@ def predict_aqi(pollution_data: dict, city: str = 'Delhi') -> dict:
     no2   = float(pollution_data.get('NO2',   0))
     epa_aqi = max(pm25_to_aqi(pm25), pm10_to_aqi(pm10), no2_to_aqi(no2))
 
-    # Use whichever is higher — EPA is reliable fallback
-    predicted_aqi = max(ml_aqi, epa_aqi)
+    # Use whichever is higher — EPA and WAQI are reliable fallbacks
+    try:
+        waqi_val = pollution_data.get('waqi_aqi', 0)
+        waqi_aqi = float(waqi_val) if waqi_val not in ['-', ''] else 0.0
+    except (ValueError, TypeError):
+        waqi_aqi = 0.0
+        
+    predicted_aqi = max(ml_aqi, epa_aqi, waqi_aqi)
     predicted_aqi = max(0, round(predicted_aqi, 1))
 
-    print(f"🔍 Debug → ML: {ml_aqi:.1f} | EPA: {epa_aqi:.1f} | Final: {predicted_aqi}")
+    print(f"🔍 Debug → ML: {ml_aqi:.1f} | EPA: {epa_aqi:.1f} | WAQI: {waqi_aqi:.1f} | Final: {predicted_aqi}")
 
     category = get_aqi_category(predicted_aqi)
 

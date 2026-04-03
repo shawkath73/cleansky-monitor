@@ -46,7 +46,7 @@ const fadeUp = {
 };
 
 export default function Dashboard() {
-  const { city } = useCity();
+  const { city, lat, lon } = useCity();
   const [aqiData, setAqiData] = useState<AQIData | null>(null);
   const [forecast, setForecast] = useState<ForecastItem[]>([]);
   const [healthRisk, setHealthRisk] = useState<HealthRiskData | null>(null);
@@ -63,9 +63,9 @@ export default function Dashboard() {
 
       try {
         const [aqiRes, forecastRes, pollutantsRes] = await Promise.all([
-          fetchCurrentAQI(city),
-          fetchForecast(city),
-          fetchPollutants(city),
+          fetchCurrentAQI(city, lat, lon),
+          fetchForecast(city, lat, lon),
+          fetchPollutants(city, lat, lon),
         ]);
 
         if (cancelled) return;
@@ -91,7 +91,7 @@ export default function Dashboard() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [city]);
+  }, [city, lat, lon]);
 
   if (loading) {
     if (!aqiData) return <LoadingScreen />;

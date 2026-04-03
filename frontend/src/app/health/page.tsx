@@ -50,7 +50,7 @@ const listItem = {
 };
 
 export default function HealthPage() {
-  const { city } = useCity();
+  const { city, lat, lon } = useCity();
   const [health, setHealth] = useState<HealthRiskData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -62,7 +62,7 @@ export default function HealthPage() {
 
     async function load() {
       try {
-        const aqiRes = await fetchCurrentAQI(city);
+        const aqiRes = await fetchCurrentAQI(city, lat, lon);
         const healthRes = await fetchHealthRisk(aqiRes.data.aqi);
         if (!cancelled) setHealth(healthRes.data);
       } catch (e) {
@@ -77,7 +77,7 @@ export default function HealthPage() {
     return () => {
       cancelled = true;
     };
-  }, [city]);
+  }, [city, lat, lon]);
 
   if (loading) return <DashboardSkeleton />;
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -9,7 +9,14 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, MapPin, Navigation } from "lucide-react";
+import {
+  Loader2,
+  MapPin,
+  Navigation,
+  X,
+  ExternalLink,
+  Wind,
+} from "lucide-react";
 
 /* ── Types ─────────────────────────────── */
 
@@ -21,6 +28,17 @@ interface CityStation {
   lon: number;
   uid?: string;
   aqi: number | string;
+}
+
+interface StationDetail {
+  station: CityStation;
+  liveAqi: number | null;
+  category: string;
+  color: string;
+  dominantPollutant: string;
+  pollutants: Record<string, number>;
+  loading: boolean;
+  error: string | null;
 }
 
 /* ── AQI Color Helpers ─────────────────── */
@@ -307,10 +325,31 @@ function AQILegend() {
 }
 
 
-/* ── DivIcon Marker Layer ──────────────── */
-/* We use a separate component to render markers with DivIcon containing AQI numbers */
+/* ── Custom pane so WAQI tiles don't block marker clicks ── */
 
-function AQIDivMarkers({ stations }: { stations: CityStation[] }) {
+function WaqiPane() {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map.getPane("waqiPane")) {
+      const pane = map.createPane("waqiPane");
+      pane.style.zIndex = "350";
+      pane.style.pointerEvents = "none";
+    }
+  }, [map]);
+
+  return null;
+}
+
+/* ── DivIcon Marker Layer ──────────────── */
+
+function AQIDivMarkers({
+  stations,
+  onStationClick,
+}: {
+  stations: CityStation[];
+  onStationClick: (station: CityStation) => void;
+}) {
   const map = useMap();
 
   useEffect(() => {
@@ -324,47 +363,39 @@ function AQIDivMarkers({ stations }: { stations: CityStation[] }) {
 
         const divIcon = L.divIcon({
           className: "aqi-div-marker",
-          html: `<div style="
+          html: `<div class="aqi-marker-ring" style="
+            position:relative;
             display:flex;align-items:center;justify-content:center;
-            width:32px;height:32px;border-radius:50%;
+            width:40px;height:40px;border-radius:50%;
             background:${info.color};
-            border:2px solid rgba(255,255,255,0.3);
-            color:#fff;font-size:11px;font-weight:700;
+            border:3px solid rgba(255,255,255,0.5);
+            color:#fff;font-size:12px;font-weight:800;
             font-family:Inter,system-ui,sans-serif;
-            box-shadow:0 2px 10px ${info.color}80, 0 0 20px ${info.color}30;
+            box-shadow:0 2px 12px ${info.color}90, 0 0 24px ${info.color}40;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             cursor:pointer;
+            z-index:800;
           ">${aqi}</div>`,
-          iconSize: [32, 32],
-          iconAnchor: [16, 16],
+          iconSize: [40, 40],
+          iconAnchor: [20, 20],
         });
 
-        const marker = L.marker([station.lat, station.lon], { icon: divIcon });
+        const marker = L.marker([station.lat, station.lon], {
+          icon: divIcon,
+          interactive: true,
+          zIndexOffset: 1000,
+          riseOnHover: true,
+          bubblingMouseEvents: false,
+        });
 
-        marker.bindPopup(
-          `<div style="font-family:Inter,system-ui,sans-serif;min-width:200px;padding:4px;">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-              <div style="width:8px;height:8px;border-radius:50%;background:${info.color};box-shadow:0 0 8px ${info.color};"></div>
-              <span style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:#64748B;font-weight:600;">Monitoring Station</span>
-            </div>
-            <h3 style="font-size:15px;font-weight:700;color:#0F172A;margin:0 0 4px 0;line-height:1.3;">${station.name}</h3>
-            ${station.state ? `<p style="font-size:12px;color:#64748B;margin:0 0 12px 0;">${station.state}</p>` : ""}
-            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:${info.color}12;border-radius:10px;border:1px solid ${info.color}25;margin-bottom:12px;">
-              <span style="font-size:28px;font-weight:800;color:${info.color};line-height:1;font-variant-numeric:tabular-nums;">${aqi}</span>
-              <div>
-                <div style="font-size:12px;font-weight:600;color:${info.color};">${info.label}</div>
-                <div style="font-size:10px;color:#94A3B8;margin-top:2px;">Air Quality Index</div>
-              </div>
-            </div>
-            <a href="/?city=${encodeURIComponent(station.name)}&lat=${station.lat}&lon=${station.lon}" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px 0;background:${info.color};color:${aqi > 400 ? "#fecaca" : "#fff"};border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;letter-spacing:0.02em;">
-              View Details →
-            </a>
-          </div>`,
-          {
-            className: "aqi-popup",
-            maxWidth: 260,
-          }
-        );
+        // On click → lift the station to the React info panel
+        marker.on("click", (e) => {
+          L.DomEvent.stopPropagation(e);
+          onStationClick(station);
+          map.flyTo([station.lat, station.lon], Math.max(map.getZoom(), 8), {
+            duration: 0.8,
+          });
+        });
 
         marker.addTo(map);
         markers.push(marker);
@@ -373,9 +404,303 @@ function AQIDivMarkers({ stations }: { stations: CityStation[] }) {
     return () => {
       markers.forEach((m) => map.removeLayer(m));
     };
-  }, [stations, map]);
+  }, [stations, map, onStationClick]);
 
   return null;
+}
+
+
+/* ── Station Info Panel (React overlay) ── */
+
+function StationInfoPanel({
+  detail,
+  onClose,
+}: {
+  detail: StationDetail;
+  onClose: () => void;
+}) {
+  const { station, liveAqi, category, color, dominantPollutant, pollutants, loading, error } = detail;
+  const displayAqi = liveAqi ?? (isValidAQI(station.aqi) ? parseAQI(station.aqi) : null);
+  const displayInfo = displayAqi ? getAQIInfo(displayAqi) : null;
+  const c = color || displayInfo?.color || "#7C9CFF";
+
+  // Build sorted pollutant list
+  const pollutantList = Object.entries(pollutants)
+    .filter(([, v]) => v > 0)
+    .sort((a, b) => b[1] - a[1]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20, scale: 0.95 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      exit={{ opacity: 0, x: -20, scale: 0.95 }}
+      transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+      style={{
+        position: "absolute",
+        top: "24px",
+        left: "24px",
+        zIndex: 1200,
+        width: "360px",
+        maxHeight: "calc(100% - 48px)",
+        overflowY: "auto",
+        background: "rgba(15, 23, 42, 0.45)",
+        backdropFilter: "blur(32px)",
+        WebkitBackdropFilter: "blur(32px)",
+        border: `1px solid rgba(255,255,255,0.08)`,
+        borderRadius: "24px",
+        boxShadow: `0 24px 64px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1)`,
+        fontFamily: "Inter, system-ui, sans-serif",
+        padding: "24px",
+        scrollbarWidth: "none",
+      }}
+    >
+      {/* Close button */}
+      <button
+        onClick={onClose}
+        style={{
+          position: "absolute",
+          top: "16px",
+          right: "16px",
+          background: "rgba(255,255,255,0.06)",
+          border: "none",
+          borderRadius: "10px",
+          padding: "6px",
+          cursor: "pointer",
+          color: "#94A3B8",
+          transition: "all 0.2s",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "rgba(255,255,255,0.12)";
+          e.currentTarget.style.color = "#E2E8F0";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+          e.currentTarget.style.color = "#94A3B8";
+        }}
+      >
+        <X className="w-5 h-5" />
+      </button>
+
+      {/* Header title */}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+        <h2 style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "#E2E8F0" }}>
+          <span style={{ color: "#38bdf8" }}>CleanSky</span> Air Quality
+        </h2>
+      </div>
+
+      {/* Station Name Details */}
+      <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", marginBottom: "20px" }}>
+        <MapPin className="w-5 h-5" style={{ color: "#38bdf8", flexShrink: 0, marginTop: "2px" }} />
+        <div>
+          <h3
+            style={{
+              fontSize: "16px",
+              fontWeight: 600,
+              color: "#38bdf8",
+              margin: "0 0 2px 0",
+              lineHeight: 1.3,
+            }}
+          >
+            {station.name}
+          </h3>
+          {station.state && (
+            <p style={{ fontSize: "12px", color: "#64748B", margin: 0 }}>
+              {station.state}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Loading state */}
+      {loading && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            padding: "16px",
+            background: "rgba(124,156,255,0.06)",
+            borderRadius: "12px",
+            marginBottom: "16px",
+          }}
+        >
+          <Loader2 className="w-5 h-5 animate-spin" style={{ color: "#7C9CFF" }} />
+          <span style={{ fontSize: "13px", color: "#94A3B8" }}>Fetching live data…</span>
+        </div>
+      )}
+
+      {/* Error */}
+      {error && (
+        <div
+          style={{
+            padding: "12px",
+            background: "rgba(239,68,68,0.1)",
+            border: "1px solid rgba(239,68,68,0.2)",
+            borderRadius: "10px",
+            color: "#fca5a5",
+            fontSize: "12px",
+            marginBottom: "16px",
+          }}
+        >
+          {error}
+        </div>
+      )}
+
+      {/* AQI Display */}
+      {displayAqi !== null && (
+        <div style={{ marginBottom: "24px" }}>
+          <div style={{ fontSize: "12px", color: "#94A3B8", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+            <Wind className="w-4 h-4" />
+            Air Quality Index
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "20px",
+            }}
+          >
+            <span
+              style={{
+                fontSize: "64px",
+                fontWeight: 800,
+                color: c,
+                lineHeight: 1,
+                fontVariantNumeric: "tabular-nums",
+                letterSpacing: "-0.04em"
+              }}
+            >
+              {displayAqi}
+            </span>
+            <div
+              style={{
+                background: c,
+                color: displayAqi > 200 ? "#ffffff" : "#0f172a",
+                padding: "6px 16px",
+                borderRadius: "8px",
+                fontSize: "16px",
+                fontWeight: 700,
+                boxShadow: `0 4px 12px ${c}40`
+              }}
+            >
+              {category || displayInfo?.label || "–"}
+            </div>
+          </div>
+          {dominantPollutant && (
+               <div style={{ fontSize: "12px", color: "#94A3B8", marginTop: "12px" }}>
+                 Dominant Pollutant: <span style={{ color: "#E2E8F0", fontWeight: 600 }}>{dominantPollutant}</span>
+               </div>
+             )}
+        </div>
+      )}
+
+      {/* Pollutant Breakdown - Styled like the screenshot */}
+      {pollutantList.length > 0 && (
+        <div style={{ 
+          background: "rgba(255,255,255,0.03)", 
+          border: "1px solid rgba(255,255,255,0.06)",
+          borderRadius: "16px",
+          padding: "16px",
+          marginBottom: "20px" 
+        }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+            {pollutantList.slice(0, 5).map(([name, value]) => {
+              // rough normalization for max bar width (using an arbitrary 100 max for UI scale)
+              const maxVal = Math.max(pollutantList[0][1], 100); 
+              const pct = Math.min(100, Math.round((value / maxVal) * 100));
+              
+              const isHigh = pct > 60;
+              const barColor = isHigh ? "#f97316" : (pct > 30 ? "#eab308" : "#84cc16");
+
+              return (
+                <div key={name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div style={{ width: "60px", color: "#E2E8F0", fontSize: "14px", fontWeight: 500 }}>
+                    {name}
+                  </div>
+                  <div style={{ width: "100px", textAlign: "right", color: "#F8FAFC", fontSize: "14px", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
+                    {value.toFixed(1)} <span style={{ fontSize: "10px", color: "#94A3B8", fontWeight: 500 }}>µg/m³</span>
+                  </div>
+                  <div
+                    style={{
+                      width: "60px",
+                      height: "4px",
+                      background: "rgba(255,255,255,0.1)",
+                      borderRadius: "2px",
+                      position: "relative"
+                    }}
+                  >
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${pct}%` }}
+                      transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        top: 0,
+                        height: "100%",
+                        background: barColor,
+                        borderRadius: "2px",
+                      }}
+                    />
+                    <div style={{
+                      position: "absolute",
+                      left: `${pct}%`,
+                      top: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "8px",
+                      height: "8px",
+                      borderRadius: "50%",
+                      background: barColor,
+                      boxShadow: `0 0 6px ${barColor}`
+                    }}></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Bottom Color Scale */}
+      <div style={{ display: "flex", borderRadius: "6px", overflow: "hidden", height: "12px", marginBottom: "20px" }}>
+        {AQI_CATEGORIES.map(cat => (
+          <div key={cat.label} style={{ flex: 1, backgroundColor: cat.color }} title={cat.label} />
+        ))}
+      </div>
+
+      {/* View Dashboard Link */}
+      <a
+        href={`/?city=${encodeURIComponent(station.name)}&lat=${station.lat}&lon=${station.lon}`}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "8px",
+          width: "100%",
+          padding: "14px 0",
+          background: "linear-gradient(135deg, rgba(124, 156, 255, 0.2), rgba(124, 156, 255, 0.05))",
+          border: "1px solid rgba(124, 156, 255, 0.2)",
+          color: "#7C9CFF",
+          borderRadius: "12px",
+          fontSize: "14px",
+          fontWeight: 600,
+          textDecoration: "none",
+          transition: "all 0.2s",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "linear-gradient(135deg, rgba(124, 156, 255, 0.3), rgba(124, 156, 255, 0.1))";
+          e.currentTarget.style.transform = "translateY(-1px)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "linear-gradient(135deg, rgba(124, 156, 255, 0.2), rgba(124, 156, 255, 0.05))";
+          e.currentTarget.style.transform = "translateY(0)";
+        }}
+      >
+        <ExternalLink style={{ width: "16px", height: "16px" }} />
+        View Full Dashboard
+      </a>
+    </motion.div>
+  );
 }
 
 
@@ -384,6 +709,7 @@ function AQIDivMarkers({ stations }: { stations: CityStation[] }) {
 export default function AQIMap() {
   const [stations, setStations] = useState<CityStation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDetail, setSelectedDetail] = useState<StationDetail | null>(null);
 
   useEffect(() => {
     async function loadStations() {
@@ -400,6 +726,64 @@ export default function AQIMap() {
       }
     }
     loadStations();
+  }, []);
+
+  const handleStationClick = useCallback(async (station: CityStation) => {
+    const aqi = isValidAQI(station.aqi) ? parseAQI(station.aqi) : 0;
+    const info = getAQIInfo(aqi);
+
+    // Set initial state with map data
+    setSelectedDetail({
+      station,
+      liveAqi: aqi || null,
+      category: info.label,
+      color: info.color,
+      dominantPollutant: "",
+      pollutants: {},
+      loading: true,
+      error: null,
+    });
+
+    // Fetch live data from backend
+    try {
+      const [aqiRes, pollRes] = await Promise.all([
+        fetch(`/api/current-aqi?city=${encodeURIComponent(station.name)}&lat=${station.lat}&lon=${station.lon}`).then((r) => r.json()),
+        fetch(`/api/pollutants?city=${encodeURIComponent(station.name)}&lat=${station.lat}&lon=${station.lon}`).then((r) => r.json()),
+      ]);
+
+      const liveAqi = aqiRes.success ? Math.round(aqiRes.data.aqi) : aqi;
+      const liveInfo = getAQIInfo(liveAqi);
+      const pollutantMap: Record<string, number> = {};
+
+      if (pollRes.success && pollRes.pollutants) {
+        for (const p of pollRes.pollutants) {
+          if (p.value > 0) pollutantMap[p.name] = p.value;
+        }
+      } else if (aqiRes.success && aqiRes.data.pollutants) {
+        // Fallback: use pollutant values from AQI endpoint
+        for (const [k, v] of Object.entries(aqiRes.data.pollutants)) {
+          if (typeof v === "number" && v > 0) pollutantMap[k] = v;
+        }
+      }
+
+      setSelectedDetail({
+        station,
+        liveAqi,
+        category: aqiRes.success ? aqiRes.data.category : liveInfo.label,
+        color: liveInfo.color,
+        dominantPollutant: aqiRes.success ? aqiRes.data.dominant_pollutant || "" : "",
+        pollutants: pollutantMap,
+        loading: false,
+        error: null,
+      });
+    } catch {
+      // If API fails, keep the map-provided AQI
+      setSelectedDetail((prev) =>
+        prev
+          ? { ...prev, loading: false, error: "Could not fetch live data" }
+          : null
+      );
+    }
   }, []);
 
   const waqiToken = process.env.NEXT_PUBLIC_WAQI_TOKEN || "";
@@ -462,6 +846,16 @@ export default function AQIMap() {
         )}
       </AnimatePresence>
 
+      {/* Station Info Panel (React-driven, not Leaflet popup) */}
+      <AnimatePresence>
+        {selectedDetail && (
+          <StationInfoPanel
+            detail={selectedDetail}
+            onClose={() => setSelectedDetail(null)}
+          />
+        )}
+      </AnimatePresence>
+
       <MapContainer
         center={[20, 0]}
         zoom={2}
@@ -477,17 +871,21 @@ export default function AQIMap() {
           attribution='&copy; <a href="https://carto.com/">CARTO</a>'
         />
 
-        {/* WAQI AQI Overlay Tiles */}
+        {/* Pane for WAQI overlay (pointer-events: none) */}
+        <WaqiPane />
+
+        {/* WAQI AQI Overlay Tiles — in custom pane so they don't block marker clicks */}
         {waqiToken && (
           <TileLayer
             url={`https://tiles.aqicn.org/tiles/usepa-aqi/{z}/{x}/{y}.png?token=${waqiToken}`}
             opacity={0.6}
+            pane="waqiPane"
             attribution='&copy; <a href="https://waqi.info/">WAQI</a>'
           />
         )}
 
         {/* Indian Station DivIcon Markers */}
-        <AQIDivMarkers stations={stations} />
+        <AQIDivMarkers stations={stations} onStationClick={handleStationClick} />
 
         {/* Locate Me Button */}
         <LocateMeButton />
@@ -496,36 +894,29 @@ export default function AQIMap() {
         <AQILegend />
       </MapContainer>
 
-      {/* Custom styles for leaflet popups */}
+      {/* Custom styles */}
       <style>{`
         .aqi-div-marker {
           background: none !important;
           border: none !important;
+          pointer-events: auto !important;
+          z-index: 800 !important;
         }
         .aqi-div-marker > div:hover {
-          transform: scale(1.15) !important;
-          box-shadow: 0 4px 20px currentColor !important;
+          transform: scale(1.2) !important;
+          box-shadow: 0 4px 24px currentColor !important;
         }
-        .leaflet-popup-content-wrapper {
-          background: rgba(255,255,255,0.97) !important;
-          border-radius: 14px !important;
-          box-shadow: 0 12px 40px rgba(0,0,0,0.2) !important;
-          padding: 0 !important;
+        /* Pulsing ring to distinguish our markers from WAQI tiles */
+        @keyframes markerPulse {
+          0%, 100% { box-shadow: 0 0 0 0 currentColor; }
+          50% { box-shadow: 0 0 0 6px transparent; }
         }
-        .leaflet-popup-content {
-          margin: 12px 14px !important;
-          font-family: Inter, system-ui, sans-serif !important;
+        .aqi-marker-ring {
+          animation: markerPulse 2.5s ease-in-out infinite;
         }
-        .leaflet-popup-tip {
-          background: rgba(255,255,255,0.97) !important;
-        }
-        .leaflet-popup-close-button {
-          color: #94A3B8 !important;
-          font-size: 20px !important;
-          padding: 8px 10px 0 0 !important;
-        }
-        .leaflet-popup-close-button:hover {
-          color: #475569 !important;
+        /* Ensure marker pane is above everything */
+        .leaflet-marker-pane {
+          z-index: 700 !important;
         }
         .leaflet-control-zoom {
           border: none !important;
