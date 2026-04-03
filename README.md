@@ -15,7 +15,8 @@ A **Predictive Air Quality Forecasting Platform** for Indian cities, featuring a
 
 ### Frontend (Next.js)
 - **Interactive Dashboard**: Clean, modern glassmorphism UI with real-time data display.
-- **City Selector**: Choose from supported Indian cities.
+- **Global AQI Map**: Interactive `react-leaflet` map with WAQI global overlays and custom dynamic markers for Indian monitoring stations.
+- **City Selector**: Choose from supported Indian cities (dynamic search via map geocoding).
 - **Forecast Visualization**: Tables and summaries for predicted AQI trends.
 - **Health Alerts**: Color-coded categories with actionable recommendations.
 - **Pollutant Charts**: Contribution percentages and WHO limit comparisons.
