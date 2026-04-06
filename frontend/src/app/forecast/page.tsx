@@ -52,6 +52,7 @@ export default function ForecastPage() {
   const { city, lat, lon } = useCity();
   const [forecast, setForecast] = useState<ForecastItem[]>([]);
   const [summary, setSummary] = useState<ForecastSummary | null>(null);
+  const [breakdownHours, setBreakdownHours] = useState<1 | 6 | 12>(6);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -63,7 +64,7 @@ export default function ForecastPage() {
       setError(null);
 
       try {
-        const res = await fetchForecast(city, lat, lon);
+        const res = await fetchForecast(city, lat, lon, breakdownHours);
         if (cancelled) return;
         setForecast(res.forecast);
         setSummary(res.summary);
@@ -79,7 +80,7 @@ export default function ForecastPage() {
     return () => {
       cancelled = true;
     };
-  }, [city, lat, lon]);
+  }, [city, lat, lon, breakdownHours]);
 
   if (loading) {
     return (
@@ -109,10 +110,17 @@ export default function ForecastPage() {
   }
 
   // Chart data
-  const chartData = forecast.map((item) => {
-    const dt = new Date(item.datetime || item.timestamp);
+  const targetBuckets = breakdownHours === 1 ? forecast.length : Math.ceil(48 / breakdownHours);
+  const displayForecast = forecast.slice(0, targetBuckets);
+
+  const chartData = displayForecast.map((item) => {
+    const dt = new Date(item.datetime ?? item.timestamp ?? new Date().toISOString());
+    const end = item.end_datetime ? new Date(item.end_datetime) : null;
+    const timeLabel = end
+      ? `${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}-${end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+      : dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     return {
-      time: dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      time: timeLabel,
       date: dt.toLocaleDateString([], { month: "short", day: "numeric" }),
       aqi: Math.round(item.aqi),
       color: getAQIColorByValue(item.aqi),
@@ -132,8 +140,27 @@ export default function ForecastPage() {
           48-Hour AQI <span>Forecast</span>
         </h1>
         <p className="text-[#64748B] text-sm mt-2 uppercase tracking-widest">
-          Predictive trends <span className="text-[#7C9CFF]">{city}</span>
+          Predictive trends <span className="text-[#7C9CFF]">{city}</span> ·
+          {" "}{breakdownHours}h buckets
         </p>
+        <div className="mt-3 inline-flex rounded-lg border border-[#1E293B]/60 bg-[#020617]/70 p-1 gap-1">
+          {[1, 6, 12].map((h) => {
+            const active = breakdownHours === h;
+            return (
+              <button
+                key={h}
+                onClick={() => setBreakdownHours(h as 1 | 6 | 12)}
+                className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
+                  active
+                    ? "bg-[#7C9CFF]/20 text-[#7C9CFF]"
+                    : "text-[#94A3B8] hover:bg-[#1E293B]/40 hover:text-[#E2E8F0]"
+                }`}
+              >
+                {h}h
+              </button>
+            );
+          })}
+        </div>
       </motion.div>
 
       {/* Summary stats */}
@@ -295,7 +322,7 @@ export default function ForecastPage() {
       {/* Hourly cards */}
       <motion.div variants={fadeUp}>
         <h2 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4">
-          Hourly Breakdown
+          {breakdownHours === 1 ? "Hourly Breakdown" : `${breakdownHours}-Hour Breakdown`}
         </h2>
 
         {/* Mobile: horizontal scroll | Laptop+: wrapping grid */}
@@ -306,8 +333,9 @@ export default function ForecastPage() {
         >
           <style>{`.hourly-strip::-webkit-scrollbar { display: none; }`}</style>
           <div className="hourly-strip flex gap-2 w-max">
-            {forecast.map((item, idx) => {
-              const dt = new Date(item.datetime || item.timestamp);
+            {displayForecast.map((item, idx) => {
+              const dt = new Date(item.datetime ?? item.timestamp ?? new Date().toISOString());
+              const end = item.end_datetime ? new Date(item.end_datetime) : null;
               const category = item.category || getAQICategory(item.aqi);
               const color = getAQIColorByValue(item.aqi);
               const barPct = Math.min(Math.round((item.aqi / 500) * 100), 100);
@@ -326,10 +354,12 @@ export default function ForecastPage() {
                     style={{ background: color }}
                   />
                   <span className="text-[10px] text-[#64748B] font-medium tabular-nums">
-                    {dt.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    {end
+                      ? `${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}-${end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+                      : dt.toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                   </span>
                   <div className="flex items-end gap-1.5 mt-1">
                     <div className="w-1.5 bg-[#1E293B]/40 rounded-full h-8 flex items-end overflow-hidden">
@@ -360,8 +390,8 @@ export default function ForecastPage() {
         {/* Laptop+ wrapping grid — groups by day */}
         <div className="hidden md:block space-y-5">
           {Array.from(
-            forecast.reduce((acc, item) => {
-              const dt = new Date(item.datetime || item.timestamp);
+            displayForecast.reduce((acc, item) => {
+              const dt = new Date(item.datetime ?? item.timestamp ?? new Date().toISOString());
               const key = dt.toDateString();
               if (!acc.has(key))
                 acc.set(key, {
@@ -384,7 +414,8 @@ export default function ForecastPage() {
               </p>
               <div className="grid grid-cols-6 lg:grid-cols-8 xl:grid-cols-12 gap-2">
                 {group.items.map((item, idx) => {
-                  const dt = new Date(item.datetime || item.timestamp);
+                  const dt = new Date(item.datetime ?? item.timestamp ?? new Date().toISOString());
+                  const end = item.end_datetime ? new Date(item.end_datetime) : null;
                   const category = item.category || getAQICategory(item.aqi);
                   const color = getAQIColorByValue(item.aqi);
                   const barPct = Math.min(
@@ -405,10 +436,12 @@ export default function ForecastPage() {
                         style={{ background: color }}
                       />
                       <span className="text-[10px] text-[#64748B] font-medium tabular-nums">
-                        {dt.toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                        {end
+                          ? `${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}-${end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+                          : dt.toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
                       </span>
                       <div className="flex items-end gap-1 mt-1">
                         <div className="w-1.5 bg-[#1E293B]/40 rounded-full h-7 flex items-end overflow-hidden">

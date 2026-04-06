@@ -7,6 +7,7 @@ import {
   fetchForecast,
   fetchHealthRisk,
   fetchPollutants,
+  fetchCities,
 } from "@/lib/api";
 import { getAQICategory, getAQIColorByValue, getAQIEmoji } from "@/lib/aqi";
 import type {
@@ -29,7 +30,22 @@ import {
   AreaChart,
 } from "recharts";
 import { motion } from "framer-motion";
-import { AlertTriangle, TrendingUp, ChevronRight } from "lucide-react";
+import {
+  AlertTriangle,
+  TrendingUp,
+  ChevronRight,
+  Globe2,
+  RadioTower,
+  ShieldAlert,
+  Activity,
+} from "lucide-react";
+
+interface StationSnapshot {
+  city?: string;
+  name?: string;
+  station_name?: string;
+  aqi?: number | string;
+}
 
 const stagger = {
   hidden: {},
@@ -51,6 +67,7 @@ export default function Dashboard() {
   const [forecast, setForecast] = useState<ForecastItem[]>([]);
   const [healthRisk, setHealthRisk] = useState<HealthRiskData | null>(null);
   const [pollutants, setPollutants] = useState<PollutantDetail[]>([]);
+  const [stations, setStations] = useState<StationSnapshot[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -62,17 +79,20 @@ export default function Dashboard() {
       setError(null);
 
       try {
-        const [aqiRes, forecastRes, pollutantsRes] = await Promise.all([
-          fetchCurrentAQI(city, lat, lon),
-          fetchForecast(city, lat, lon),
-          fetchPollutants(city, lat, lon),
-        ]);
+        const [aqiRes, forecastRes, pollutantsRes, citiesRes] =
+          await Promise.all([
+            fetchCurrentAQI(city, lat, lon),
+            fetchForecast(city, lat, lon),
+            fetchPollutants(city, lat, lon),
+            fetchCities(),
+          ]);
 
         if (cancelled) return;
 
         setAqiData(aqiRes.data);
         setForecast(forecastRes.forecast.slice(0, 24));
         setPollutants(pollutantsRes.pollutants);
+        setStations((citiesRes.cities || []) as StationSnapshot[]);
 
         // Fetch health risk with the AQI value
         const healthRes = await fetchHealthRisk(aqiRes.data.aqi);
@@ -129,7 +149,9 @@ export default function Dashboard() {
 
   // Prepare chart data
   const chartData = forecast.map((item) => ({
-    time: new Date(item.datetime || item.timestamp).toLocaleTimeString([], {
+    time: new Date(
+      item.datetime ?? item.timestamp ?? new Date().toISOString(),
+    ).toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     }),
@@ -143,6 +165,34 @@ export default function Dashboard() {
     1,
   );
 
+  const stationAQIs = stations
+    .map((s) => {
+      const raw = s.aqi;
+      const val = typeof raw === "string" ? parseInt(raw, 10) : raw;
+      return Number.isFinite(val) ? Number(val) : 0;
+    })
+    .filter((v) => v > 0);
+
+  const activeStations = stationAQIs.length;
+  const networkAvgAQI = activeStations
+    ? Math.round(stationAQIs.reduce((a, b) => a + b, 0) / activeStations)
+    : 0;
+  const poorOrWorseCount = stationAQIs.filter((v) => v > 200).length;
+  const severeCount = stationAQIs.filter((v) => v > 400).length;
+
+  const hotspotStations = stations
+    .map((s) => {
+      const raw = s.aqi;
+      const val = typeof raw === "string" ? parseInt(raw, 10) : raw;
+      return {
+        label: s.city || s.name || "Unknown",
+        aqi: Number.isFinite(val) ? Number(val) : 0,
+      };
+    })
+    .filter((s) => s.aqi > 0)
+    .sort((a, b) => b.aqi - a.aqi)
+    .slice(0, 5);
+
   return (
     <motion.div
       className="space-y-6"
@@ -151,14 +201,114 @@ export default function Dashboard() {
       animate="show"
     >
       {/* Hero Header */}
-      <motion.div variants={fadeUp}>
+      <motion.div variants={fadeUp} className="hero-atmosphere rounded-2xl p-6">
         <h1 className="text-3xl md:text-4xl font-bold text-[#E2E8F0] leading-tight">
-          Real-time Air Quality
+          Monitoring Overview
         </h1>
         <p className="text-[#64748B] text-sm mt-2 uppercase tracking-widest">
-          Monitoring <span className="text-[#7C9CFF]">{city}</span> Updated
-          every 5 minutes
+          Network status across tracked stations · Updated every 5 minutes
         </p>
+      </motion.div>
+
+      {/* Row 0: Global monitoring summary */}
+      <motion.div
+        className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+        variants={fadeUp}
+      >
+        {[
+          {
+            label: "Active Stations",
+            value: activeStations,
+            icon: <RadioTower className="w-4 h-4 text-[#94A3B8]" />,
+          },
+          {
+            label: "Network Avg AQI",
+            value: networkAvgAQI,
+            icon: <Activity className="w-4 h-4 text-[#94A3B8]" />,
+          },
+          {
+            label: "Poor+ Stations",
+            value: poorOrWorseCount,
+            icon: <ShieldAlert className="w-4 h-4 text-[#F97316]" />,
+          },
+          {
+            label: "Severe Stations",
+            value: severeCount,
+            icon: <AlertTriangle className="w-4 h-4 text-[#EF4444]" />,
+          },
+        ].map((item) => (
+          <GlassCard key={item.label} animate={false} className="py-4">
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-[#64748B] uppercase tracking-wider">
+                {item.label}
+              </p>
+              {item.icon}
+            </div>
+            <p className="text-2xl font-bold text-[#E2E8F0] mt-2">
+              {item.value}
+            </p>
+          </GlassCard>
+        ))}
+      </motion.div>
+
+      {/* Row 0b: Hotspots + context */}
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        variants={fadeUp}
+      >
+        <GlassCard>
+          <h2 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4 flex items-center gap-2">
+            <Globe2 className="w-4 h-4 text-[#7C9CFF]" />
+            Top Pollution Hotspots
+          </h2>
+          <div className="space-y-2">
+            {hotspotStations.map((item, i) => (
+              <div
+                key={`${item.label}-${i}`}
+                className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#0B1220]/60 border border-[#1E293B]/40"
+              >
+                <span className="text-sm text-[#E2E8F0] truncate pr-3">
+                  {item.label}
+                </span>
+                <span
+                  className="text-xs font-semibold px-2 py-1 rounded-md"
+                  style={{
+                    backgroundColor: `${getAQIColorByValue(item.aqi)}20`,
+                    color: getAQIColorByValue(item.aqi),
+                  }}
+                >
+                  AQI {item.aqi}
+                </span>
+              </div>
+            ))}
+            {hotspotStations.length === 0 && (
+              <p className="text-sm text-[#64748B]">
+                No station AQI data available.
+              </p>
+            )}
+          </div>
+        </GlassCard>
+
+        <GlassCard>
+          <h2 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4">
+            Selected City Focus
+          </h2>
+          <p className="text-2xl font-bold text-[#E2E8F0]">{city}</p>
+          <p className="text-sm text-[#94A3B8] mt-2">
+            Detailed diagnostics below are scoped to the currently selected
+            city.
+          </p>
+          <div className="mt-4 text-xs text-[#64748B]">
+            Use the city selector in the top bar to switch focus while keeping
+            system-wide context in view.
+          </div>
+        </GlassCard>
+      </motion.div>
+
+      <motion.div variants={fadeUp}>
+        <h2 className="text-sm font-medium text-[#64748B] uppercase tracking-widest">
+          City Detail Panel
+        </h2>
       </motion.div>
 
       {/* Row 1: AQI Gauge + Health Risk */}
@@ -189,7 +339,9 @@ export default function Dashboard() {
             )}
             {aqiData && (
               <p className="text-[#64748B] text-xs mt-1">
-                WAQI {Math.round(aqiData.waqi_aqi ?? 0)} | EPA {Math.round(aqiData.epa_estimate_aqi ?? 0)} | ML {Math.round(aqiData.ml_estimate_aqi ?? 0)}
+                WAQI {Math.round(aqiData.waqi_aqi ?? 0)} | EPA{" "}
+                {Math.round(aqiData.epa_estimate_aqi ?? 0)} | ML{" "}
+                {Math.round(aqiData.ml_estimate_aqi ?? 0)}
               </p>
             )}
             {aqiData?.dominant_pollutant && (

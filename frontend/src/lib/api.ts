@@ -20,12 +20,19 @@ export async function fetchCurrentAQI(city: string, lat?: number, lon?: number) 
   }>(url);
 }
 
-export async function fetchForecast(city: string, lat?: number, lon?: number) {
+export async function fetchForecast(
+  city: string,
+  lat?: number,
+  lon?: number,
+  breakdownHours = 1
+) {
   let url = `${API_BASE}/forecast?city=${encodeURIComponent(city)}`;
   if (lat !== undefined && lon !== undefined) url += `&lat=${lat}&lon=${lon}`;
+  url += `&breakdown_hours=${breakdownHours}`;
   return fetchJSON<{
     success: boolean;
     city: string;
+    breakdown_hours: number;
     summary: import("./types").ForecastSummary;
     forecast: import("./types").ForecastItem[];
   }>(url);
