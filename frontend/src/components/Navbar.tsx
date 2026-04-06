@@ -197,8 +197,8 @@ export default function Navbar() {
       : filteredDefaults;
 
   const handleSelect = useCallback(
-    (name: string) => {
-      setCity(name);
+    (result: CitySearchResult) => {
+      setCity(result.city || result.name || "Delhi", result.lat, result.lon);
       setOpen(false);
       setMobileOpen(false);
       setSearch("");
@@ -299,7 +299,7 @@ export default function Navbar() {
                         <CityItem
                           result={result}
                           isActive={result.city === city}
-                          onSelect={() => handleSelect(result.city)}
+                          onSelect={() => handleSelect(result)}
                         />
                       </li>
                     ))}
@@ -408,7 +408,7 @@ export default function Navbar() {
                         <CityItem
                           result={result}
                           isActive={result.city === city}
-                          onSelect={() => handleSelect(result.city)}
+                          onSelect={() => handleSelect(result)}
                         />
                       </li>
                     ))}
