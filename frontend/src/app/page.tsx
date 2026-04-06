@@ -129,7 +129,9 @@ export default function Dashboard() {
 
   // Prepare chart data
   const chartData = forecast.map((item) => ({
-    time: new Date(item.datetime || item.timestamp).toLocaleTimeString([], {
+    time: new Date(
+      item.datetime ?? item.timestamp ?? new Date().toISOString(),
+    ).toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     }),
@@ -189,7 +191,9 @@ export default function Dashboard() {
             )}
             {aqiData && (
               <p className="text-[#64748B] text-xs mt-1">
-                WAQI {Math.round(aqiData.waqi_aqi ?? 0)} | EPA {Math.round(aqiData.epa_estimate_aqi ?? 0)} | ML {Math.round(aqiData.ml_estimate_aqi ?? 0)}
+                WAQI {Math.round(aqiData.waqi_aqi ?? 0)} | EPA{" "}
+                {Math.round(aqiData.epa_estimate_aqi ?? 0)} | ML{" "}
+                {Math.round(aqiData.ml_estimate_aqi ?? 0)}
               </p>
             )}
             {aqiData?.dominant_pollutant && (

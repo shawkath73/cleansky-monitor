@@ -8,7 +8,7 @@ from services.geocoding import (
     search_city_with_station,
     get_default_cities,
 )
-from services.prediction import predict_aqi, predict_forecast
+from services.prediction import predict_aqi, predict_forecast, get_aqi_category
 from services.database import save_aqi_reading, save_forecast
 import json
 import os
@@ -19,6 +19,54 @@ aqi_bp = Blueprint('aqi', __name__)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 with open(os.path.join(BASE_DIR, 'models', 'model_metadata.json')) as f:
     metadata = json.load(f)
+
+
+ALLOWED_FORECAST_BREAKDOWNS = {1, 6, 12}
+
+
+def _aggregate_forecast(predictions: list, breakdown_hours: int) -> list:
+    """
+    Deterministic bucketing of forecast points.
+    Method:
+      - Group consecutive hourly points into fixed-size windows.
+      - Bucket AQI = arithmetic mean of AQI values in that window.
+      - Peak AQI = max AQI in that window.
+      - Category/color/emoji derived from bucket AQI.
+    """
+    if breakdown_hours == 1:
+        return predictions
+
+    buckets = []
+    for i in range(0, len(predictions), breakdown_hours):
+        chunk = predictions[i:i + breakdown_hours]
+        if not chunk:
+            continue
+
+        aqi_values = [float(item.get('aqi', 0) or 0) for item in chunk]
+        bucket_aqi = round(sum(aqi_values) / len(aqi_values), 1)
+        peak_aqi = round(max(aqi_values), 1)
+        cat = get_aqi_category(bucket_aqi)
+
+        dominant = chunk[-1].get('dominant', '')
+        for item in chunk:
+            dom = item.get('dominant', '')
+            if dom:
+                dominant = dom
+
+        buckets.append({
+            'datetime': chunk[0].get('datetime'),
+            'end_datetime': chunk[-1].get('datetime'),
+            'hour': chunk[0].get('hour', 0),
+            'aqi': bucket_aqi,
+            'peak_aqi': peak_aqi,
+            'points': len(chunk),
+            'category': cat['label'],
+            'color': cat['color'],
+            'emoji': cat['emoji'],
+            'dominant': dominant,
+        })
+
+    return buckets
 
 
 # ─────────────────────────────────────────
@@ -78,6 +126,13 @@ def forecast():
         city = request.args.get('city', 'Delhi')
         lat  = request.args.get('lat', None)
         lon  = request.args.get('lon', None)
+        breakdown_hours = int(request.args.get('breakdown_hours', 1))
+
+        if breakdown_hours not in ALLOWED_FORECAST_BREAKDOWNS:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid breakdown_hours. Allowed: 1, 6, 12'
+            }), 400
 
         if lat and lon:
             lat, lon = float(lat), float(lon)
@@ -87,13 +142,16 @@ def forecast():
 
         forecast_data = get_forecast_pollution(lat, lon)
         predictions   = predict_forecast(forecast_data, city)
+        forecast_out  = _aggregate_forecast(predictions, breakdown_hours)
 
-        aqi_values = [p['aqi'] for p in predictions]
+        aqi_values = [p['aqi'] for p in forecast_out]
         summary = {
             'min_aqi': min(aqi_values) if aqi_values else 0,
             'max_aqi': max(aqi_values) if aqi_values else 0,
             'avg_aqi': round(sum(aqi_values) / len(aqi_values), 1) if aqi_values else 0,
-            'hours':   len(predictions)
+            'hours':   len(predictions),
+            'breakdown_hours': breakdown_hours,
+            'buckets': len(forecast_out),
         }
 
         # Tag forecast source
@@ -109,8 +167,9 @@ def forecast():
             'success':     True,
             'city':        city,
             'data_source': fc_source,
+            'breakdown_hours': breakdown_hours,
             'summary':     summary,
-            'forecast':    predictions,
+            'forecast':    forecast_out,
             'forecast_id': forecast_id
         }), 200
 

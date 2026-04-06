@@ -21,9 +21,12 @@ export interface ForecastItem {
   color: string;
   emoji: string;
   datetime: string;
-  timestamp: string;
-  dt: number;
-  pollutants: Record<string, number>;
+  end_datetime?: string;
+  hour?: number;
+  timestamp?: string;
+  dominant?: string;
+  peak_aqi?: number;
+  points?: number;
 }
 
 export interface ForecastSummary {
@@ -31,6 +34,8 @@ export interface ForecastSummary {
   max_aqi: number;
   avg_aqi: number;
   hours: number;
+  breakdown_hours?: number;
+  buckets?: number;
 }
 
 export interface PollutantDetail {
