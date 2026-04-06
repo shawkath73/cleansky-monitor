@@ -201,7 +201,7 @@ export default function Dashboard() {
       animate="show"
     >
       {/* Hero Header */}
-      <motion.div variants={fadeUp}>
+      <motion.div variants={fadeUp} className="hero-atmosphere rounded-2xl p-6">
         <h1 className="text-3xl md:text-4xl font-bold text-[#E2E8F0] leading-tight">
           Monitoring Overview
         </h1>
@@ -219,12 +219,12 @@ export default function Dashboard() {
           {
             label: "Active Stations",
             value: activeStations,
-            icon: <RadioTower className="w-4 h-4 text-[#7C9CFF]" />,
+            icon: <RadioTower className="w-4 h-4 text-[#94A3B8]" />,
           },
           {
             label: "Network Avg AQI",
             value: networkAvgAQI,
-            icon: <Activity className="w-4 h-4 text-[#7C9CFF]" />,
+            icon: <Activity className="w-4 h-4 text-[#94A3B8]" />,
           },
           {
             label: "Poor+ Stations",

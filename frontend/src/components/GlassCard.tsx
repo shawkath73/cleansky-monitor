@@ -17,12 +17,12 @@ export default function GlassCard({
   delay = 0,
 }: GlassCardProps) {
   if (!animate) {
-    return <div className={`glass p-6 rounded-2xl ${className}`}>{children}</div>;
+    return <div className={`glass data-surface p-6 rounded-2xl ${className}`}>{children}</div>;
   }
 
   return (
     <motion.div
-      className={`glass p-6 rounded-2xl ${className}`}
+      className={`glass data-surface p-6 rounded-2xl ${className}`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{

@@ -13,6 +13,8 @@ import {
   ChevronDown,
   Menu,
   X,
+  Sun,
+  Moon,
   Building2,
   Loader2,
   Radio,
@@ -68,7 +70,9 @@ function CityItem({
     >
       <Building2 className="w-3.5 h-3.5 opacity-50 shrink-0" />
       <div className="flex-1 min-w-0">
-        <span className="block truncate font-medium">{result.city || result.name}</span>
+        <span className="block truncate font-medium">
+          {result.city || result.name}
+        </span>
         {result.state && (
           <span className="block text-xs text-[#64748B] truncate">
             {result.state}
@@ -105,11 +109,33 @@ export default function Navbar() {
   const [searching, setSearching] = useState(false);
   const [open, setOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const debouncedSearch = useDebounce(search, 300);
 
   // Load default cities on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    const prefersLight = window.matchMedia(
+      "(prefers-color-scheme: light)",
+    ).matches;
+    const initialTheme =
+      savedTheme === "light" || savedTheme === "dark"
+        ? (savedTheme as "light" | "dark")
+        : prefersLight
+          ? "light"
+          : "dark";
+
+    setTheme(initialTheme);
+    document.documentElement.setAttribute("data-theme", initialTheme);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
   useEffect(() => {
     fetchCities()
       .then((res) => {
@@ -125,13 +151,25 @@ export default function Navbar() {
       })
       .catch(() => {
         setDefaultCities(
-          ["Delhi", "Mumbai", "Chennai", "Kolkata", "Bangalore",
-           "Hyderabad", "Ahmedabad", "Pune", "Jaipur", "Lucknow"].map(
-            (name) => ({
-              city: name, state: "", lat: 0, lon: 0,
-              station_name: "", aqi: "-",
-            })
-          )
+          [
+            "Delhi",
+            "Mumbai",
+            "Chennai",
+            "Kolkata",
+            "Bangalore",
+            "Hyderabad",
+            "Ahmedabad",
+            "Pune",
+            "Jaipur",
+            "Lucknow",
+          ].map((name) => ({
+            city: name,
+            state: "",
+            lat: 0,
+            lon: 0,
+            station_name: "",
+            aqi: "-",
+          })),
         );
       });
   }, []);
@@ -188,7 +226,7 @@ export default function Navbar() {
 
   // Which list to show: search results if actively searching, otherwise defaults
   const filteredDefaults = defaultCities.filter((c) =>
-    c.city.toLowerCase().includes(search.toLowerCase())
+    c.city.toLowerCase().includes(search.toLowerCase()),
   );
 
   const displayList =
@@ -204,8 +242,12 @@ export default function Navbar() {
       setSearch("");
       setSearchResults([]);
     },
-    [setCity]
+    [setCity],
   );
+
+  const toggleTheme = useCallback(() => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  }, []);
 
   return (
     <nav
@@ -241,6 +283,20 @@ export default function Navbar() {
               );
             })}
           </div>
+
+          {/* Theme toggle */}
+          <button
+            onClick={toggleTheme}
+            className="hidden sm:inline-flex items-center justify-center ml-3 p-2 rounded-lg glass-light text-[#94A3B8] hover:text-[#E2E8F0]"
+            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+            title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+          >
+            {theme === "dark" ? (
+              <Sun className="w-4 h-4" />
+            ) : (
+              <Moon className="w-4 h-4" />
+            )}
+          </button>
 
           {/* City search — Desktop */}
           <div className="relative hidden sm:block" ref={dropdownRef}>
@@ -287,9 +343,7 @@ export default function Navbar() {
                   {/* Section label */}
                   <div className="px-4 py-1.5">
                     <span className="text-[10px] text-[#64748B] uppercase tracking-widest font-medium">
-                      {search.length >= 2
-                        ? `Search results`
-                        : "Popular cities"}
+                      {search.length >= 2 ? `Search results` : "Popular cities"}
                     </span>
                   </div>
 
@@ -384,6 +438,18 @@ export default function Navbar() {
 
                 {/* City selector — mobile */}
                 <div className="sm:hidden mt-3 px-2">
+                  <button
+                    onClick={toggleTheme}
+                    className="w-full mb-2 flex items-center justify-center gap-2 bg-[#020617] border border-[#1E293B] rounded-lg px-3 py-2 text-sm text-[#E2E8F0]"
+                    aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+                  >
+                    {theme === "dark" ? (
+                      <Sun className="w-4 h-4" />
+                    ) : (
+                      <Moon className="w-4 h-4" />
+                    )}
+                    {theme === "dark" ? "Light theme" : "Dark theme"}
+                  </button>
                   <div className="flex items-center gap-2 mb-2 px-2">
                     <MapPin className="w-4 h-4 text-[#7C9CFF]" />
                     <span className="text-xs text-[#94A3B8] uppercase tracking-widest font-medium">
