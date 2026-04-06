@@ -209,7 +209,7 @@ export default function Navbar() {
 
   return (
     <nav
-      className="sticky top-0 z-50 glass border-b border-[#1E293B]/30"
+      className="sticky top-0 z-[3000] isolate glass border-b border-[#1E293B]/30"
       style={{ borderRadius: 0 }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -266,7 +266,7 @@ export default function Navbar() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.96 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
-                  className="absolute right-0 top-12 w-80 glass border border-[#1E293B]/50 rounded-xl overflow-hidden shadow-2xl"
+                  className="absolute right-0 top-12 z-[3100] w-80 glass border border-[#1E293B]/50 rounded-xl overflow-hidden shadow-2xl"
                 >
                   <div className="p-2">
                     <div className="relative">
@@ -361,7 +361,7 @@ export default function Navbar() {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="md:hidden overflow-hidden border-t border-[#1E293B]/30"
+              className="md:hidden relative z-[3100] overflow-hidden border-t border-[#1E293B]/30"
             >
               <div className="pb-4 mt-2 pt-3 flex flex-col gap-1">
                 {NAV_LINKS.map((link) => {
