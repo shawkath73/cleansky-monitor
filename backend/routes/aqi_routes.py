@@ -264,7 +264,8 @@ def search_cities():
     """
     try:
         keyword = request.args.get('q', '').strip()
-        limit   = int(request.args.get('limit', 5))
+        limit_param = request.args.get('limit', '').strip()
+        limit = int(limit_param) if limit_param else None
 
         if not keyword:
             return jsonify({'success': False, 'error': 'Query param ?q= is required'}), 400

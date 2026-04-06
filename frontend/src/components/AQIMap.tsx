@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import {
-  MapContainer,
-  TileLayer,
-  useMap,
-} from "react-leaflet";
+import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { motion, AnimatePresence } from "framer-motion";
@@ -60,7 +56,8 @@ function getAQIInfo(aqi: number) {
 }
 
 function isValidAQI(val: unknown): val is number {
-  if (val === null || val === undefined || val === "-" || val === "") return false;
+  if (val === null || val === undefined || val === "-" || val === "")
+    return false;
   const n = typeof val === "string" ? parseInt(val, 10) : (val as number);
   return !isNaN(n) && n > 0;
 }
@@ -92,7 +89,7 @@ function LocateMeButton() {
 
         try {
           const res = await fetch(
-            `/api/current-aqi?lat=${latitude}&lon=${longitude}`
+            `/api/current-aqi?lat=${latitude}&lon=${longitude}`,
           );
           const data = await res.json();
           if (data.success && data.data?.aqi) {
@@ -110,16 +107,16 @@ function LocateMeButton() {
         setLocating(false);
         setTimeout(() => setError(null), 3000);
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 10000 },
     );
   };
 
   return (
-    <div className="leaflet-top leaflet-right" style={{ pointerEvents: "auto" }}>
-      <div
-        className="leaflet-control"
-        style={{ margin: "12px 12px 0 0" }}
-      >
+    <div
+      className="leaflet-top leaflet-right"
+      style={{ pointerEvents: "auto" }}
+    >
+      <div className="leaflet-control" style={{ margin: "12px 12px 0 0" }}>
         <button
           id="locate-me-btn"
           onClick={handleLocate}
@@ -153,7 +150,10 @@ function LocateMeButton() {
           }}
         >
           {locating ? (
-            <Loader2 className="w-4 h-4 animate-spin" style={{ color: "#7C9CFF" }} />
+            <Loader2
+              className="w-4 h-4 animate-spin"
+              style={{ color: "#7C9CFF" }}
+            />
           ) : (
             <Navigation className="w-4 h-4" style={{ color: "#7C9CFF" }} />
           )}
@@ -178,8 +178,13 @@ function LocateMeButton() {
                 fontFamily: "Inter, system-ui, sans-serif",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <MapPin className="w-4 h-4" style={{ color: getAQIInfo(locAqi).color }} />
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
+                <MapPin
+                  className="w-4 h-4"
+                  style={{ color: getAQIInfo(locAqi).color }}
+                />
                 <span
                   style={{
                     fontSize: "12px",
@@ -297,7 +302,9 @@ function AQILegend() {
                   flexShrink: 0,
                 }}
               />
-              <span style={{ fontSize: "12px", color: "#CBD5E1", fontWeight: 500 }}>
+              <span
+                style={{ fontSize: "12px", color: "#CBD5E1", fontWeight: 500 }}
+              >
                 {cat.label}
               </span>
               <span
@@ -312,9 +319,12 @@ function AQILegend() {
                   ? "400+"
                   : cat.max === 50
                     ? "0–50"
-                    : `${AQI_CATEGORIES[AQI_CATEGORIES.indexOf(cat) - 1]?.max
-                        ? AQI_CATEGORIES[AQI_CATEGORIES.indexOf(cat) - 1].max + 1
-                        : 0}–${cat.max}`}
+                    : `${
+                        AQI_CATEGORIES[AQI_CATEGORIES.indexOf(cat) - 1]?.max
+                          ? AQI_CATEGORIES[AQI_CATEGORIES.indexOf(cat) - 1]
+                              .max + 1
+                          : 0
+                      }–${cat.max}`}
               </span>
             </div>
           ))}
@@ -323,7 +333,6 @@ function AQILegend() {
     </div>
   );
 }
-
 
 /* ── Custom pane so WAQI tiles don't block marker clicks ── */
 
@@ -409,7 +418,6 @@ function AQIDivMarkers({
   return null;
 }
 
-
 /* ── Station Info Panel (React overlay) ── */
 
 function StationInfoPanel({
@@ -419,8 +427,18 @@ function StationInfoPanel({
   detail: StationDetail;
   onClose: () => void;
 }) {
-  const { station, liveAqi, category, color, dominantPollutant, pollutants, loading, error } = detail;
-  const displayAqi = liveAqi ?? (isValidAQI(station.aqi) ? parseAQI(station.aqi) : null);
+  const {
+    station,
+    liveAqi,
+    category,
+    color,
+    dominantPollutant,
+    pollutants,
+    loading,
+    error,
+  } = detail;
+  const displayAqi =
+    liveAqi ?? (isValidAQI(station.aqi) ? parseAQI(station.aqi) : null);
   const displayInfo = displayAqi ? getAQIInfo(displayAqi) : null;
   const c = color || displayInfo?.color || "#7C9CFF";
 
@@ -482,15 +500,39 @@ function StationInfoPanel({
       </button>
 
       {/* Header title */}
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
-        <h2 style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "#E2E8F0" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          marginBottom: "16px",
+        }}
+      >
+        <h2
+          style={{
+            margin: 0,
+            fontSize: "16px",
+            fontWeight: 700,
+            color: "#E2E8F0",
+          }}
+        >
           <span style={{ color: "#38bdf8" }}>CleanSky</span> Air Quality
         </h2>
       </div>
 
       {/* Station Name Details */}
-      <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", marginBottom: "20px" }}>
-        <MapPin className="w-5 h-5" style={{ color: "#38bdf8", flexShrink: 0, marginTop: "2px" }} />
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "8px",
+          marginBottom: "20px",
+        }}
+      >
+        <MapPin
+          className="w-5 h-5"
+          style={{ color: "#38bdf8", flexShrink: 0, marginTop: "2px" }}
+        />
         <div>
           <h3
             style={{
@@ -524,8 +566,13 @@ function StationInfoPanel({
             marginBottom: "16px",
           }}
         >
-          <Loader2 className="w-5 h-5 animate-spin" style={{ color: "#7C9CFF" }} />
-          <span style={{ fontSize: "13px", color: "#94A3B8" }}>Fetching live data…</span>
+          <Loader2
+            className="w-5 h-5 animate-spin"
+            style={{ color: "#7C9CFF" }}
+          />
+          <span style={{ fontSize: "13px", color: "#94A3B8" }}>
+            Fetching live data…
+          </span>
         </div>
       )}
 
@@ -549,7 +596,16 @@ function StationInfoPanel({
       {/* AQI Display */}
       {displayAqi !== null && (
         <div style={{ marginBottom: "24px" }}>
-          <div style={{ fontSize: "12px", color: "#94A3B8", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+          <div
+            style={{
+              fontSize: "12px",
+              color: "#94A3B8",
+              marginBottom: "8px",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+          >
             <Wind className="w-4 h-4" />
             Air Quality Index
           </div>
@@ -567,7 +623,7 @@ function StationInfoPanel({
                 color: c,
                 lineHeight: 1,
                 fontVariantNumeric: "tabular-nums",
-                letterSpacing: "-0.04em"
+                letterSpacing: "-0.04em",
               }}
             >
               {displayAqi}
@@ -580,45 +636,90 @@ function StationInfoPanel({
                 borderRadius: "8px",
                 fontSize: "16px",
                 fontWeight: 700,
-                boxShadow: `0 4px 12px ${c}40`
+                boxShadow: `0 4px 12px ${c}40`,
               }}
             >
               {category || displayInfo?.label || "–"}
             </div>
           </div>
           {dominantPollutant && (
-               <div style={{ fontSize: "12px", color: "#94A3B8", marginTop: "12px" }}>
-                 Dominant Pollutant: <span style={{ color: "#E2E8F0", fontWeight: 600 }}>{dominantPollutant}</span>
-               </div>
-             )}
+            <div
+              style={{ fontSize: "12px", color: "#94A3B8", marginTop: "12px" }}
+            >
+              Dominant Pollutant:{" "}
+              <span style={{ color: "#E2E8F0", fontWeight: 600 }}>
+                {dominantPollutant}
+              </span>
+            </div>
+          )}
         </div>
       )}
 
       {/* Pollutant Breakdown - Styled like the screenshot */}
       {pollutantList.length > 0 && (
-        <div style={{ 
-          background: "rgba(255,255,255,0.03)", 
-          border: "1px solid rgba(255,255,255,0.06)",
-          borderRadius: "16px",
-          padding: "16px",
-          marginBottom: "20px" 
-        }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+        <div
+          style={{
+            background: "rgba(255,255,255,0.03)",
+            border: "1px solid rgba(255,255,255,0.06)",
+            borderRadius: "16px",
+            padding: "16px",
+            marginBottom: "20px",
+          }}
+        >
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "14px" }}
+          >
             {pollutantList.slice(0, 5).map(([name, value]) => {
               // rough normalization for max bar width (using an arbitrary 100 max for UI scale)
-              const maxVal = Math.max(pollutantList[0][1], 100); 
+              const maxVal = Math.max(pollutantList[0][1], 100);
               const pct = Math.min(100, Math.round((value / maxVal) * 100));
-              
+
               const isHigh = pct > 60;
-              const barColor = isHigh ? "#f97316" : (pct > 30 ? "#eab308" : "#84cc16");
+              const barColor = isHigh
+                ? "#f97316"
+                : pct > 30
+                  ? "#eab308"
+                  : "#84cc16";
 
               return (
-                <div key={name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <div style={{ width: "60px", color: "#E2E8F0", fontSize: "14px", fontWeight: 500 }}>
+                <div
+                  key={name}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "60px",
+                      color: "#E2E8F0",
+                      fontSize: "14px",
+                      fontWeight: 500,
+                    }}
+                  >
                     {name}
                   </div>
-                  <div style={{ width: "100px", textAlign: "right", color: "#F8FAFC", fontSize: "14px", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
-                    {value.toFixed(1)} <span style={{ fontSize: "10px", color: "#94A3B8", fontWeight: 500 }}>µg/m³</span>
+                  <div
+                    style={{
+                      width: "100px",
+                      textAlign: "right",
+                      color: "#F8FAFC",
+                      fontSize: "14px",
+                      fontWeight: 700,
+                      fontVariantNumeric: "tabular-nums",
+                    }}
+                  >
+                    {value.toFixed(1)}{" "}
+                    <span
+                      style={{
+                        fontSize: "10px",
+                        color: "#94A3B8",
+                        fontWeight: 500,
+                      }}
+                    >
+                      µg/m³
+                    </span>
                   </div>
                   <div
                     style={{
@@ -626,13 +727,17 @@ function StationInfoPanel({
                       height: "4px",
                       background: "rgba(255,255,255,0.1)",
                       borderRadius: "2px",
-                      position: "relative"
+                      position: "relative",
                     }}
                   >
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${pct}%` }}
-                      transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
+                      transition={{
+                        duration: 0.8,
+                        delay: 0.1,
+                        ease: "easeOut",
+                      }}
                       style={{
                         position: "absolute",
                         left: 0,
@@ -642,17 +747,19 @@ function StationInfoPanel({
                         borderRadius: "2px",
                       }}
                     />
-                    <div style={{
-                      position: "absolute",
-                      left: `${pct}%`,
-                      top: "50%",
-                      transform: "translate(-50%, -50%)",
-                      width: "8px",
-                      height: "8px",
-                      borderRadius: "50%",
-                      background: barColor,
-                      boxShadow: `0 0 6px ${barColor}`
-                    }}></div>
+                    <div
+                      style={{
+                        position: "absolute",
+                        left: `${pct}%`,
+                        top: "50%",
+                        transform: "translate(-50%, -50%)",
+                        width: "8px",
+                        height: "8px",
+                        borderRadius: "50%",
+                        background: barColor,
+                        boxShadow: `0 0 6px ${barColor}`,
+                      }}
+                    ></div>
                   </div>
                 </div>
               );
@@ -662,9 +769,21 @@ function StationInfoPanel({
       )}
 
       {/* Bottom Color Scale */}
-      <div style={{ display: "flex", borderRadius: "6px", overflow: "hidden", height: "12px", marginBottom: "20px" }}>
-        {AQI_CATEGORIES.map(cat => (
-          <div key={cat.label} style={{ flex: 1, backgroundColor: cat.color }} title={cat.label} />
+      <div
+        style={{
+          display: "flex",
+          borderRadius: "6px",
+          overflow: "hidden",
+          height: "12px",
+          marginBottom: "20px",
+        }}
+      >
+        {AQI_CATEGORIES.map((cat) => (
+          <div
+            key={cat.label}
+            style={{ flex: 1, backgroundColor: cat.color }}
+            title={cat.label}
+          />
         ))}
       </div>
 
@@ -678,7 +797,8 @@ function StationInfoPanel({
           gap: "8px",
           width: "100%",
           padding: "14px 0",
-          background: "linear-gradient(135deg, rgba(124, 156, 255, 0.2), rgba(124, 156, 255, 0.05))",
+          background:
+            "linear-gradient(135deg, rgba(124, 156, 255, 0.2), rgba(124, 156, 255, 0.05))",
           border: "1px solid rgba(124, 156, 255, 0.2)",
           color: "#7C9CFF",
           borderRadius: "12px",
@@ -688,11 +808,13 @@ function StationInfoPanel({
           transition: "all 0.2s",
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.background = "linear-gradient(135deg, rgba(124, 156, 255, 0.3), rgba(124, 156, 255, 0.1))";
+          e.currentTarget.style.background =
+            "linear-gradient(135deg, rgba(124, 156, 255, 0.3), rgba(124, 156, 255, 0.1))";
           e.currentTarget.style.transform = "translateY(-1px)";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.background = "linear-gradient(135deg, rgba(124, 156, 255, 0.2), rgba(124, 156, 255, 0.05))";
+          e.currentTarget.style.background =
+            "linear-gradient(135deg, rgba(124, 156, 255, 0.2), rgba(124, 156, 255, 0.05))";
           e.currentTarget.style.transform = "translateY(0)";
         }}
       >
@@ -703,13 +825,14 @@ function StationInfoPanel({
   );
 }
 
-
 /* ── Main Map Component ────────────────── */
 
 export default function AQIMap() {
   const [stations, setStations] = useState<CityStation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedDetail, setSelectedDetail] = useState<StationDetail | null>(null);
+  const [selectedDetail, setSelectedDetail] = useState<StationDetail | null>(
+    null,
+  );
 
   useEffect(() => {
     async function loadStations() {
@@ -747,8 +870,12 @@ export default function AQIMap() {
     // Fetch live data from backend
     try {
       const [aqiRes, pollRes] = await Promise.all([
-        fetch(`/api/current-aqi?city=${encodeURIComponent(station.name)}&lat=${station.lat}&lon=${station.lon}`).then((r) => r.json()),
-        fetch(`/api/pollutants?city=${encodeURIComponent(station.name)}&lat=${station.lat}&lon=${station.lon}`).then((r) => r.json()),
+        fetch(
+          `/api/current-aqi?city=${encodeURIComponent(station.name)}&lat=${station.lat}&lon=${station.lon}`,
+        ).then((r) => r.json()),
+        fetch(
+          `/api/pollutants?city=${encodeURIComponent(station.name)}&lat=${station.lat}&lon=${station.lon}`,
+        ).then((r) => r.json()),
       ]);
 
       const liveAqi = aqiRes.success ? Math.round(aqiRes.data.aqi) : aqi;
@@ -771,7 +898,9 @@ export default function AQIMap() {
         liveAqi,
         category: aqiRes.success ? aqiRes.data.category : liveInfo.label,
         color: liveInfo.color,
-        dominantPollutant: aqiRes.success ? aqiRes.data.dominant_pollutant || "" : "",
+        dominantPollutant: aqiRes.success
+          ? aqiRes.data.dominant_pollutant || ""
+          : "",
         pollutants: pollutantMap,
         loading: false,
         error: null,
@@ -781,7 +910,7 @@ export default function AQIMap() {
       setSelectedDetail((prev) =>
         prev
           ? { ...prev, loading: false, error: "Could not fetch live data" }
-          : null
+          : null,
       );
     }
   }, []);
@@ -885,7 +1014,10 @@ export default function AQIMap() {
         )}
 
         {/* Indian Station DivIcon Markers */}
-        <AQIDivMarkers stations={stations} onStationClick={handleStationClick} />
+        <AQIDivMarkers
+          stations={stations}
+          onStationClick={handleStationClick}
+        />
 
         {/* Locate Me Button */}
         <LocateMeButton />

@@ -118,6 +118,14 @@ export default function Dashboard() {
   const aqi = aqiData?.aqi ?? 0;
   const category = aqiData?.category ?? getAQICategory(aqi);
   const color = getAQIColorByValue(aqi);
+  const sourceLabelMap: Record<string, string> = {
+    waqi: "WAQI Live",
+    epa_fallback: "EPA Fallback",
+    ml_fallback: "ML Fallback",
+  };
+  const sourceLabel = aqiData?.current_source
+    ? sourceLabelMap[aqiData.current_source] || "Unknown"
+    : null;
 
   // Prepare chart data
   const chartData = forecast.map((item) => ({
@@ -174,6 +182,16 @@ export default function Dashboard() {
             >
               {getAQIEmoji(category)} {category}
             </span>
+            {sourceLabel && (
+              <p className="text-[#64748B] text-xs mt-2">
+                Source: <span className="text-[#94A3B8]">{sourceLabel}</span>
+              </p>
+            )}
+            {aqiData && (
+              <p className="text-[#64748B] text-xs mt-1">
+                WAQI {Math.round(aqiData.waqi_aqi ?? 0)} | EPA {Math.round(aqiData.epa_estimate_aqi ?? 0)} | ML {Math.round(aqiData.ml_estimate_aqi ?? 0)}
+              </p>
+            )}
             {aqiData?.dominant_pollutant && (
               <p className="text-[#64748B] text-xs mt-2">
                 Dominant pollutant:{" "}

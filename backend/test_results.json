@@ -4,7 +4,7 @@
     "category": "Moderate",
     "color": "#ffff00",
     "emoji": "\ud83d\udfe0",
-    "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+    "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
     "dominant_pollutant": "PM10",
     "pollutants": {
       "PM2.5": 85.5,
@@ -29,15 +29,15 @@
       "O3": 11.8
     },
     "city": "Delhi",
-    "datetime": "2026-03-31T19:46:02.610323",
+    "datetime": "2026-04-06T15:53:00.927854",
     "data_source": "waqi_mock",
     "station_name": "Delhi Anand Vihar",
     "waqi_aqi": 165
   },
   "test2_forecast": [
     {
-      "datetime": "2026-03-31T19:46:02.667999",
-      "hour": 19,
+      "datetime": "2026-04-06T15:53:01.031446",
+      "hour": 15,
       "aqi": 153.3,
       "category": "Moderate",
       "color": "#ffff00",
@@ -45,8 +45,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-03-31T20:46:02.667999",
-      "hour": 20,
+      "datetime": "2026-04-06T16:53:01.031446",
+      "hour": 16,
       "aqi": 154.3,
       "category": "Moderate",
       "color": "#ffff00",
@@ -54,44 +54,44 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-03-31T21:46:02.667999",
+      "datetime": "2026-04-06T17:53:01.031446",
+      "hour": 17,
+      "aqi": 155.3,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-06T18:53:01.031446",
+      "hour": 18,
+      "aqi": 156.3,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-06T19:53:01.031446",
+      "hour": 19,
+      "aqi": 157.4,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-06T20:53:01.031446",
+      "hour": 20,
+      "aqi": 158.4,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-06T21:53:01.031446",
       "hour": 21,
-      "aqi": 154.6,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-03-31T22:46:02.667999",
-      "hour": 22,
-      "aqi": 155.2,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-03-31T23:46:02.667999",
-      "hour": 23,
-      "aqi": 155.8,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-04-01T00:46:02.667999",
-      "hour": 0,
-      "aqi": 156.4,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-04-01T01:46:02.667999",
-      "hour": 1,
       "aqi": 157.0,
       "category": "Moderate",
       "color": "#ffff00",
@@ -99,8 +99,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-01T02:46:02.667999",
-      "hour": 2,
+      "datetime": "2026-04-06T22:53:01.031446",
+      "hour": 22,
       "aqi": 157.7,
       "category": "Moderate",
       "color": "#ffff00",
@@ -108,8 +108,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-01T03:46:02.667999",
-      "hour": 3,
+      "datetime": "2026-04-06T23:53:01.031446",
+      "hour": 23,
       "aqi": 158.3,
       "category": "Moderate",
       "color": "#ffff00",
@@ -117,8 +117,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-01T04:46:02.667999",
-      "hour": 4,
+      "datetime": "2026-04-07T00:53:01.031446",
+      "hour": 0,
       "aqi": 158.9,
       "category": "Moderate",
       "color": "#ffff00",
@@ -126,8 +126,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-01T05:46:02.667999",
-      "hour": 5,
+      "datetime": "2026-04-07T01:53:01.031446",
+      "hour": 1,
       "aqi": 159.5,
       "category": "Moderate",
       "color": "#ffff00",
@@ -135,44 +135,44 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-01T06:46:02.667999",
+      "datetime": "2026-04-07T02:53:01.031446",
+      "hour": 2,
+      "aqi": 160.1,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-07T03:53:01.031446",
+      "hour": 3,
+      "aqi": 160.8,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-07T04:53:01.031446",
+      "hour": 4,
+      "aqi": 161.4,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-07T05:53:01.031446",
+      "hour": 5,
+      "aqi": 162.0,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-07T06:53:01.031446",
       "hour": 6,
-      "aqi": 164.4,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-04-01T07:46:02.667999",
-      "hour": 7,
-      "aqi": 165.4,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-04-01T08:46:02.667999",
-      "hour": 8,
-      "aqi": 166.4,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-04-01T09:46:02.667999",
-      "hour": 9,
-      "aqi": 167.4,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-04-01T10:46:02.667999",
-      "hour": 10,
       "aqi": 168.4,
       "category": "Moderate",
       "color": "#ffff00",
@@ -180,8 +180,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-01T11:46:02.667999",
-      "hour": 11,
+      "datetime": "2026-04-07T07:53:01.031446",
+      "hour": 7,
       "aqi": 169.4,
       "category": "Moderate",
       "color": "#ffff00",
@@ -189,8 +189,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-01T12:46:02.667999",
-      "hour": 12,
+      "datetime": "2026-04-07T08:53:01.031446",
+      "hour": 8,
       "aqi": 170.4,
       "category": "Moderate",
       "color": "#ffff00",
@@ -198,8 +198,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-01T13:46:02.667999",
-      "hour": 13,
+      "datetime": "2026-04-07T09:53:01.031446",
+      "hour": 9,
       "aqi": 171.4,
       "category": "Moderate",
       "color": "#ffff00",
@@ -207,8 +207,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-01T14:46:02.667999",
-      "hour": 14,
+      "datetime": "2026-04-07T10:53:01.031446",
+      "hour": 10,
       "aqi": 172.5,
       "category": "Moderate",
       "color": "#ffff00",
@@ -216,8 +216,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-01T15:46:02.667999",
-      "hour": 15,
+      "datetime": "2026-04-07T11:53:01.031446",
+      "hour": 11,
       "aqi": 173.5,
       "category": "Moderate",
       "color": "#ffff00",
@@ -225,8 +225,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-01T16:46:02.667999",
-      "hour": 16,
+      "datetime": "2026-04-07T12:53:01.031446",
+      "hour": 12,
       "aqi": 174.5,
       "category": "Moderate",
       "color": "#ffff00",
@@ -234,8 +234,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-01T17:46:02.667999",
-      "hour": 17,
+      "datetime": "2026-04-07T13:53:01.031446",
+      "hour": 13,
       "aqi": 175.5,
       "category": "Moderate",
       "color": "#ffff00",
@@ -243,8 +243,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-01T18:46:02.667999",
-      "hour": 18,
+      "datetime": "2026-04-07T14:53:01.031446",
+      "hour": 14,
       "aqi": 176.5,
       "category": "Moderate",
       "color": "#ffff00",
@@ -252,8 +252,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-01T19:46:02.667999",
-      "hour": 19,
+      "datetime": "2026-04-07T15:53:01.031446",
+      "hour": 15,
       "aqi": 177.5,
       "category": "Moderate",
       "color": "#ffff00",
@@ -261,8 +261,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-01T20:46:02.667999",
-      "hour": 20,
+      "datetime": "2026-04-07T16:53:01.031446",
+      "hour": 16,
       "aqi": 178.5,
       "category": "Moderate",
       "color": "#ffff00",
@@ -270,44 +270,44 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-01T21:46:02.667999",
+      "datetime": "2026-04-07T17:53:01.031446",
+      "hour": 17,
+      "aqi": 179.5,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-07T18:53:01.031446",
+      "hour": 18,
+      "aqi": 180.5,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-07T19:53:01.031446",
+      "hour": 19,
+      "aqi": 181.5,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-07T20:53:01.031446",
+      "hour": 20,
+      "aqi": 182.5,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-07T21:53:01.031446",
       "hour": 21,
-      "aqi": 169.4,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-04-01T22:46:02.667999",
-      "hour": 22,
-      "aqi": 170.1,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-04-01T23:46:02.667999",
-      "hour": 23,
-      "aqi": 170.7,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-04-02T00:46:02.667999",
-      "hour": 0,
-      "aqi": 171.3,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-04-02T01:46:02.667999",
-      "hour": 1,
       "aqi": 171.9,
       "category": "Moderate",
       "color": "#ffff00",
@@ -315,8 +315,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-02T02:46:02.667999",
-      "hour": 2,
+      "datetime": "2026-04-07T22:53:01.031446",
+      "hour": 22,
       "aqi": 172.5,
       "category": "Moderate",
       "color": "#ffff00",
@@ -324,8 +324,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-02T03:46:02.667999",
-      "hour": 3,
+      "datetime": "2026-04-07T23:53:01.031446",
+      "hour": 23,
       "aqi": 173.2,
       "category": "Moderate",
       "color": "#ffff00",
@@ -333,8 +333,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-02T04:46:02.667999",
-      "hour": 4,
+      "datetime": "2026-04-08T00:53:01.031446",
+      "hour": 0,
       "aqi": 173.8,
       "category": "Moderate",
       "color": "#ffff00",
@@ -342,8 +342,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-02T05:46:02.667999",
-      "hour": 5,
+      "datetime": "2026-04-08T01:53:01.031446",
+      "hour": 1,
       "aqi": 174.4,
       "category": "Moderate",
       "color": "#ffff00",
@@ -351,44 +351,44 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-02T06:46:02.667999",
+      "datetime": "2026-04-08T02:53:01.031446",
+      "hour": 2,
+      "aqi": 175.0,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-08T03:53:01.031446",
+      "hour": 3,
+      "aqi": 175.6,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-08T04:53:01.031446",
+      "hour": 4,
+      "aqi": 176.2,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-08T05:53:01.031446",
+      "hour": 5,
+      "aqi": 176.9,
+      "category": "Moderate",
+      "color": "#ffff00",
+      "emoji": "\ud83d\udfe0",
+      "dominant": "PM10"
+    },
+    {
+      "datetime": "2026-04-08T06:53:01.031446",
       "hour": 6,
-      "aqi": 188.6,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-04-02T07:46:02.667999",
-      "hour": 7,
-      "aqi": 189.6,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-04-02T08:46:02.667999",
-      "hour": 8,
-      "aqi": 190.6,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-04-02T09:46:02.667999",
-      "hour": 9,
-      "aqi": 191.6,
-      "category": "Moderate",
-      "color": "#ffff00",
-      "emoji": "\ud83d\udfe0",
-      "dominant": "PM10"
-    },
-    {
-      "datetime": "2026-04-02T10:46:02.667999",
-      "hour": 10,
       "aqi": 192.6,
       "category": "Moderate",
       "color": "#ffff00",
@@ -396,8 +396,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-02T11:46:02.667999",
-      "hour": 11,
+      "datetime": "2026-04-08T07:53:01.031446",
+      "hour": 7,
       "aqi": 193.6,
       "category": "Moderate",
       "color": "#ffff00",
@@ -405,8 +405,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-02T12:46:02.667999",
-      "hour": 12,
+      "datetime": "2026-04-08T08:53:01.031446",
+      "hour": 8,
       "aqi": 194.6,
       "category": "Moderate",
       "color": "#ffff00",
@@ -414,8 +414,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-02T13:46:02.667999",
-      "hour": 13,
+      "datetime": "2026-04-08T09:53:01.031446",
+      "hour": 9,
       "aqi": 195.6,
       "category": "Moderate",
       "color": "#ffff00",
@@ -423,8 +423,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-02T14:46:02.667999",
-      "hour": 14,
+      "datetime": "2026-04-08T10:53:01.031446",
+      "hour": 10,
       "aqi": 196.6,
       "category": "Moderate",
       "color": "#ffff00",
@@ -432,8 +432,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-02T15:46:02.667999",
-      "hour": 15,
+      "datetime": "2026-04-08T11:53:01.031446",
+      "hour": 11,
       "aqi": 197.6,
       "category": "Moderate",
       "color": "#ffff00",
@@ -441,8 +441,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-02T16:46:02.667999",
-      "hour": 16,
+      "datetime": "2026-04-08T12:53:01.031446",
+      "hour": 12,
       "aqi": 198.6,
       "category": "Moderate",
       "color": "#ffff00",
@@ -450,8 +450,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-02T17:46:02.667999",
-      "hour": 17,
+      "datetime": "2026-04-08T13:53:01.031446",
+      "hour": 13,
       "aqi": 199.6,
       "category": "Moderate",
       "color": "#ffff00",
@@ -459,8 +459,8 @@
       "dominant": "PM10"
     },
     {
-      "datetime": "2026-04-02T18:46:02.667999",
-      "hour": 18,
+      "datetime": "2026-04-08T14:53:01.031446",
+      "hour": 14,
       "aqi": 202.1,
       "category": "Poor",
       "color": "#ff7e00",
@@ -474,7 +474,7 @@
       "category": "Moderate",
       "color": "#ffff00",
       "emoji": "\ud83d\udfe0",
-      "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+      "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
       "dominant_pollutant": "PM10",
       "pollutants": {
         "PM2.5": 75.0,
@@ -499,14 +499,14 @@
         "O3": 11.0
       },
       "city": "Delhi",
-      "datetime": "2026-03-31T19:46:03.528412"
+      "datetime": "2026-04-06T15:53:01.806680"
     },
     {
       "aqi": 161.1,
       "category": "Moderate",
       "color": "#ffff00",
       "emoji": "\ud83d\udfe0",
-      "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+      "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
       "dominant_pollutant": "PM10",
       "pollutants": {
         "PM2.5": 75.0,
@@ -531,14 +531,14 @@
         "O3": 11.0
       },
       "city": "Mumbai",
-      "datetime": "2026-03-31T19:46:03.528412"
+      "datetime": "2026-04-06T15:53:01.806680"
     },
     {
       "aqi": 161.1,
       "category": "Moderate",
       "color": "#ffff00",
       "emoji": "\ud83d\udfe0",
-      "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+      "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
       "dominant_pollutant": "PM10",
       "pollutants": {
         "PM2.5": 75.0,
@@ -563,14 +563,14 @@
         "O3": 11.0
       },
       "city": "Chennai",
-      "datetime": "2026-03-31T19:46:03.528412"
+      "datetime": "2026-04-06T15:53:01.806680"
     },
     {
       "aqi": 161.1,
       "category": "Moderate",
       "color": "#ffff00",
       "emoji": "\ud83d\udfe0",
-      "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+      "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
       "dominant_pollutant": "PM10",
       "pollutants": {
         "PM2.5": 75.0,
@@ -595,14 +595,14 @@
         "O3": 11.0
       },
       "city": "Kolkata",
-      "datetime": "2026-03-31T19:46:03.528412"
+      "datetime": "2026-04-06T15:53:01.806680"
     },
     {
       "aqi": 161.1,
       "category": "Moderate",
       "color": "#ffff00",
       "emoji": "\ud83d\udfe0",
-      "recommendation": "Sensitive groups may experience effects. General public less likely affected.",
+      "recommendation": "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
       "dominant_pollutant": "PM10",
       "pollutants": {
         "PM2.5": 75.0,
@@ -627,7 +627,7 @@
         "O3": 11.0
       },
       "city": "Bangalore",
-      "datetime": "2026-03-31T19:46:03.528412"
+      "datetime": "2026-04-06T15:53:01.806680"
     }
   ],
   "test4_live_apis": {

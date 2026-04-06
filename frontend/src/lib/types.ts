@@ -9,6 +9,10 @@ export interface AQIData {
   pollutant_percentages: Record<string, number>;
   color: string;
   emoji: string;
+  current_source?: "waqi" | "epa_fallback" | "ml_fallback";
+  waqi_aqi?: number;
+  epa_estimate_aqi?: number;
+  ml_estimate_aqi?: number;
 }
 
 export interface ForecastItem {

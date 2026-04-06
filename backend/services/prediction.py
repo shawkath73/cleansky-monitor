@@ -170,7 +170,7 @@ def predict_aqi(pollution_data: dict, city: str = 'Delhi') -> dict:
     """
     input_df, dominant_pollutant = engineer_features(pollution_data, city)
 
-    # XGBoost prediction
+    # ML estimate is kept for diagnostics, but not used as primary current AQI.
     ml_aqi = float(model.predict(input_df)[0])
 
     # EPA formula as ground truth
@@ -179,19 +179,32 @@ def predict_aqi(pollution_data: dict, city: str = 'Delhi') -> dict:
     no2   = float(pollution_data.get('NO2',   0))
     epa_aqi = max(pm25_to_aqi(pm25), pm10_to_aqi(pm10), no2_to_aqi(no2))
 
-    # Use whichever is higher — EPA and WAQI are reliable fallbacks
+    # Live current AQI should come from the live provider (WAQI) when available.
+    # Fallback order for current AQI: WAQI -> EPA computed from raw pollutants -> ML estimate.
     try:
         waqi_val = pollution_data.get('waqi_aqi', 0)
         waqi_aqi = float(waqi_val) if waqi_val not in ['-', ''] else 0.0
     except (ValueError, TypeError):
         waqi_aqi = 0.0
-        
-    predicted_aqi = max(ml_aqi, epa_aqi, waqi_aqi)
-    predicted_aqi = max(0, round(predicted_aqi, 1))
 
-    print(f"🔍 Debug → ML: {ml_aqi:.1f} | EPA: {epa_aqi:.1f} | WAQI: {waqi_aqi:.1f} | Final: {predicted_aqi}")
+    if waqi_aqi > 0:
+        current_aqi = waqi_aqi
+        current_source = 'waqi'
+    elif epa_aqi > 0:
+        current_aqi = epa_aqi
+        current_source = 'epa_fallback'
+    else:
+        current_aqi = ml_aqi
+        current_source = 'ml_fallback'
 
-    category = get_aqi_category(predicted_aqi)
+    current_aqi = max(0, round(current_aqi, 1))
+
+    print(
+        f"🔍 Debug → CurrentSource: {current_source} | "
+        f"WAQI: {waqi_aqi:.1f} | EPA: {epa_aqi:.1f} | ML: {ml_aqi:.1f} | Current: {current_aqi}"
+    )
+
+    category = get_aqi_category(current_aqi)
 
     # Pollutant breakdown for dashboard chart
     pollutant_values = {p: round(float(pollution_data.get(p, 0)), 2) for p in pollutant_cols}
@@ -203,7 +216,7 @@ def predict_aqi(pollution_data: dict, city: str = 'Delhi') -> dict:
     }
 
     return {
-        'aqi':                 predicted_aqi,
+        'aqi':                 current_aqi,
         'category':            category['label'],
         'color':               category['color'],
         'emoji':               category['emoji'],
@@ -211,6 +224,10 @@ def predict_aqi(pollution_data: dict, city: str = 'Delhi') -> dict:
         'dominant_pollutant':  dominant_pollutant,
         'pollutants':          pollutant_values,
         'pollutant_percentages': pollutant_percentages,
+        'current_source':      current_source,
+        'ml_estimate_aqi':     round(max(0, ml_aqi), 1),
+        'epa_estimate_aqi':    round(max(0, epa_aqi), 1),
+        'waqi_aqi':            round(max(0, waqi_aqi), 1),
         'city':                city,
         'datetime':            pollution_data.get('datetime', datetime.utcnow().isoformat())
     }
