@@ -28,6 +28,7 @@ import {
   CartesianGrid,
   Area,
   AreaChart,
+  Line,
 } from "recharts";
 import { motion } from "framer-motion";
 import {
@@ -192,13 +193,22 @@ export default function Dashboard() {
 
   // Prepare chart data
   const chartData = forecast.map((item, i) => {
-    const baseBand =
+    const fallbackSpread =
       sourceKey === "waqi" ? 8 : sourceKey === "epa_fallback" ? 14 : 20;
     const horizonSpread = i * 0.5;
-    const uncertainty = baseBand + horizonSpread;
+    const derivedSpread = fallbackSpread + horizonSpread;
     const roundedAqi = Math.round(item.aqi);
-    const lower = Math.max(0, Math.round(roundedAqi - uncertainty));
-    const upper = Math.min(500, Math.round(roundedAqi + uncertainty));
+
+    const minLine = Math.round(item.min_aqi ?? roundedAqi);
+    const maxLine = Math.round(item.max_aqi ?? roundedAqi);
+    const medianLine = Math.round(item.median_aqi ?? roundedAqi);
+
+    const uncertaintyMin = Math.round(
+      item.uncertainty_min_aqi ?? Math.max(0, medianLine - derivedSpread),
+    );
+    const uncertaintyMax = Math.round(
+      item.uncertainty_max_aqi ?? Math.min(500, medianLine + derivedSpread),
+    );
 
     return {
       time: new Date(
@@ -208,9 +218,11 @@ export default function Dashboard() {
         minute: "2-digit",
       }),
       aqi: roundedAqi,
-      lower,
-      band: upper - lower,
-      uncertainty: Math.round(uncertainty),
+      minLine,
+      maxLine,
+      medianLine,
+      uncertaintyMin,
+      uncertaintyBand: Math.max(0, uncertaintyMax - uncertaintyMin),
     };
   });
 
@@ -489,9 +501,25 @@ export default function Dashboard() {
             <TrendingUp className="w-4 h-4 text-[#7C9CFF]" />
             24-Hour AQI Forecast
           </h2>
+          <div className="flex flex-wrap items-center gap-2 mb-3 text-[11px]">
+            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#0B1220]/70 border border-[#1E293B]/50 text-[#94A3B8]">
+              <span className="w-3 h-[2px] bg-[#7C9CFF]" /> Predicted AQI
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#0B1220]/70 border border-[#1E293B]/50 text-[#94A3B8]">
+              <span className="w-3 h-[2px] bg-[#22D3EE]" /> Median
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#0B1220]/70 border border-[#1E293B]/50 text-[#94A3B8]">
+              <span className="w-3 h-[2px] border-t border-dashed border-[#94A3B8]" />
+              Min/Max
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#0B1220]/70 border border-[#1E293B]/50 text-[#94A3B8]">
+              <span className="w-3 h-2 bg-[#7C9CFF]/25 rounded-sm" />
+              Confidence area
+            </span>
+          </div>
           <p className="text-xs text-[#64748B] mb-3">
-            Includes estimated uncertainty band that widens over forecast
-            horizon.
+            Includes min/max/median trajectories and a deterministic confidence
+            area that widens over forecast horizon.
           </p>
           <div
             className="overflow-x-auto"
@@ -531,7 +559,7 @@ export default function Dashboard() {
                   />
                   <Area
                     type="monotone"
-                    dataKey="lower"
+                    dataKey="uncertaintyMin"
                     stackId="uncertainty"
                     stroke="none"
                     fill="transparent"
@@ -540,11 +568,37 @@ export default function Dashboard() {
                   />
                   <Area
                     type="monotone"
-                    dataKey="band"
+                    dataKey="uncertaintyBand"
                     stackId="uncertainty"
                     stroke="none"
                     fill="#7C9CFF"
                     fillOpacity={0.12}
+                    activeDot={false}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="maxLine"
+                    stroke="#94A3B8"
+                    strokeWidth={1.5}
+                    strokeDasharray="5 4"
+                    dot={false}
+                    activeDot={false}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="minLine"
+                    stroke="#94A3B8"
+                    strokeWidth={1.5}
+                    strokeDasharray="5 4"
+                    dot={false}
+                    activeDot={false}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="medianLine"
+                    stroke="#22D3EE"
+                    strokeWidth={2}
+                    dot={false}
                     activeDot={false}
                   />
                   <Area

@@ -24,6 +24,17 @@ with open(os.path.join(BASE_DIR, 'models', 'model_metadata.json')) as f:
 ALLOWED_FORECAST_BREAKDOWNS = {1, 6, 12}
 
 
+def _median(values: list) -> float:
+    if not values:
+        return 0.0
+    ordered = sorted(values)
+    n = len(ordered)
+    mid = n // 2
+    if n % 2 == 1:
+        return float(ordered[mid])
+    return float((ordered[mid - 1] + ordered[mid]) / 2)
+
+
 def _aggregate_forecast(predictions: list, breakdown_hours: int) -> list:
     """
     Deterministic bucketing of forecast points.
@@ -45,6 +56,9 @@ def _aggregate_forecast(predictions: list, breakdown_hours: int) -> list:
         aqi_values = [float(item.get('aqi', 0) or 0) for item in chunk]
         bucket_aqi = round(sum(aqi_values) / len(aqi_values), 1)
         peak_aqi = round(max(aqi_values), 1)
+        min_aqi = round(min(aqi_values), 1)
+        max_aqi = round(max(aqi_values), 1)
+        median_aqi = round(_median(aqi_values), 1)
         cat = get_aqi_category(bucket_aqi)
 
         dominant = chunk[-1].get('dominant', '')
@@ -59,6 +73,9 @@ def _aggregate_forecast(predictions: list, breakdown_hours: int) -> list:
             'hour': chunk[0].get('hour', 0),
             'aqi': bucket_aqi,
             'peak_aqi': peak_aqi,
+            'min_aqi': min_aqi,
+            'max_aqi': max_aqi,
+            'median_aqi': median_aqi,
             'points': len(chunk),
             'category': cat['label'],
             'color': cat['color'],
@@ -67,6 +84,46 @@ def _aggregate_forecast(predictions: list, breakdown_hours: int) -> list:
         })
 
     return buckets
+
+
+def _attach_forecast_uncertainty_bounds(forecast_points: list, data_source: str) -> list:
+    """
+    Attach deterministic uncertainty bounds to each forecast point.
+    These are UI-facing ranges (not probabilistic confidence intervals).
+    """
+    if not forecast_points:
+        return []
+
+    source_base_spread = {
+        'waqi_daily_fc': 10,
+        'owm_fc': 14,
+        'unknown': 16,
+    }
+    base_spread = source_base_spread.get(data_source, 16)
+    horizon_len = max(len(forecast_points) - 1, 1)
+
+    enriched = []
+    for i, point in enumerate(forecast_points):
+        center = float(point.get('aqi', 0) or 0)
+        raw_min = float(point.get('min_aqi', center) or center)
+        raw_max = float(point.get('max_aqi', center) or center)
+        raw_median = float(point.get('median_aqi', center) or center)
+
+        horizon_factor = 1 + (i / horizon_len) * 0.45
+        spread = base_spread * horizon_factor
+
+        uncertainty_min = round(max(0, raw_median - spread), 1)
+        uncertainty_max = round(min(500, raw_median + spread), 1)
+
+        item = dict(point)
+        item['min_aqi'] = round(raw_min, 1)
+        item['max_aqi'] = round(raw_max, 1)
+        item['median_aqi'] = round(raw_median, 1)
+        item['uncertainty_min_aqi'] = uncertainty_min
+        item['uncertainty_max_aqi'] = uncertainty_max
+        enriched.append(item)
+
+    return enriched
 
 
 # ─────────────────────────────────────────
@@ -144,6 +201,10 @@ def forecast():
         predictions   = predict_forecast(forecast_data, city)
         forecast_out  = _aggregate_forecast(predictions, breakdown_hours)
 
+        # Tag forecast source
+        fc_source = forecast_data[0].get('source', 'unknown') if forecast_data else 'unknown'
+        forecast_out = _attach_forecast_uncertainty_bounds(forecast_out, fc_source)
+
         aqi_values = [p['aqi'] for p in forecast_out]
         summary = {
             'min_aqi': min(aqi_values) if aqi_values else 0,
@@ -153,9 +214,6 @@ def forecast():
             'breakdown_hours': breakdown_hours,
             'buckets': len(forecast_out),
         }
-
-        # Tag forecast source
-        fc_source = forecast_data[0].get('source', 'unknown') if forecast_data else 'unknown'
 
         forecast_id = None
         try:

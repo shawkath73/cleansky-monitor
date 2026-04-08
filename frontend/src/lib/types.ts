@@ -30,6 +30,11 @@ export interface ForecastItem {
   dominant?: string;
   peak_aqi?: number;
   points?: number;
+  min_aqi?: number;
+  max_aqi?: number;
+  median_aqi?: number;
+  uncertainty_min_aqi?: number;
+  uncertainty_max_aqi?: number;
 }
 
 export interface ForecastSummary {
