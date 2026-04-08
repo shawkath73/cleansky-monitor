@@ -11,3 +11,5 @@ gunicorn==25.1.0
 pymongo==4.16.0
 dnspython==2.8.0
 PyJWT==2.12.1
+deep-translator==1.11.4
+langdetect==1.0.9

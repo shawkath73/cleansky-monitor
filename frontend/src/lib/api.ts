@@ -112,6 +112,13 @@ export async function searchCities(query: string) {
   return fetchJSON<{
     success: boolean;
     query: string;
+    normalized_query?: string;
+    original_query?: string;
+    translated_query?: string;
+    detected_language?: string;
+    translation_applied?: boolean;
+    translation_failed?: boolean;
+    translation_error?: string | null;
     count: number;
     results: CitySearchResult[];
   }>(`${API_BASE}/search-cities?q=${encodeURIComponent(query)}`);
