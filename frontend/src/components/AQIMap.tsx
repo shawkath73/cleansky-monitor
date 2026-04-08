@@ -375,18 +375,17 @@ function AQIDivMarkers({
           html: `<div class="aqi-marker-ring" style="
             position:relative;
             display:flex;align-items:center;justify-content:center;
-            width:40px;height:40px;border-radius:50%;
+            width:20px;height:20px;border-radius:50%;
             background:${info.color};
-            border:3px solid rgba(255,255,255,0.5);
-            color:#fff;font-size:12px;font-weight:800;
+            border:2px solid rgba(255,255,255,0.55);
             font-family:Inter,system-ui,sans-serif;
             box-shadow:0 2px 12px ${info.color}90, 0 0 24px ${info.color}40;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             cursor:pointer;
             z-index:800;
-          ">${aqi}</div>`,
-          iconSize: [40, 40],
-          iconAnchor: [20, 20],
+          "></div>`,
+          iconSize: [20, 20],
+          iconAnchor: [10, 10],
         });
 
         const marker = L.marker([station.lat, station.lon], {
@@ -1013,7 +1012,7 @@ export default function AQIMap() {
           />
         )}
 
-        {/* Indian Station DivIcon Markers */}
+        {/* WAQI Station DivIcon Markers */}
         <AQIDivMarkers
           stations={stations}
           onStationClick={handleStationClick}
