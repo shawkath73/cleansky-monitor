@@ -1,44 +1,61 @@
 # CleanSky Monitor Frontend
 
-This is the Next.js frontend application for the **CleanSky Monitor** project, built using the App Router.
+Next.js App Router frontend for CleanSky Monitor.
 
-## 🚀 Getting Started
+## Highlights
 
-First, install the dependencies (assuming you are using npm, yarn, or pnpm):
+- Dashboard with real-time AQI, pollutant insights, and health guidance
+- Confidence-focused UX:
+  - last updated indicator
+  - confidence score
+  - fallback source warning
+- Forecast charts with uncertainty area and min/max/median overlays
+- Historical insights:
+  - 7d/30d trend
+  - hour-of-day pattern
+  - weekday pattern
+- Forecast-based guidance cards:
+  - safe outdoor window
+  - sensitive group recommendations
+  - duration-based suggestions
+- Global WAQI map overlay with custom compact markers
+- Responsive dark/light theme support
+
+## Getting Started
+
+Install dependencies:
 
 ```bash
 npm install
-# or
-yarn install
-# or
-pnpm install
 ```
 
-Then, run the development server:
+Create `frontend/.env.local` (optional but recommended):
+
+```env
+# Optional proxy target for /api rewrite
+# Defaults to http://127.0.0.1:5000 in development.
+API_PROXY_TARGET=http://127.0.0.1:5000
+
+# Optional WAQI tile token for map overlay
+NEXT_PUBLIC_WAQI_TOKEN=your_waqi_token
+```
+
+Run dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the running dashboard.
+Open `http://localhost:3000`.
 
-## 🎨 Design System
+## Notes
 
-The frontend is built with an extreme focus on aesthetics, utilizing a premium dark-mode glassmorphism design:
-- **Animations**: Smooth transitions, loading bars, and variants are powered by `framer-motion`.
-- **Icons**: Consistent UI iconography is provided by `lucide-react`.
-- **Mapping**: Dynamic, layer-based maps via `react-leaflet` and `leaflet` customized for the UI.
-- **Components**: Reusable UI elements like `GlassCard` are used throughout the application.
-- **Styling**: We leverage vanilla CSS and `globals.css` to build an independent, tailored design system.
+- The frontend uses `/api/*` routes and relies on Next rewrites to reach the backend.
+- If you edit `next.config.ts`, restart the Next dev server.
 
-## 📂 Key Directories
+## Key Directories
 
-- `src/app/` - Next.js App Router pages (Dashboard, Forecast, Pollutants, Health, Auth, Map).
-- `src/components/` - Reusable React components (e.g., GlassCard, LoadingBar, AQIMap).
-- `src/app/globals.css` - Global design tokens and glassmorphism styling.
+- `src/app/`: app router pages (dashboard, forecast, map, health, pollutants)
+- `src/components/`: shared UI components (`AQIMap`, `AQIGauge`, `GlassCard`, etc.)
+- `src/lib/`: API client and type definitions
+- `src/context/`: shared city selection context
