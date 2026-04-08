@@ -2,14 +2,15 @@ from flask import Flask
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
+from services.database import connect_db, save_model_metadata
+from services.cache import cache
 
 # Load environment variables
 load_dotenv()
 
-from services.database import connect_db, save_model_metadata
-
 def create_app():
     app = Flask(__name__)
+    cache.init_app(app)
 
         # Connect to MongoDB
     CORS(app, resources={

@@ -1,4 +1,6 @@
 from flask import Blueprint, request, jsonify
+from collections import defaultdict
+from urllib.parse import urlencode
 from services.weather import (
     get_current_pollution,
     get_forecast_pollution,
@@ -10,10 +12,21 @@ from services.geocoding import (
 )
 from services.prediction import predict_aqi, predict_forecast, get_aqi_category
 from services.database import save_aqi_reading, save_forecast, get_aqi_history
+from services.cache import cache
 import json
 import os
 from datetime import datetime, timezone, timedelta
 from zoneinfo import ZoneInfo
+
+try:
+    from deep_translator import GoogleTranslator
+except Exception:
+    GoogleTranslator = None
+
+try:
+    from langdetect import detect as detect_language
+except Exception:
+    detect_language = None
 
 aqi_bp = Blueprint('aqi', __name__)
 
@@ -24,6 +37,123 @@ with open(os.path.join(BASE_DIR, 'models', 'model_metadata.json')) as f:
 
 
 ALLOWED_FORECAST_BREAKDOWNS = {1, 6, 12}
+CACHE_TTL_CURRENT_AQI = 5 * 60
+CACHE_TTL_FORECAST = 30 * 60
+CACHE_TTL_CITIES = 24 * 60 * 60
+
+# Keep a lightweight city -> cache-key index so we can invalidate per city.
+_CITY_CACHE_KEYS = defaultdict(set)
+
+
+def _normalize_city_text(text: str) -> dict:
+    """
+    Detect language and normalize a user-provided city to English.
+    Always returns a safe fallback (original text) if detection/translation fails.
+    """
+    original = (text or '').strip()
+    meta = {
+        'original_text': original,
+        'english_text': original,
+        'detected_language': 'unknown',
+        'translation_applied': False,
+        'translation_failed': False,
+        'translation_error': None,
+    }
+
+    if not original:
+        return meta
+
+    is_ascii = all(ord(ch) < 128 for ch in original)
+    if is_ascii:
+        meta['detected_language'] = 'en'
+        return meta
+
+    if detect_language is not None:
+        try:
+            detected = detect_language(original)
+            if detected:
+                meta['detected_language'] = detected
+        except Exception:
+            # Keep fallback as unknown when detection cannot classify input.
+            pass
+
+    if GoogleTranslator is None:
+        meta['translation_failed'] = True
+        meta['translation_error'] = 'translator_unavailable'
+        return meta
+
+    try:
+        translated = GoogleTranslator(source='auto', target='en').translate(original)
+        translated = (translated or '').strip()
+
+        if translated:
+            meta['english_text'] = translated
+            meta['translation_applied'] = translated.casefold() != original.casefold()
+        else:
+            meta['translation_failed'] = True
+            meta['translation_error'] = 'empty_translation'
+    except Exception as exc:
+        meta['translation_failed'] = True
+        meta['translation_error'] = str(exc)
+
+    return meta
+
+
+def _normalize_search_keyword(keyword: str) -> tuple[str, str]:
+    meta = _normalize_city_text(keyword)
+    return meta['original_text'], meta['english_text']
+
+
+def _refresh_requested() -> bool:
+    return request.args.get('refresh', '').strip().lower() == 'true'
+
+
+def _cache_key_from_request(prefix: str, city_key_enabled: bool = False) -> str:
+    pairs = []
+
+    for arg_name in request.args:
+        if arg_name == 'refresh':
+            continue
+        for value in request.args.getlist(arg_name):
+            item_value = (value or '').strip()
+            if arg_name == 'city' and item_value:
+                item_value = _normalize_city_text(item_value)['english_text'] or item_value
+            pairs.append((arg_name, item_value))
+
+    pairs.sort(key=lambda item: (item[0], item[1]))
+    query = urlencode(pairs, doseq=True)
+    key = f"{prefix}:{request.path}"
+    if query:
+        key = f"{key}?{query}"
+
+    if city_key_enabled:
+        city_values = [val for name, val in pairs if name == 'city' and val]
+        for city_val in city_values:
+            _CITY_CACHE_KEYS[city_val.casefold()].add(key)
+
+    return key
+
+
+def _current_aqi_cache_key() -> str:
+    return _cache_key_from_request('current-aqi', city_key_enabled=True)
+
+
+def _forecast_cache_key() -> str:
+    return _cache_key_from_request('forecast', city_key_enabled=True)
+
+
+def _cities_cache_key() -> str:
+    return _cache_key_from_request('cities', city_key_enabled=False)
+
+
+def _invalidate_city_cache(city_name: str):
+    normalized = (city_name or '').strip().casefold()
+    if not normalized:
+        return
+
+    keys = _CITY_CACHE_KEYS.pop(normalized, set())
+    for key in keys:
+        cache.delete(key)
 
 
 def _median(values: list) -> float:
@@ -150,9 +280,17 @@ def _parse_history_datetime(raw_dt):
 # Returns live AQI prediction for a city
 # ─────────────────────────────────────────
 @aqi_bp.route('/current-aqi', methods=['GET'])
+@cache.cached(
+    timeout=CACHE_TTL_CURRENT_AQI,
+    query_string=True,
+    forced_update=_refresh_requested,
+    make_cache_key=_current_aqi_cache_key,
+)
 def current_aqi():
     try:
-        city = request.args.get('city', 'Delhi')
+        city_raw = request.args.get('city', 'Delhi')
+        city_meta = _normalize_city_text(city_raw)
+        city = city_meta['english_text'] or 'Delhi'
         lat  = request.args.get('lat', None)
         lon  = request.args.get('lon', None)
 
@@ -178,11 +316,19 @@ def current_aqi():
         reading_id = None
         try:
             reading_id = save_aqi_reading(city, pollution_data, result['aqi'])
+            if reading_id:
+                _invalidate_city_cache(city)
         except Exception as e:
             print(f"⚠️ AQI save failed: {e}")
 
         return jsonify({
             'success':    True,
+            'city_original': city_meta['original_text'],
+            'city_english': city,
+            'detected_language': city_meta['detected_language'],
+            'translation_applied': city_meta['translation_applied'],
+            'translation_failed': city_meta['translation_failed'],
+            'translation_error': city_meta['translation_error'],
             'data':       result,
             'reading_id': reading_id
         }), 200
@@ -196,9 +342,17 @@ def current_aqi():
 # Returns 48-hour AQI forecast
 # ─────────────────────────────────────────
 @aqi_bp.route('/forecast', methods=['GET'])
+@cache.cached(
+    timeout=CACHE_TTL_FORECAST,
+    query_string=True,
+    forced_update=_refresh_requested,
+    make_cache_key=_forecast_cache_key,
+)
 def forecast():
     try:
-        city = request.args.get('city', 'Delhi')
+        city_raw = request.args.get('city', 'Delhi')
+        city_meta = _normalize_city_text(city_raw)
+        city = city_meta['english_text'] or 'Delhi'
         lat  = request.args.get('lat', None)
         lon  = request.args.get('lon', None)
         breakdown_hours = int(request.args.get('breakdown_hours', 1))
@@ -236,11 +390,19 @@ def forecast():
         forecast_id = None
         try:
             forecast_id = save_forecast(city, predictions, summary)
+            if forecast_id:
+                _invalidate_city_cache(city)
         except Exception as e:
             print(f"⚠️ Forecast save failed: {e}")
 
         return jsonify({
             'success':     True,
+            'city_original': city_meta['original_text'],
+            'city_english': city,
+            'detected_language': city_meta['detected_language'],
+            'translation_applied': city_meta['translation_applied'],
+            'translation_failed': city_meta['translation_failed'],
+            'translation_error': city_meta['translation_error'],
             'city':        city,
             'data_source': fc_source,
             'breakdown_hours': breakdown_hours,
@@ -321,7 +483,9 @@ def health_risk():
 @aqi_bp.route('/pollutants', methods=['GET'])
 def pollutants():
     try:
-        city = request.args.get('city', 'Delhi')
+        city_raw = request.args.get('city', 'Delhi')
+        city_meta = _normalize_city_text(city_raw)
+        city = city_meta['english_text'] or 'Delhi'
         lat  = request.args.get('lat', None)
         lon  = request.args.get('lon', None)
 
@@ -360,6 +524,12 @@ def pollutants():
 
         return jsonify({
             'success':            True,
+            'city_original':       city_meta['original_text'],
+            'city_english':        city,
+            'detected_language':   city_meta['detected_language'],
+            'translation_applied': city_meta['translation_applied'],
+            'translation_failed':  city_meta['translation_failed'],
+            'translation_error':   city_meta['translation_error'],
             'city':               city,
             'data_source':        pollution_data.get('source', 'unknown'),
             'station_name':       pollution_data.get('station_name', city),
@@ -377,6 +547,12 @@ def pollutants():
 # Returns default popular Indian cities
 # ─────────────────────────────────────────
 @aqi_bp.route('/cities', methods=['GET'])
+@cache.cached(
+    timeout=CACHE_TTL_CITIES,
+    query_string=True,
+    forced_update=_refresh_requested,
+    make_cache_key=_cities_cache_key,
+)
 def cities():
     defaults = get_default_cities()
     return jsonify({
@@ -393,7 +569,9 @@ def cities():
 @aqi_bp.route('/history', methods=['GET'])
 def history():
     try:
-        city = request.args.get('city', 'Delhi')
+        city_raw = request.args.get('city', 'Delhi')
+        city_meta = _normalize_city_text(city_raw)
+        city = city_meta['english_text'] or 'Delhi'
         days = int(request.args.get('days', 30))
         days = max(1, min(days, 30))
         tz_name = request.args.get('tz', 'Asia/Kolkata')
@@ -492,6 +670,12 @@ def history():
 
         return jsonify({
             'success': True,
+            'city_original': city_meta['original_text'],
+            'city_english': city,
+            'detected_language': city_meta['detected_language'],
+            'translation_applied': city_meta['translation_applied'],
+            'translation_failed': city_meta['translation_failed'],
+            'translation_error': city_meta['translation_error'],
             'city': city,
             'days': days,
             'timezone': tz_name,
@@ -508,14 +692,13 @@ def history():
 
 # ─────────────────────────────────────────
 # GET /api/search-cities?q=kochi
-# Geocode + WAQI station matching search
+# Global city search with language normalization
 # ─────────────────────────────────────────
 @aqi_bp.route('/search-cities', methods=['GET'])
 def search_cities():
     """
-    Search Indian cities by keyword using geocode.maps.co
-    and match with nearest WAQI monitoring station.
-    Returns city name, state, lat/lon, station name, and live AQI.
+    Search global cities by keyword and normalize non-English input to English.
+    Returns city name, state, lat/lon, station name, live AQI, and translation metadata.
     """
     try:
         keyword = request.args.get('q', '').strip()
@@ -525,14 +708,37 @@ def search_cities():
         if not keyword:
             return jsonify({'success': False, 'error': 'Query param ?q= is required'}), 400
 
-        if len(keyword) < 2:
-            return jsonify({'success': True, 'query': keyword, 'count': 0, 'results': []}), 200
+        keyword_meta = _normalize_city_text(keyword)
+        original_keyword = keyword_meta['original_text']
+        english_keyword = keyword_meta['english_text']
 
-        results = search_city_with_station(keyword, limit=limit)
+        if len(english_keyword) < 2:
+            return jsonify({
+                'success': True,
+                'query': original_keyword,
+                'normalized_query': english_keyword,
+                'original_query': original_keyword,
+                'translated_query': english_keyword,
+                'detected_language': keyword_meta['detected_language'],
+                'translation_applied': keyword_meta['translation_applied'],
+                'translation_failed': keyword_meta['translation_failed'],
+                'translation_error': keyword_meta['translation_error'],
+                'count': 0,
+                'results': []
+            }), 200
+
+        results = search_city_with_station(english_keyword, limit=limit)
 
         return jsonify({
             'success': True,
-            'query':   keyword,
+            'query':   original_keyword,
+            'normalized_query': english_keyword,
+            'original_query': original_keyword,
+            'translated_query': english_keyword,
+            'detected_language': keyword_meta['detected_language'],
+            'translation_applied': keyword_meta['translation_applied'],
+            'translation_failed': keyword_meta['translation_failed'],
+            'translation_error': keyword_meta['translation_error'],
             'count':   len(results),
             'results': results
         }), 200

@@ -49,6 +49,20 @@ function getAQIBadgeColor(aqi: number | string): string {
   return "#7C3AED";
 }
 
+function getCityLabel(result: CitySearchResult): string {
+  return (result.city || result.name || "").trim();
+}
+
+function sortCitiesAlphabetically(
+  cities: CitySearchResult[],
+): CitySearchResult[] {
+  return [...cities].sort((a, b) =>
+    getCityLabel(a).localeCompare(getCityLabel(b), "en", {
+      sensitivity: "base",
+    }),
+  );
+}
+
 // City item component (shared between desktop and mobile)
 function CityItem({
   result,
@@ -106,6 +120,7 @@ export default function Navbar() {
   // Dynamic search results
   const [searchResults, setSearchResults] = useState<CitySearchResult[]>([]);
   const [search, setSearch] = useState("");
+  const [normalizedSearch, setNormalizedSearch] = useState("");
   const [searching, setSearching] = useState(false);
   const [open, setOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -147,29 +162,31 @@ export default function Navbar() {
           station_name: "",
           aqi: "-",
         }));
-        setDefaultCities(defaults);
+        setDefaultCities(sortCitiesAlphabetically(defaults));
       })
       .catch(() => {
         setDefaultCities(
-          [
-            "Delhi",
-            "Mumbai",
-            "Chennai",
-            "Kolkata",
-            "Bangalore",
-            "Hyderabad",
-            "Ahmedabad",
-            "Pune",
-            "Jaipur",
-            "Lucknow",
-          ].map((name) => ({
-            city: name,
-            state: "",
-            lat: 0,
-            lon: 0,
-            station_name: "",
-            aqi: "-",
-          })),
+          sortCitiesAlphabetically(
+            [
+              "Delhi",
+              "Mumbai",
+              "Chennai",
+              "Kolkata",
+              "Bangalore",
+              "Hyderabad",
+              "Ahmedabad",
+              "Pune",
+              "Jaipur",
+              "Lucknow",
+            ].map((name) => ({
+              city: name,
+              state: "",
+              lat: 0,
+              lon: 0,
+              station_name: "",
+              aqi: "-",
+            })),
+          ),
         );
       });
   }, []);
@@ -180,6 +197,7 @@ export default function Navbar() {
       // Clear state asynchronously to avoid React cascading render warnings
       const t = setTimeout(() => {
         setSearchResults([]);
+        setNormalizedSearch("");
         setSearching(false);
       }, 0);
       return () => clearTimeout(t);
@@ -193,13 +211,15 @@ export default function Navbar() {
     searchCities(debouncedSearch)
       .then((res) => {
         if (!cancelled) {
-          setSearchResults(res.results);
+          setSearchResults(sortCitiesAlphabetically(res.results));
+          setNormalizedSearch((res.translated_query || res.normalized_query || "").trim());
           setSearching(false);
         }
       })
       .catch(() => {
         if (!cancelled) {
           setSearchResults([]);
+          setNormalizedSearch("");
           setSearching(false);
         }
       });
@@ -233,6 +253,10 @@ export default function Navbar() {
     search.length >= 2 && searchResults.length > 0
       ? searchResults
       : filteredDefaults;
+  const showNormalizedSearch =
+    search.length >= 2 &&
+    normalizedSearch.length > 0 &&
+    normalizedSearch.toLowerCase() !== search.trim().toLowerCase();
 
   const handleSelect = useCallback(
     (result: CitySearchResult) => {
@@ -240,6 +264,7 @@ export default function Navbar() {
       setOpen(false);
       setMobileOpen(false);
       setSearch("");
+      setNormalizedSearch("");
       setSearchResults([]);
     },
     [setCity],
@@ -328,7 +353,7 @@ export default function Navbar() {
                     <div className="relative">
                       <input
                         type="text"
-                        placeholder="Search any Indian city…"
+                        placeholder="Search any city worldwide…"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         className="w-full bg-[#020617] border border-[#1E293B] rounded-lg px-3 py-2 text-sm text-[#E2E8F0] placeholder-[#64748B] outline-none focus:border-[#7C9CFF] transition-colors pr-8"
@@ -345,6 +370,11 @@ export default function Navbar() {
                     <span className="text-[10px] text-[#64748B] uppercase tracking-widest font-medium">
                       {search.length >= 2 ? `Search results` : "Popular cities"}
                     </span>
+                    {showNormalizedSearch && (
+                      <p className="mt-1 text-[11px] text-[#94A3B8]">
+                        Searching as: <span className="text-[#7C9CFF]">{normalizedSearch}</span>
+                      </p>
+                    )}
                   </div>
 
                   <ul className="max-h-64 overflow-y-auto">
@@ -459,7 +489,7 @@ export default function Navbar() {
                   <div className="relative">
                     <input
                       type="text"
-                      placeholder="Search any Indian city…"
+                      placeholder="Search any city worldwide…"
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                       className="w-full bg-[#020617] border border-[#1E293B] rounded-lg px-3 py-2 text-sm text-[#E2E8F0] placeholder-[#64748B] outline-none focus:border-[#7C9CFF] transition-colors mb-1 pr-8"
@@ -468,6 +498,11 @@ export default function Navbar() {
                       <Loader2 className="absolute right-3 top-2.5 w-4 h-4 text-[#7C9CFF] animate-spin" />
                     )}
                   </div>
+                  {showNormalizedSearch && (
+                    <p className="px-2 mb-2 text-[11px] text-[#94A3B8]">
+                      Searching as: <span className="text-[#7C9CFF]">{normalizedSearch}</span>
+                    </p>
+                  )}
                   <ul className="max-h-44 overflow-y-auto rounded-lg border border-[#1E293B]/40 bg-[#020617]/80">
                     {displayList.map((result, i) => (
                       <li key={`mobile-${result.city}-${result.lat}-${i}`}>
