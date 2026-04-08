@@ -47,6 +47,9 @@ import {
   RadioTower,
   ShieldAlert,
   Activity,
+  Clock3,
+  Users,
+  Timer,
 } from "lucide-react";
 
 interface StationSnapshot {
@@ -381,6 +384,96 @@ export default function Dashboard() {
           .filter((x) => x.count > 0)
           .map((x) => ({ day: x.day, aqi: Math.round(x.aqi) }))
       : weekdayPatternFallback;
+
+  const parsedForecast = forecast
+    .map((item) => {
+      const dt = new Date(item.datetime ?? item.timestamp ?? "");
+      return {
+        dt,
+        aqi: Number(item.aqi || 0),
+      };
+    })
+    .filter((item) => !Number.isNaN(item.dt.getTime()) && item.aqi > 0)
+    .sort((a, b) => a.dt.getTime() - b.dt.getTime());
+
+  const minWindowHours = 2;
+  let bestWindow:
+    | { start: Date; end: Date; avgAqi: number; maxAqi: number }
+    | null = null;
+
+  for (let i = 0; i <= parsedForecast.length - minWindowHours; i += 1) {
+    const chunk = parsedForecast.slice(i, i + minWindowHours);
+    if (chunk.length < minWindowHours) continue;
+
+    const consecutive =
+      chunk[chunk.length - 1].dt.getTime() - chunk[0].dt.getTime() <=
+      (minWindowHours - 1) * 60 * 60 * 1000 + 10 * 60 * 1000;
+    if (!consecutive) continue;
+
+    const aqiValues = chunk.map((x) => x.aqi);
+    const avgAqi = aqiValues.reduce((sum, val) => sum + val, 0) / aqiValues.length;
+    const maxAqi = Math.max(...aqiValues);
+
+    if (!bestWindow || avgAqi < bestWindow.avgAqi) {
+      bestWindow = {
+        start: chunk[0].dt,
+        end: chunk[chunk.length - 1].dt,
+        avgAqi,
+        maxAqi,
+      };
+    }
+  }
+
+  const safeWindowLabel = bestWindow
+    ? `${bestWindow.start.toLocaleTimeString([], { hour: "numeric" })}-${bestWindow.end.toLocaleTimeString([], { hour: "numeric" })}`
+    : "Unavailable";
+  const safeWindowTrusted = !!bestWindow && bestWindow.maxAqi <= 120;
+
+  const sensitiveGuidance =
+    aqi <= 100
+      ? [
+          "Children and older adults can do regular outdoor activities.",
+          "Asthma patients should still carry rescue medication.",
+        ]
+      : aqi <= 200
+        ? [
+            "Children, elderly, and pregnant people should limit exertion.",
+            "Respiratory or cardiac patients should prefer short, low-intensity outings.",
+          ]
+        : aqi <= 300
+          ? [
+              "Sensitive groups should avoid outdoor exercise.",
+              "If stepping out is required, use N95 masks and keep duration short.",
+            ]
+          : [
+              "All sensitive groups should stay indoors as much as possible.",
+              "Use air purification indoors and avoid outdoor exposure.",
+            ];
+
+  const durationGuidance =
+    aqi <= 50
+      ? [
+          "Light activity: up to 2 hours",
+          "Moderate activity: 60-90 minutes",
+          "High intensity: 30-45 minutes",
+        ]
+      : aqi <= 100
+        ? [
+            "Light activity: 60-90 minutes",
+            "Moderate activity: 30-45 minutes",
+            "High intensity: up to 20 minutes",
+          ]
+        : aqi <= 200
+          ? [
+              "Light activity: 20-40 minutes",
+              "Moderate activity: up to 20 minutes",
+              "High intensity: avoid outdoors",
+            ]
+          : [
+              "Light activity: up to 15 minutes only if necessary",
+              "Moderate activity: avoid outdoors",
+              "High intensity: avoid outdoors",
+            ];
 
   return (
     <motion.div
@@ -735,6 +828,59 @@ export default function Dashboard() {
               </ResponsiveContainer>
             </div>
           </div>
+        </GlassCard>
+      </motion.div>
+
+      {/* Row 2.5: Actionable guidance from forecast */}
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        variants={fadeUp}
+      >
+        <GlassCard>
+          <h3 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-3 flex items-center gap-2">
+            <Clock3 className="w-4 h-4 text-[#7C9CFF]" />
+            Safe Outdoor Window
+          </h3>
+          <p className="text-2xl font-bold text-[#E2E8F0]">{safeWindowLabel}</p>
+          <p className="text-xs text-[#64748B] mt-2">
+            Best 2-hour window in the next 24 hours based on lowest forecast AQI.
+          </p>
+          <p
+            className="text-xs mt-2"
+            style={{ color: safeWindowTrusted ? "#22C55E" : "#F97316" }}
+          >
+            {safeWindowTrusted
+              ? "Window is low-risk for most users"
+              : "No clearly low-risk window; use caution"}
+          </p>
+        </GlassCard>
+
+        <GlassCard>
+          <h3 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-3 flex items-center gap-2">
+            <Users className="w-4 h-4 text-[#22D3EE]" />
+            Sensitive Group Guidance
+          </h3>
+          <ul className="space-y-2">
+            {sensitiveGuidance.map((tip, i) => (
+              <li key={i} className="text-sm text-[#94A3B8] leading-relaxed">
+                {tip}
+              </li>
+            ))}
+          </ul>
+        </GlassCard>
+
+        <GlassCard>
+          <h3 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-3 flex items-center gap-2">
+            <Timer className="w-4 h-4 text-[#F59E0B]" />
+            Duration Recommendations
+          </h3>
+          <ul className="space-y-2">
+            {durationGuidance.map((tip, i) => (
+              <li key={i} className="text-sm text-[#94A3B8] leading-relaxed">
+                {tip}
+              </li>
+            ))}
+          </ul>
         </GlassCard>
       </motion.div>
 
