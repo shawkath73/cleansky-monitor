@@ -46,6 +46,32 @@ export interface ForecastSummary {
   buckets?: number;
 }
 
+export interface HistoryReading {
+  datetime: string;
+  aqi: number;
+  location: string;
+  source: string;
+}
+
+export interface TrendDailyPoint {
+  date: string;
+  aqi: number;
+  count: number;
+  in_last_7d: boolean;
+}
+
+export interface HourPatternPoint {
+  hour: string;
+  aqi: number;
+  count: number;
+}
+
+export interface WeekdayPatternPoint {
+  day: string;
+  aqi: number;
+  count: number;
+}
+
 export interface PollutantDetail {
   name: string;
   value: number;

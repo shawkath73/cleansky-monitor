@@ -9,9 +9,11 @@ from services.geocoding import (
     get_default_cities,
 )
 from services.prediction import predict_aqi, predict_forecast, get_aqi_category
-from services.database import save_aqi_reading, save_forecast
+from services.database import save_aqi_reading, save_forecast, get_aqi_history
 import json
 import os
+from datetime import datetime, timezone, timedelta
+from zoneinfo import ZoneInfo
 
 aqi_bp = Blueprint('aqi', __name__)
 
@@ -124,6 +126,22 @@ def _attach_forecast_uncertainty_bounds(forecast_points: list, data_source: str)
         enriched.append(item)
 
     return enriched
+
+
+def _parse_history_datetime(raw_dt):
+    if isinstance(raw_dt, datetime):
+        dt = raw_dt
+    elif isinstance(raw_dt, str) and raw_dt:
+        try:
+            dt = datetime.fromisoformat(raw_dt.replace('Z', '+00:00'))
+        except Exception:
+            return None
+    else:
+        return None
+
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt
 
 
 # ─────────────────────────────────────────
@@ -366,6 +384,126 @@ def cities():
         'count':   len(defaults),
         'cities':  defaults
     }), 200
+
+
+# ─────────────────────────────────────────
+# GET /api/history?city=Delhi&days=30
+# Returns historical AQI readings for trend and pattern charts
+# ─────────────────────────────────────────
+@aqi_bp.route('/history', methods=['GET'])
+def history():
+    try:
+        city = request.args.get('city', 'Delhi')
+        days = int(request.args.get('days', 30))
+        days = max(1, min(days, 30))
+        tz_name = request.args.get('tz', 'Asia/Kolkata')
+
+        try:
+            tz = ZoneInfo(tz_name)
+        except Exception:
+            tz = timezone.utc
+            tz_name = 'UTC'
+
+        docs = get_aqi_history(city, days=days)
+        readings = []
+        valid_points = []
+
+        for doc in docs:
+            dt = doc.get('datetime')
+            parsed_dt = _parse_history_datetime(dt)
+            if not parsed_dt:
+                continue
+
+            local_dt = parsed_dt.astimezone(tz)
+            iso_dt = local_dt.isoformat()
+            aqi_val = float(doc.get('aqi', 0) or 0)
+            if aqi_val <= 0:
+                continue
+
+            readings.append({
+                'datetime': iso_dt,
+                'aqi': aqi_val,
+                'location': doc.get('location', city),
+                'source': doc.get('source', 'unknown'),
+            })
+            valid_points.append((local_dt, aqi_val))
+
+        now_local = datetime.now(tz)
+        cutoff_7d = now_local - timedelta(days=7)
+
+        # Daily trend aggregation
+        daily_map = {}
+        for local_dt, aqi_val in valid_points:
+            key = local_dt.date().isoformat()
+            if key not in daily_map:
+                daily_map[key] = {
+                    'date': local_dt.strftime('%b %d'),
+                    'ts': local_dt.timestamp(),
+                    'total': 0.0,
+                    'count': 0,
+                    'in_last_7d': local_dt >= cutoff_7d,
+                }
+            daily_map[key]['total'] += aqi_val
+            daily_map[key]['count'] += 1
+
+        trend_daily = []
+        for item in sorted(daily_map.values(), key=lambda x: x['ts']):
+            trend_daily.append({
+                'date': item['date'],
+                'aqi': round(item['total'] / max(item['count'], 1), 1),
+                'count': item['count'],
+                'in_last_7d': item['in_last_7d'],
+            })
+
+        # Hour-of-day aggregation
+        hour_totals = [{'hour': h, 'total': 0.0, 'count': 0} for h in range(24)]
+        for local_dt, aqi_val in valid_points:
+            hour_idx = local_dt.hour
+            hour_totals[hour_idx]['total'] += aqi_val
+            hour_totals[hour_idx]['count'] += 1
+
+        hour_pattern = []
+        for item in hour_totals:
+            count = item['count']
+            avg_aqi = round(item['total'] / count, 1) if count > 0 else 0.0
+            hour_pattern.append({
+                'hour': f"{item['hour']:02d}:00",
+                'aqi': avg_aqi,
+                'count': count,
+            })
+
+        # Weekday aggregation
+        weekday_names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+        weekday_totals = [{'day': d, 'total': 0.0, 'count': 0} for d in weekday_names]
+        for local_dt, aqi_val in valid_points:
+            weekday_idx = (local_dt.weekday() + 1) % 7  # Monday=0 -> Sun=0 format
+            weekday_totals[weekday_idx]['total'] += aqi_val
+            weekday_totals[weekday_idx]['count'] += 1
+
+        weekday_pattern = []
+        for item in weekday_totals:
+            count = item['count']
+            avg_aqi = round(item['total'] / count, 1) if count > 0 else 0.0
+            weekday_pattern.append({
+                'day': item['day'],
+                'aqi': avg_aqi,
+                'count': count,
+            })
+
+        return jsonify({
+            'success': True,
+            'city': city,
+            'days': days,
+            'timezone': tz_name,
+            'count': len(readings),
+            'readings': readings,
+            'trend_daily': trend_daily,
+            'hour_pattern': hour_pattern,
+            'weekday_pattern': weekday_pattern,
+        }), 200
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 # ─────────────────────────────────────────

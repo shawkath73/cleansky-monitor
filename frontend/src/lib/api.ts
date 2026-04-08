@@ -84,6 +84,20 @@ export async function fetchCities() {
   }>(`${API_BASE}/cities`);
 }
 
+export async function fetchAQIHistory(city: string, days = 30) {
+  return fetchJSON<{
+    success: boolean;
+    city: string;
+    days: number;
+    timezone: string;
+    count: number;
+    readings: import("./types").HistoryReading[];
+    trend_daily: import("./types").TrendDailyPoint[];
+    hour_pattern: import("./types").HourPatternPoint[];
+    weekday_pattern: import("./types").WeekdayPatternPoint[];
+  }>(`${API_BASE}/history?city=${encodeURIComponent(city)}&days=${days}`);
+}
+
 export interface CitySearchResult {
   city: string;
   state: string;
