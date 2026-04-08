@@ -11,6 +11,7 @@ import {
   fetchAQIHistory,
 } from "@/lib/api";
 import { getAQICategory, getAQIColorByValue, getAQIEmoji } from "@/lib/aqi";
+import { buildCsvContent, triggerCsvDownload } from "@/lib/csv";
 import type {
   AQIData,
   ForecastItem,
@@ -50,6 +51,7 @@ import {
   Clock3,
   Users,
   Timer,
+  Download,
 } from "lucide-react";
 
 interface StationSnapshot {
@@ -87,6 +89,7 @@ export default function Dashboard() {
     [],
   );
   const [loading, setLoading] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -475,6 +478,120 @@ export default function Dashboard() {
               "High intensity: avoid outdoors",
             ];
 
+  const handleDownloadCsv = () => {
+    if (!aqiData) return;
+
+    setIsExporting(true);
+    try {
+      const forecastStaleToleranceMs = 3 * 60 * 60 * 1000;
+      const nowMs = Date.now();
+      const exportedAt = new Date().toISOString();
+      const currentDatetime = aqiData.datetime
+        ? new Date(aqiData.datetime).toISOString()
+        : "";
+      const currentPollutants = aqiData.pollutants || {};
+
+      const validForecastItems = forecast.filter((item) => {
+        const rawDatetime = item.datetime || item.timestamp;
+        if (!rawDatetime) return false;
+
+        const forecastTimeMs = new Date(rawDatetime).getTime();
+        if (Number.isNaN(forecastTimeMs)) return false;
+
+        return forecastTimeMs >= nowMs - forecastStaleToleranceMs;
+      });
+      const forecastWasFiltered = validForecastItems.length < forecast.length;
+
+      const headers = [
+        "record_type",
+        "city",
+        "exported_at_utc",
+        "data_datetime_utc",
+        "aqi",
+        "category",
+        "dominant_pollutant",
+        "source",
+        "forecast_is_stale",
+        "pm2_5_ug_m3",
+        "pm10_ug_m3",
+        "no2_ug_m3",
+        "o3_ug_m3",
+        "co_ug_m3",
+        "so2_ug_m3",
+        "forecast_min_aqi",
+        "forecast_median_aqi",
+        "forecast_max_aqi",
+        "uncertainty_min_aqi",
+        "uncertainty_max_aqi",
+      ];
+
+      const currentRow = {
+        record_type: "current",
+        city,
+        exported_at_utc: exportedAt,
+        data_datetime_utc: currentDatetime,
+        aqi: Math.round(aqiData.aqi),
+        category: aqiData.category,
+        dominant_pollutant: aqiData.dominant_pollutant,
+        source: aqiData.current_source ?? aqiData.data_source ?? "unknown",
+        forecast_is_stale: forecastWasFiltered,
+        pm2_5_ug_m3: currentPollutants["PM2.5"] ?? "",
+        pm10_ug_m3: currentPollutants.PM10 ?? "",
+        no2_ug_m3: currentPollutants.NO2 ?? "",
+        o3_ug_m3: currentPollutants.O3 ?? "",
+        co_ug_m3: currentPollutants.CO ?? "",
+        so2_ug_m3: currentPollutants.SO2 ?? "",
+        forecast_min_aqi: "",
+        forecast_median_aqi: "",
+        forecast_max_aqi: "",
+        uncertainty_min_aqi: "",
+        uncertainty_max_aqi: "",
+      };
+
+      const forecastRows = validForecastItems.map((item) => {
+        const forecastDatetime = item.datetime || item.timestamp || "";
+        return {
+          record_type: "forecast",
+          city,
+          exported_at_utc: exportedAt,
+          data_datetime_utc: forecastDatetime
+            ? new Date(forecastDatetime).toISOString()
+            : "",
+          aqi: Math.round(item.aqi),
+          category: item.category,
+          dominant_pollutant: item.dominant ?? "",
+          source: sourceKey,
+          forecast_is_stale: false,
+          pm2_5_ug_m3: "",
+          pm10_ug_m3: "",
+          no2_ug_m3: "",
+          o3_ug_m3: "",
+          co_ug_m3: "",
+          so2_ug_m3: "",
+          forecast_min_aqi: item.min_aqi ?? "",
+          forecast_median_aqi: item.median_aqi ?? "",
+          forecast_max_aqi: item.max_aqi ?? "",
+          uncertainty_min_aqi: item.uncertainty_min_aqi ?? "",
+          uncertainty_max_aqi: item.uncertainty_max_aqi ?? "",
+        };
+      });
+
+      const csvContent = buildCsvContent(headers, [currentRow, ...forecastRows]);
+      const citySlug = city
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+      const stamp = new Date()
+        .toISOString()
+        .replace(/[-:]/g, "")
+        .replace(/\.\d{3}Z$/, "Z");
+
+      triggerCsvDownload(`cleansky_${citySlug || "city"}_${stamp}.csv`, csvContent);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <motion.div
       className="space-y-6"
@@ -484,12 +601,25 @@ export default function Dashboard() {
     >
       {/* Hero Header */}
       <motion.div variants={fadeUp} className="hero-atmosphere rounded-2xl p-6">
-        <h1 className="text-3xl md:text-4xl font-bold text-[#E2E8F0] leading-tight">
-          Monitoring Overview
-        </h1>
-        <p className="text-[#64748B] text-sm mt-2 uppercase tracking-widest">
-          Network status across tracked stations · Updated every 5 minutes
-        </p>
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold text-[#E2E8F0] leading-tight">
+              Monitoring Overview
+            </h1>
+            <p className="text-[#64748B] text-sm mt-2 uppercase tracking-widest">
+              Network status across tracked stations · Updated every 5 minutes
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleDownloadCsv}
+            disabled={!aqiData || isExporting}
+            className="inline-flex w-full md:w-auto items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#020617] border border-[#1E293B] text-sm text-[#E2E8F0] hover:border-[#7C9CFF]/60 hover:text-[#7C9CFF] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <Download className="w-4 h-4" />
+            {isExporting ? "Preparing CSV..." : "Download CSV"}
+          </button>
+        </div>
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#0B1220]/70 border border-[#1E293B]/60 text-[#94A3B8]">
             {lastUpdatedText}
