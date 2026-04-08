@@ -8,13 +8,18 @@ import {
   fetchHealthRisk,
   fetchPollutants,
   fetchCities,
+  fetchAQIHistory,
 } from "@/lib/api";
 import { getAQICategory, getAQIColorByValue, getAQIEmoji } from "@/lib/aqi";
 import type {
   AQIData,
   ForecastItem,
   HealthRiskData,
+  HourPatternPoint,
+  HistoryReading,
   PollutantDetail,
+  TrendDailyPoint,
+  WeekdayPatternPoint,
 } from "@/lib/types";
 import GlassCard from "@/components/GlassCard";
 import AQIGauge from "@/components/AQIGauge";
@@ -28,6 +33,10 @@ import {
   CartesianGrid,
   Area,
   AreaChart,
+  Line,
+  LineChart,
+  BarChart,
+  Bar,
 } from "recharts";
 import { motion } from "framer-motion";
 import {
@@ -68,6 +77,12 @@ export default function Dashboard() {
   const [healthRisk, setHealthRisk] = useState<HealthRiskData | null>(null);
   const [pollutants, setPollutants] = useState<PollutantDetail[]>([]);
   const [stations, setStations] = useState<StationSnapshot[]>([]);
+  const [historyReadings, setHistoryReadings] = useState<HistoryReading[]>([]);
+  const [trendDaily, setTrendDaily] = useState<TrendDailyPoint[]>([]);
+  const [hourPattern, setHourPattern] = useState<HourPatternPoint[]>([]);
+  const [weekdayPattern, setWeekdayPattern] = useState<WeekdayPatternPoint[]>(
+    [],
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -79,12 +94,13 @@ export default function Dashboard() {
       setError(null);
 
       try {
-        const [aqiRes, forecastRes, pollutantsRes, citiesRes] =
+        const [aqiRes, forecastRes, pollutantsRes, citiesRes, historyRes] =
           await Promise.all([
             fetchCurrentAQI(city, lat, lon),
             fetchForecast(city, lat, lon),
             fetchPollutants(city, lat, lon),
             fetchCities(),
+            fetchAQIHistory(city, 30),
           ]);
 
         if (cancelled) return;
@@ -93,6 +109,10 @@ export default function Dashboard() {
         setForecast(forecastRes.forecast.slice(0, 24));
         setPollutants(pollutantsRes.pollutants);
         setStations((citiesRes.cities || []) as StationSnapshot[]);
+        setHistoryReadings(historyRes.readings || []);
+        setTrendDaily(historyRes.trend_daily || []);
+        setHourPattern(historyRes.hour_pattern || []);
+        setWeekdayPattern(historyRes.weekday_pattern || []);
 
         // Fetch health risk with the AQI value
         const healthRes = await fetchHealthRisk(aqiRes.data.aqi);
@@ -192,13 +212,22 @@ export default function Dashboard() {
 
   // Prepare chart data
   const chartData = forecast.map((item, i) => {
-    const baseBand =
+    const fallbackSpread =
       sourceKey === "waqi" ? 8 : sourceKey === "epa_fallback" ? 14 : 20;
     const horizonSpread = i * 0.5;
-    const uncertainty = baseBand + horizonSpread;
+    const derivedSpread = fallbackSpread + horizonSpread;
     const roundedAqi = Math.round(item.aqi);
-    const lower = Math.max(0, Math.round(roundedAqi - uncertainty));
-    const upper = Math.min(500, Math.round(roundedAqi + uncertainty));
+
+    const minLine = Math.round(item.min_aqi ?? roundedAqi);
+    const maxLine = Math.round(item.max_aqi ?? roundedAqi);
+    const medianLine = Math.round(item.median_aqi ?? roundedAqi);
+
+    const uncertaintyMin = Math.round(
+      item.uncertainty_min_aqi ?? Math.max(0, medianLine - derivedSpread),
+    );
+    const uncertaintyMax = Math.round(
+      item.uncertainty_max_aqi ?? Math.min(500, medianLine + derivedSpread),
+    );
 
     return {
       time: new Date(
@@ -208,9 +237,11 @@ export default function Dashboard() {
         minute: "2-digit",
       }),
       aqi: roundedAqi,
-      lower,
-      band: upper - lower,
-      uncertainty: Math.round(uncertainty),
+      minLine,
+      maxLine,
+      medianLine,
+      uncertaintyMin,
+      uncertaintyBand: Math.max(0, uncertaintyMax - uncertaintyMin),
     };
   });
 
@@ -248,6 +279,108 @@ export default function Dashboard() {
     .filter((s) => s.aqi > 0)
     .sort((a, b) => b.aqi - a.aqi)
     .slice(0, 5);
+
+  const history30d = historyReadings
+    .map((r) => ({
+      dt: new Date(r.datetime),
+      aqi: Number(r.aqi || 0),
+    }))
+    .filter((r) => !Number.isNaN(r.dt.getTime()) && r.aqi > 0)
+    .sort((a, b) => a.dt.getTime() - b.dt.getTime());
+
+  const dailyMap = new Map<
+    string,
+    { label: string; total: number; count: number; ts: number }
+  >();
+  for (const r of history30d) {
+    const key = `${r.dt.getFullYear()}-${r.dt.getMonth()}-${r.dt.getDate()}`;
+    const existing = dailyMap.get(key);
+    if (existing) {
+      existing.total += r.aqi;
+      existing.count += 1;
+    } else {
+      dailyMap.set(key, {
+        label: r.dt.toLocaleDateString([], { month: "short", day: "numeric" }),
+        total: r.aqi,
+        count: 1,
+        ts: r.dt.getTime(),
+      });
+    }
+  }
+
+  const trend30dData = Array.from(dailyMap.values())
+    .sort((a, b) => a.ts - b.ts)
+    .map((d) => ({
+      date: d.label,
+      aqi30: Math.round(d.total / d.count),
+      ts: d.ts,
+    }));
+
+  const cutoff7d = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const trendCombinedFallback = trend30dData.map((d) => ({
+    date: d.date,
+    aqi30: d.aqi30,
+    aqi7: d.ts >= cutoff7d ? d.aqi30 : null,
+  }));
+
+  const hourAgg = Array.from({ length: 24 }, (_, h) => ({
+    hour: h,
+    total: 0,
+    count: 0,
+  }));
+  for (const r of history30d) {
+    const h = r.dt.getHours();
+    hourAgg[h].total += r.aqi;
+    hourAgg[h].count += 1;
+  }
+  const hourPatternFallback = hourAgg
+    .filter((x) => x.count > 0)
+    .map((x) => ({
+      hour: `${String(x.hour).padStart(2, "0")}:00`,
+      aqi: Math.round(x.total / x.count),
+    }));
+
+  const weekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const weekdayAgg = weekdayNames.map((day) => ({ day, total: 0, count: 0 }));
+  for (const r of history30d) {
+    const d = r.dt.getDay();
+    weekdayAgg[d].total += r.aqi;
+    weekdayAgg[d].count += 1;
+  }
+  const weekdayPatternFallback = weekdayAgg
+    .filter((x) => x.count > 0)
+    .map((x) => ({
+      day: x.day,
+      aqi: Math.round(x.total / x.count),
+    }));
+
+  const trendCombinedData =
+    trendDaily.length > 0
+      ? trendDaily.map((d) => ({
+          date: d.date,
+          aqi30: Math.round(d.aqi),
+          aqi7: d.in_last_7d ? Math.round(d.aqi) : null,
+        }))
+      : trendCombinedFallback;
+
+  const trendTickInterval = Math.max(
+    0,
+    Math.ceil(Math.max(trendCombinedData.length, 1) / 8) - 1,
+  );
+
+  const hourPatternData =
+    hourPattern.filter((x) => x.count > 0).length > 0
+      ? hourPattern
+          .filter((x) => x.count > 0)
+          .map((x) => ({ hour: x.hour, aqi: Math.round(x.aqi) }))
+      : hourPatternFallback;
+
+  const weekdayPatternData =
+    weekdayPattern.filter((x) => x.count > 0).length > 0
+      ? weekdayPattern
+          .filter((x) => x.count > 0)
+          .map((x) => ({ day: x.day, aqi: Math.round(x.aqi) }))
+      : weekdayPatternFallback;
 
   return (
     <motion.div
@@ -489,9 +622,25 @@ export default function Dashboard() {
             <TrendingUp className="w-4 h-4 text-[#7C9CFF]" />
             24-Hour AQI Forecast
           </h2>
+          <div className="flex flex-wrap items-center gap-2 mb-3 text-[11px]">
+            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#0B1220]/70 border border-[#1E293B]/50 text-[#94A3B8]">
+              <span className="w-3 h-[2px] bg-[#7C9CFF]" /> Predicted AQI
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#0B1220]/70 border border-[#1E293B]/50 text-[#94A3B8]">
+              <span className="w-3 h-[2px] bg-[#22D3EE]" /> Median
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#0B1220]/70 border border-[#1E293B]/50 text-[#94A3B8]">
+              <span className="w-3 h-[2px] border-t border-dashed border-[#94A3B8]" />
+              Min/Max
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#0B1220]/70 border border-[#1E293B]/50 text-[#94A3B8]">
+              <span className="w-3 h-2 bg-[#7C9CFF]/25 rounded-sm" />
+              Confidence area
+            </span>
+          </div>
           <p className="text-xs text-[#64748B] mb-3">
-            Includes estimated uncertainty band that widens over forecast
-            horizon.
+            Includes min/max/median trajectories and a deterministic confidence
+            area that widens over forecast horizon.
           </p>
           <div
             className="overflow-x-auto"
@@ -531,7 +680,7 @@ export default function Dashboard() {
                   />
                   <Area
                     type="monotone"
-                    dataKey="lower"
+                    dataKey="uncertaintyMin"
                     stackId="uncertainty"
                     stroke="none"
                     fill="transparent"
@@ -540,11 +689,37 @@ export default function Dashboard() {
                   />
                   <Area
                     type="monotone"
-                    dataKey="band"
+                    dataKey="uncertaintyBand"
                     stackId="uncertainty"
                     stroke="none"
                     fill="#7C9CFF"
                     fillOpacity={0.12}
+                    activeDot={false}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="maxLine"
+                    stroke="#94A3B8"
+                    strokeWidth={1.5}
+                    strokeDasharray="5 4"
+                    dot={false}
+                    activeDot={false}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="minLine"
+                    stroke="#94A3B8"
+                    strokeWidth={1.5}
+                    strokeDasharray="5 4"
+                    dot={false}
+                    activeDot={false}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="medianLine"
+                    stroke="#22D3EE"
+                    strokeWidth={2}
+                    dot={false}
                     activeDot={false}
                   />
                   <Area
@@ -563,7 +738,154 @@ export default function Dashboard() {
         </GlassCard>
       </motion.div>
 
-      {/* Row 3: Pollutant breakdown */}
+      {/* Row 3: Historical trends and patterns */}
+      <motion.div variants={fadeUp}>
+        <h2 className="text-sm font-medium text-[#64748B] uppercase tracking-widest">
+          Historical Insights
+        </h2>
+      </motion.div>
+
+      <motion.div
+        className="grid grid-cols-1 xl:grid-cols-3 gap-6"
+        variants={fadeUp}
+      >
+        <GlassCard>
+          <h3 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4">
+            7D / 30D AQI Trend
+          </h3>
+          {trendCombinedData.length > 0 ? (
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={trendCombinedData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
+                  <XAxis
+                    dataKey="date"
+                    stroke="#64748B"
+                    tick={{ fill: "#94A3B8", fontSize: 10 }}
+                    interval={trendTickInterval}
+                    minTickGap={16}
+                    tickMargin={8}
+                    angle={-28}
+                    textAnchor="end"
+                    height={56}
+                  />
+                  <YAxis
+                    stroke="#64748B"
+                    tick={{ fill: "#94A3B8", fontSize: 11 }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#0F172A",
+                      border: "1px solid #1E293B",
+                      borderRadius: "12px",
+                      color: "#E2E8F0",
+                    }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="aqi30"
+                    stroke="#7C9CFF"
+                    strokeWidth={2}
+                    dot={false}
+                    name="30-day"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="aqi7"
+                    stroke="#22D3EE"
+                    strokeWidth={2}
+                    dot={false}
+                    name="7-day"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <p className="text-sm text-[#64748B]">Not enough history yet.</p>
+          )}
+        </GlassCard>
+
+        <GlassCard>
+          <h3 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4">
+            Hour of Day Pattern
+          </h3>
+          {hourPatternData.length > 0 ? (
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={hourPatternData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
+                  <XAxis
+                    dataKey="hour"
+                    stroke="#64748B"
+                    tick={{ fill: "#94A3B8", fontSize: 11 }}
+                    interval={2}
+                  />
+                  <YAxis
+                    stroke="#64748B"
+                    tick={{ fill: "#94A3B8", fontSize: 11 }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#0F172A",
+                      border: "1px solid #1E293B",
+                      borderRadius: "12px",
+                      color: "#E2E8F0",
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="aqi"
+                    stroke="#34D399"
+                    fill="#34D399"
+                    fillOpacity={0.15}
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <p className="text-sm text-[#64748B]">Not enough history yet.</p>
+          )}
+        </GlassCard>
+
+        <GlassCard>
+          <h3 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4">
+            Weekday Pattern
+          </h3>
+          {weekdayPatternData.length > 0 ? (
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={weekdayPatternData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
+                  <XAxis
+                    dataKey="day"
+                    stroke="#64748B"
+                    tick={{ fill: "#94A3B8", fontSize: 11 }}
+                  />
+                  <YAxis
+                    stroke="#64748B"
+                    tick={{ fill: "#94A3B8", fontSize: 11 }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#0F172A",
+                      border: "1px solid #1E293B",
+                      borderRadius: "12px",
+                      color: "#E2E8F0",
+                    }}
+                  />
+                  <Bar dataKey="aqi" fill="#F59E0B" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <p className="text-sm text-[#64748B]">Not enough history yet.</p>
+          )}
+        </GlassCard>
+      </motion.div>
+
+      {/* Row 4: Pollutant breakdown */}
       <motion.div variants={fadeUp}>
         <GlassCard>
           <h2 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4">

@@ -9,6 +9,7 @@ Flow:
 
 import requests
 import os
+from typing import Optional
 
 # Read API keys from env
 WAQI_TOKEN    = os.getenv('WAQI_TOKEN', 'demo') # Ensure fallback if missing
@@ -29,7 +30,7 @@ DEFAULT_CITIES = [
 ]
 
 
-def search_city_with_station(query: str, limit: int | None = None) -> list:
+def search_city_with_station(query: str, limit: Optional[int] = None) -> list:
     """
     Search using WAQI native search API.
     Returns list of enriched city objects.

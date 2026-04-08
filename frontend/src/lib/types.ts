@@ -30,6 +30,11 @@ export interface ForecastItem {
   dominant?: string;
   peak_aqi?: number;
   points?: number;
+  min_aqi?: number;
+  max_aqi?: number;
+  median_aqi?: number;
+  uncertainty_min_aqi?: number;
+  uncertainty_max_aqi?: number;
 }
 
 export interface ForecastSummary {
@@ -39,6 +44,32 @@ export interface ForecastSummary {
   hours: number;
   breakdown_hours?: number;
   buckets?: number;
+}
+
+export interface HistoryReading {
+  datetime: string;
+  aqi: number;
+  location: string;
+  source: string;
+}
+
+export interface TrendDailyPoint {
+  date: string;
+  aqi: number;
+  count: number;
+  in_last_7d: boolean;
+}
+
+export interface HourPatternPoint {
+  hour: string;
+  aqi: number;
+  count: number;
+}
+
+export interface WeekdayPatternPoint {
+  day: string;
+  aqi: number;
+  count: number;
 }
 
 export interface PollutantDetail {
