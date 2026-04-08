@@ -1,12 +1,32 @@
 const API_BASE = "/api";
 
+const RETRYABLE_STATUS = new Set([502, 503, 504]);
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 async function fetchJSON<T>(url: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(url, options);
-  if (!res.ok) {
+  const maxAttempts = 3;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const res = await fetch(url, options);
+
+    if (res.ok) {
+      return res.json();
+    }
+
     const err = await res.json().catch(() => ({ error: res.statusText }));
+    const isRetryable = RETRYABLE_STATUS.has(res.status);
+    const hasMoreAttempts = attempt < maxAttempts;
+
+    if (isRetryable && hasMoreAttempts) {
+      await sleep(attempt * 400);
+      continue;
+    }
+
     throw new Error(err.error || res.statusText);
   }
-  return res.json();
+
+  throw new Error("Request failed after retries");
 }
 
 /* ── AQI ─────────────────────────────────── */
