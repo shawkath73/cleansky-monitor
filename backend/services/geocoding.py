@@ -80,16 +80,16 @@ def search_city_with_station(query: str, limit: Optional[int] = None) -> list:
 
 def get_default_cities() -> list:
     """
-    Return all Indian stations from WAQI /map/bounds instead of a static list.
-    This dynamically populates the map with rich data.
+    Return WAQI stations from /map/bounds for global map markers.
+    Falls back to a static sample list only if WAQI is unavailable.
     """
     if not WAQI_TOKEN:
         return DEFAULT_CITIES
 
     try:
-        # Bounding box for India roughly
+        # Global bounding box (near full extent; avoids pole edge issues)
         url = f"{WAQI_BASE_URL}/map/bounds/"
-        r = requests.get(url, params={'token': WAQI_TOKEN, 'latlng': '6.7,68.1,35.5,97.4'}, timeout=15)
+        r = requests.get(url, params={'token': WAQI_TOKEN, 'latlng': '-89.5,-179.5,89.5,179.5'}, timeout=20)
         r.raise_for_status()
         data = r.json()
 
