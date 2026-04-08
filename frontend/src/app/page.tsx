@@ -138,6 +138,49 @@ export default function Dashboard() {
   const aqi = aqiData?.aqi ?? 0;
   const category = aqiData?.category ?? getAQICategory(aqi);
   const color = getAQIColorByValue(aqi);
+
+  const parsedUpdatedAt = aqiData?.datetime ? new Date(aqiData.datetime) : null;
+  const lastUpdatedMinutes =
+    parsedUpdatedAt && !Number.isNaN(parsedUpdatedAt.getTime())
+      ? Math.max(
+          0,
+          Math.floor((Date.now() - parsedUpdatedAt.getTime()) / (1000 * 60)),
+        )
+      : null;
+  const lastUpdatedText =
+    lastUpdatedMinutes === null
+      ? "Last updated: unavailable"
+      : lastUpdatedMinutes === 0
+        ? "Last updated: just now"
+        : `Last updated: ${lastUpdatedMinutes} min${lastUpdatedMinutes === 1 ? "" : "s"} ago`;
+
+  const sourceConfidenceMap: Record<string, number> = {
+    waqi: 88,
+    epa_fallback: 72,
+    ml_fallback: 58,
+  };
+  const sourceKey = aqiData?.current_source ?? "ml_fallback";
+  const sourceScore = sourceConfidenceMap[sourceKey] ?? 55;
+  const freshnessScore =
+    lastUpdatedMinutes === null
+      ? 62
+      : Math.max(45, Math.min(100, 100 - lastUpdatedMinutes * 1.2));
+  const criticalPollutants = ["PM2.5", "PM10", "NO2"];
+  const availableCriticalCount = criticalPollutants.filter(
+    (key) => (aqiData?.pollutants?.[key] ?? 0) > 0,
+  ).length;
+  const completenessScore = 55 + (availableCriticalCount / 3) * 45;
+  const confidenceScore = Math.round(
+    Math.max(
+      5,
+      Math.min(
+        99,
+        sourceScore * 0.5 + freshnessScore * 0.3 + completenessScore * 0.2,
+      ),
+    ),
+  );
+  const fallbackActive = (aqiData?.current_source ?? "waqi") !== "waqi";
+
   const sourceLabelMap: Record<string, string> = {
     waqi: "WAQI Live",
     epa_fallback: "EPA Fallback",
@@ -148,15 +191,28 @@ export default function Dashboard() {
     : null;
 
   // Prepare chart data
-  const chartData = forecast.map((item) => ({
-    time: new Date(
-      item.datetime ?? item.timestamp ?? new Date().toISOString(),
-    ).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
-    aqi: Math.round(item.aqi),
-  }));
+  const chartData = forecast.map((item, i) => {
+    const baseBand =
+      sourceKey === "waqi" ? 8 : sourceKey === "epa_fallback" ? 14 : 20;
+    const horizonSpread = i * 0.5;
+    const uncertainty = baseBand + horizonSpread;
+    const roundedAqi = Math.round(item.aqi);
+    const lower = Math.max(0, Math.round(roundedAqi - uncertainty));
+    const upper = Math.min(500, Math.round(roundedAqi + uncertainty));
+
+    return {
+      time: new Date(
+        item.datetime ?? item.timestamp ?? new Date().toISOString(),
+      ).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      aqi: roundedAqi,
+      lower,
+      band: upper - lower,
+      uncertainty: Math.round(uncertainty),
+    };
+  });
 
   // Top pollutants for bars
   const topPollutants = pollutants.slice(0, 5);
@@ -208,6 +264,16 @@ export default function Dashboard() {
         <p className="text-[#64748B] text-sm mt-2 uppercase tracking-widest">
           Network status across tracked stations · Updated every 5 minutes
         </p>
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#0B1220]/70 border border-[#1E293B]/60 text-[#94A3B8]">
+            {lastUpdatedText}
+          </span>
+          {fallbackActive && (
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#F97316]/15 border border-[#F97316]/30 text-[#F97316]">
+              Fallback source active
+            </span>
+          )}
+        </div>
       </motion.div>
 
       {/* Row 0: Global monitoring summary */}
@@ -332,6 +398,14 @@ export default function Dashboard() {
             >
               {getAQIEmoji(category)} {category}
             </span>
+            <div className="mt-3">
+              <p className="text-[10px] text-[#64748B] uppercase tracking-widest">
+                Confidence score
+              </p>
+              <p className="text-lg font-semibold text-[#E2E8F0]">
+                {confidenceScore}%
+              </p>
+            </div>
             {sourceLabel && (
               <p className="text-[#64748B] text-xs mt-2">
                 Source: <span className="text-[#94A3B8]">{sourceLabel}</span>
@@ -415,6 +489,10 @@ export default function Dashboard() {
             <TrendingUp className="w-4 h-4 text-[#7C9CFF]" />
             24-Hour AQI Forecast
           </h2>
+          <p className="text-xs text-[#64748B] mb-3">
+            Includes estimated uncertainty band that widens over forecast
+            horizon.
+          </p>
           <div
             className="overflow-x-auto"
             style={{
@@ -450,6 +528,24 @@ export default function Dashboard() {
                       borderRadius: "12px",
                       color: "#E2E8F0",
                     }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="lower"
+                    stackId="uncertainty"
+                    stroke="none"
+                    fill="transparent"
+                    activeDot={false}
+                    isAnimationActive={false}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="band"
+                    stackId="uncertainty"
+                    stroke="none"
+                    fill="#7C9CFF"
+                    fillOpacity={0.12}
+                    activeDot={false}
                   />
                   <Area
                     type="monotone"
