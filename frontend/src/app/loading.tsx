@@ -7,7 +7,7 @@ export default function Loading() {
   return (
     <motion.div
       className="fixed inset-0 z-[9999] flex items-center justify-center"
-      style={{ backgroundColor: "#0d0e10" }}
+      style={{ backgroundColor: "var(--loading-overlay-bg)" }}
       initial={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
@@ -17,7 +17,7 @@ export default function Loading() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse at 50% 40%, rgba(124,156,255,0.06) 0%, transparent 60%)",
+            "radial-gradient(ellipse at 50% 40%, var(--loading-ambient-glow) 0%, transparent 60%)",
         }}
       />
 
@@ -26,7 +26,7 @@ export default function Loading() {
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage:
-            "linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px)",
+            "linear-gradient(to right, var(--loading-grid-line) 1px, transparent 1px), linear-gradient(to bottom, var(--loading-grid-line) 1px, transparent 1px)",
           backgroundSize: "calc(100vw / 7) calc(100vh / 6)",
         }}
       />
@@ -110,7 +110,10 @@ export default function Loading() {
 
         {/* Loading bar */}
         <div className="w-48">
-          <div className="relative w-full h-[3px] bg-[#1a1b1e] rounded-full overflow-hidden">
+          <div
+            className="relative w-full h-[3px] rounded-full overflow-hidden"
+            style={{ backgroundColor: "var(--loading-bar-track)" }}
+          >
             <motion.div
               className="absolute h-full rounded-full"
               style={{

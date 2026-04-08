@@ -440,15 +440,15 @@ export default function Navbar() {
                 <div className="sm:hidden mt-3 px-2">
                   <button
                     onClick={toggleTheme}
-                    className="w-full mb-2 flex items-center justify-center gap-2 bg-[#020617] border border-[#1E293B] rounded-lg px-3 py-2 text-sm text-[#E2E8F0]"
+                    className="w-full mb-2 flex items-center justify-center bg-[#020617] border border-[#1E293B] rounded-lg px-3 py-2 text-sm text-[#E2E8F0]"
                     aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+                    title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
                   >
                     {theme === "dark" ? (
                       <Sun className="w-4 h-4" />
                     ) : (
                       <Moon className="w-4 h-4" />
                     )}
-                    {theme === "dark" ? "Light theme" : "Dark theme"}
                   </button>
                   <div className="flex items-center gap-2 mb-2 px-2">
                     <MapPin className="w-4 h-4 text-[#7C9CFF]" />
