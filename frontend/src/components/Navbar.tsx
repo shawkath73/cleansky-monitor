@@ -49,6 +49,18 @@ function getAQIBadgeColor(aqi: number | string): string {
   return "#7C3AED";
 }
 
+function getCityLabel(result: CitySearchResult): string {
+  return (result.city || result.name || "").trim();
+}
+
+function sortCitiesAlphabetically(cities: CitySearchResult[]): CitySearchResult[] {
+  return [...cities].sort((a, b) =>
+    getCityLabel(a).localeCompare(getCityLabel(b), "en", {
+      sensitivity: "base",
+    }),
+  );
+}
+
 // City item component (shared between desktop and mobile)
 function CityItem({
   result,
@@ -147,29 +159,31 @@ export default function Navbar() {
           station_name: "",
           aqi: "-",
         }));
-        setDefaultCities(defaults);
+        setDefaultCities(sortCitiesAlphabetically(defaults));
       })
       .catch(() => {
         setDefaultCities(
-          [
-            "Delhi",
-            "Mumbai",
-            "Chennai",
-            "Kolkata",
-            "Bangalore",
-            "Hyderabad",
-            "Ahmedabad",
-            "Pune",
-            "Jaipur",
-            "Lucknow",
-          ].map((name) => ({
-            city: name,
-            state: "",
-            lat: 0,
-            lon: 0,
-            station_name: "",
-            aqi: "-",
-          })),
+          sortCitiesAlphabetically(
+            [
+              "Delhi",
+              "Mumbai",
+              "Chennai",
+              "Kolkata",
+              "Bangalore",
+              "Hyderabad",
+              "Ahmedabad",
+              "Pune",
+              "Jaipur",
+              "Lucknow",
+            ].map((name) => ({
+              city: name,
+              state: "",
+              lat: 0,
+              lon: 0,
+              station_name: "",
+              aqi: "-",
+            })),
+          ),
         );
       });
   }, []);
@@ -193,7 +207,7 @@ export default function Navbar() {
     searchCities(debouncedSearch)
       .then((res) => {
         if (!cancelled) {
-          setSearchResults(res.results);
+          setSearchResults(sortCitiesAlphabetically(res.results));
           setSearching(false);
         }
       })
