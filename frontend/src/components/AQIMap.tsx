@@ -372,7 +372,7 @@ function AQIDivMarkers({
 
         const divIcon = L.divIcon({
           className: "aqi-div-marker",
-          html: `<div class="aqi-marker-ring" style="
+          html: `<div style="
             position:relative;
             display:flex;align-items:center;justify-content:center;
             width:20px;height:20px;border-radius:50%;
@@ -1036,14 +1036,6 @@ export default function AQIMap() {
         .aqi-div-marker > div:hover {
           transform: scale(1.2) !important;
           box-shadow: 0 4px 24px currentColor !important;
-        }
-        /* Pulsing ring to distinguish our markers from WAQI tiles */
-        @keyframes markerPulse {
-          0%, 100% { box-shadow: 0 0 0 0 currentColor; }
-          50% { box-shadow: 0 0 0 6px transparent; }
-        }
-        .aqi-marker-ring {
-          animation: markerPulse 2.5s ease-in-out infinite;
         }
         /* Ensure marker pane is above everything */
         .leaflet-marker-pane {
