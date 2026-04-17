@@ -81,7 +81,7 @@ export default function Loading() {
               ease: "easeInOut",
             }}
           >
-            <CloudSun className="w-12 h-12 text-[#7C9CFF] relative z-10" />
+            <CloudSun className="w-12 h-12 text-[#78EAF8] relative z-10" />
           </motion.div>
         </div>
 
@@ -93,7 +93,7 @@ export default function Loading() {
           className="text-center"
         >
           <h1 className="text-2xl font-bold text-[#E2E8F0] tracking-widest uppercase">
-            Clean<span className="text-[#7C9CFF]">Sky</span>
+            Clean<span className="text-[#78EAF8]">Sky</span>
           </h1>
           <motion.p
             className="text-xs text-[#64748B] mt-1 tracking-[0.3em] uppercase"
@@ -118,7 +118,7 @@ export default function Loading() {
               className="absolute h-full rounded-full"
               style={{
                 background:
-                  "linear-gradient(90deg, transparent, #7C9CFF, #94A3B8, transparent)",
+                  "linear-gradient(90deg, transparent, #78EAF8, #94A3B8, transparent)",
               }}
               animate={{
                 left: ["-40%", "100%"],
@@ -137,7 +137,7 @@ export default function Loading() {
             {[0, 1, 2].map((i) => (
               <motion.div
                 key={i}
-                className="w-1.5 h-1.5 rounded-full bg-[#7C9CFF]"
+                className="w-1.5 h-1.5 rounded-full bg-[#78EAF8]"
                 animate={{
                   opacity: [0.2, 1, 0.2],
                   scale: [0.8, 1.2, 0.8],

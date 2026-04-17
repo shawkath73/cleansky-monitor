@@ -46,12 +46,12 @@ export default function MapPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl md:text-4xl font-bold text-[#E2E8F0] leading-tight flex items-center gap-3">
-          <Globe className="w-8 h-8 text-[#7C9CFF]" />
+          <Globe className="w-8 h-8 text-[#78EAF8]" />
           Global AQI Map
         </h1>
         <p className="text-[#64748B] text-sm mt-2 uppercase tracking-widest">
           Real-time air quality data across the{" "}
-          <span className="text-[#7C9CFF]">world</span> · Click any station for
+          <span className="text-[#78EAF8]">world</span> · Click any station for
           details
         </p>
       </div>

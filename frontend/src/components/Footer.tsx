@@ -8,7 +8,7 @@ export default function Footer() {
           <div className="flex items-center gap-5 text-[#64748B]">
             <a
               href="https://github.com/theGautham/cleansky-monitor"
-              className="hover:text-[#7C9CFF] transition-colors"
+              className="hover:text-[#78EAF8] transition-colors"
               aria-label="Github"
               target="_blank"
               rel="noopener noreferrer"
@@ -24,7 +24,7 @@ export default function Footer() {
           </p>
           <p className="text-xs text-[#64748B] uppercase tracking-wider">
             Powered by XG BOOST 3.2.0{" "}
-            <span className="text-[#7C9CFF] mx-2">✦</span> Breathe safe
+            <span className="text-[#78EAF8] mx-2">✦</span> Breathe safe
           </p>
         </div>
       </div>

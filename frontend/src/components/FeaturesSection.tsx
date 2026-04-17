@@ -84,7 +84,7 @@ export default function FeaturesSection() {
         </p>
         <h2 className="text-2xl md:text-3xl font-bold text-[#E2E8F0]">
           Platform{" "}
-          <span className="text-[#7C9CFF] italic font-light">Features</span>
+          <span className="text-[#78EAF8] italic font-light">Features</span>
         </h2>
       </motion.div>
 
@@ -104,8 +104,8 @@ export default function FeaturesSection() {
             >
               {/* Top row: Icon + Number */}
               <div className="flex items-start justify-between mb-5">
-                <div className="w-11 h-11 rounded-xl bg-[#7C9CFF]/10 border border-[#7C9CFF]/15 flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-[#7C9CFF]" strokeWidth={1.8} />
+                <div className="w-11 h-11 rounded-xl bg-[#78EAF8]/10 border border-[#78EAF8]/15 flex items-center justify-center">
+                  <Icon className="w-5 h-5 text-[#78EAF8]" strokeWidth={1.8} />
                 </div>
                 <span className="text-[#64748B]/40 text-xs font-mono tracking-wider">
                   {String(index + 1).padStart(2, "0")}
@@ -113,7 +113,7 @@ export default function FeaturesSection() {
               </div>
 
               {/* Title */}
-              <h3 className="text-[#E2E8F0] text-lg font-semibold mb-2 group-hover:text-[#7C9CFF] transition-colors duration-300">
+              <h3 className="text-[#E2E8F0] text-lg font-semibold mb-2 group-hover:text-[#78EAF8] transition-colors duration-300">
                 {feature.title}
               </h3>
 

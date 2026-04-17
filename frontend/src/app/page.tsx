@@ -685,7 +685,7 @@ export default function Dashboard() {
             type="button"
             onClick={handleDownloadCsv}
             disabled={!aqiData || isExporting}
-            className="inline-flex w-full md:w-auto items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#020617] border border-[#1E293B] text-sm text-[#E2E8F0] hover:border-[#7C9CFF]/60 hover:text-[#7C9CFF] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            className="inline-flex w-full md:w-auto items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#020617] border border-[#1E293B] text-sm text-[#E2E8F0] hover:border-[#78EAF8]/60 hover:text-[#78EAF8] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <Download className="w-4 h-4" />
             {isExporting ? "Preparing CSV..." : "Download CSV"}
@@ -751,7 +751,7 @@ export default function Dashboard() {
       >
         <GlassCard>
           <h2 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4 flex items-center gap-2">
-            <Globe2 className="w-4 h-4 text-[#7C9CFF]" />
+            <Globe2 className="w-4 h-4 text-[#78EAF8]" />
             Top Pollution Hotspots
           </h2>
           <div className="space-y-2">
@@ -913,12 +913,12 @@ export default function Dashboard() {
       <motion.div variants={fadeUp}>
         <GlassCard delay={3}>
           <h2 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-[#7C9CFF]" />
+            <TrendingUp className="w-4 h-4 text-[#78EAF8]" />
             24-Hour AQI Forecast
           </h2>
           <div className="flex flex-wrap items-center gap-2 mb-3 text-[11px]">
             <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#0B1220]/70 border border-[#1E293B]/50 text-[#94A3B8]">
-              <span className="w-3 h-[2px] bg-[#7C9CFF]" /> Predicted AQI
+              <span className="w-3 h-[2px] bg-[#78EAF8]" /> Predicted AQI
             </span>
             <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#0B1220]/70 border border-[#1E293B]/50 text-[#94A3B8]">
               <span className="w-3 h-[2px] bg-[#22D3EE]" /> Median
@@ -928,7 +928,7 @@ export default function Dashboard() {
               Min/Max
             </span>
             <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#0B1220]/70 border border-[#1E293B]/50 text-[#94A3B8]">
-              <span className="w-3 h-2 bg-[#7C9CFF]/25 rounded-sm" />
+              <span className="w-3 h-2 bg-[#78EAF8]/25 rounded-sm" />
               Confidence area
             </span>
           </div>
@@ -949,8 +949,8 @@ export default function Dashboard() {
                 <AreaChart data={chartData}>
                   <defs>
                     <linearGradient id="aqiGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#7C9CFF" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#7C9CFF" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#78EAF8" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#78EAF8" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
@@ -986,7 +986,7 @@ export default function Dashboard() {
                     dataKey="uncertaintyBand"
                     stackId="uncertainty"
                     stroke="none"
-                    fill="#7C9CFF"
+                    fill="#78EAF8"
                     fillOpacity={0.12}
                     activeDot={false}
                   />
@@ -1019,11 +1019,11 @@ export default function Dashboard() {
                   <Area
                     type="monotone"
                     dataKey="aqi"
-                    stroke="#7C9CFF"
+                    stroke="#78EAF8"
                     strokeWidth={2}
                     fill="url(#aqiGrad)"
                     dot={false}
-                    activeDot={{ r: 5, fill: "#7C9CFF" }}
+                    activeDot={{ r: 5, fill: "#78EAF8" }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -1039,7 +1039,7 @@ export default function Dashboard() {
       >
         <GlassCard>
           <h3 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-3 flex items-center gap-2">
-            <Clock3 className="w-4 h-4 text-[#7C9CFF]" />
+            <Clock3 className="w-4 h-4 text-[#78EAF8]" />
             Safe Outdoor Window
           </h3>
           <p className="text-2xl font-bold text-[#E2E8F0]">{safeWindowLabel}</p>
@@ -1123,7 +1123,7 @@ export default function Dashboard() {
                     }
                     className={`px-2.5 py-1 text-[11px] rounded-md transition-colors ${
                       active
-                        ? "bg-[#7C9CFF]/20 text-[#7C9CFF]"
+                        ? "bg-[#78EAF8]/20 text-[#78EAF8]"
                         : "text-[#94A3B8] hover:bg-[#1E293B]/40 hover:text-[#E2E8F0]"
                     }`}
                   >
@@ -1185,7 +1185,7 @@ export default function Dashboard() {
                     <Line
                       type="monotone"
                       dataKey="aqi30"
-                      stroke="#7C9CFF"
+                      stroke="#78EAF8"
                       strokeWidth={2}
                       dot={false}
                       name="30-day"
@@ -1321,7 +1321,7 @@ export default function Dashboard() {
                     }}
                     style={{
                       backgroundColor:
-                        pol.status === "exceeded" ? "#F97316" : "#7C9CFF",
+                        pol.status === "exceeded" ? "#F97316" : "#78EAF8",
                     }}
                   />
                 </div>

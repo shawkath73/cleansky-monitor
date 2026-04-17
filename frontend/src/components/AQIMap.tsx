@@ -152,10 +152,10 @@ function LocateMeButton() {
           {locating ? (
             <Loader2
               className="w-4 h-4 animate-spin"
-              style={{ color: "#7C9CFF" }}
+              style={{ color: "#78EAF8" }}
             />
           ) : (
-            <Navigation className="w-4 h-4" style={{ color: "#7C9CFF" }} />
+            <Navigation className="w-4 h-4" style={{ color: "#78EAF8" }} />
           )}
           {locating ? "Locating…" : "Locate Me"}
         </button>
@@ -439,7 +439,7 @@ function StationInfoPanel({
   const displayAqi =
     liveAqi ?? (isValidAQI(station.aqi) ? parseAQI(station.aqi) : null);
   const displayInfo = displayAqi ? getAQIInfo(displayAqi) : null;
-  const c = color || displayInfo?.color || "#7C9CFF";
+  const c = color || displayInfo?.color || "#78EAF8";
 
   // Build sorted pollutant list
   const pollutantList = Object.entries(pollutants)
@@ -567,7 +567,7 @@ function StationInfoPanel({
         >
           <Loader2
             className="w-5 h-5 animate-spin"
-            style={{ color: "#7C9CFF" }}
+            style={{ color: "#78EAF8" }}
           />
           <span style={{ fontSize: "13px", color: "#94A3B8" }}>
             Fetching live data…
@@ -799,7 +799,7 @@ function StationInfoPanel({
           background:
             "linear-gradient(135deg, rgba(124, 156, 255, 0.2), rgba(124, 156, 255, 0.05))",
           border: "1px solid rgba(124, 156, 255, 0.2)",
-          color: "#7C9CFF",
+          color: "#78EAF8",
           borderRadius: "12px",
           fontSize: "14px",
           fontWeight: 600,
@@ -957,7 +957,7 @@ export default function AQIMap() {
             >
               <Loader2
                 className="animate-spin"
-                style={{ width: "32px", height: "32px", color: "#7C9CFF" }}
+                style={{ width: "32px", height: "32px", color: "#78EAF8" }}
               />
               <span
                 style={{
@@ -1060,7 +1060,7 @@ export default function AQIMap() {
         }
         .leaflet-control-zoom a:hover {
           background: rgba(30, 31, 34, 0.95) !important;
-          color: #7C9CFF !important;
+          color: #78EAF8 !important;
         }
         .leaflet-control-zoom a:last-child {
           border-bottom: none !important;

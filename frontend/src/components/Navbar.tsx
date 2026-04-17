@@ -42,7 +42,7 @@ interface InAppAlert {
 function getAlertAccent(level: AlertLevel): string {
   if (level === "critical") return "#EF4444";
   if (level === "warning") return "#F97316";
-  return "#7C9CFF";
+  return "#78EAF8";
 }
 
 // Debounce hook
@@ -94,7 +94,7 @@ function CityItem({
     <button
       className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center gap-3 ${
         isActive
-          ? "bg-[#7C9CFF]/15 text-[#7C9CFF]"
+          ? "bg-[#78EAF8]/15 text-[#78EAF8]"
           : "text-[#94A3B8] hover:bg-[#1E293B]/30 hover:text-[#E2E8F0]"
       }`}
       onClick={onSelect}
@@ -409,9 +409,9 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <CloudSun className="w-6 h-6 text-[#7C9CFF]" />
+            <CloudSun className="w-6 h-6 text-[#78EAF8]" />
             <span className="text-xl font-bold text-[#E2E8F0] tracking-widest uppercase">
-              Clean<span className="text-[#7C9CFF]">Sky</span>
+              Clean<span className="text-[#78EAF8]">Sky</span>
             </span>
           </Link>
 
@@ -425,7 +425,7 @@ export default function Navbar() {
                   href={link.href}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     active
-                      ? "bg-[#7C9CFF]/15 text-[#7C9CFF]"
+                      ? "bg-[#78EAF8]/15 text-[#78EAF8]"
                       : "text-[#94A3B8] hover:text-[#E2E8F0] hover:bg-[#1E293B]/30"
                   }`}
                 >
@@ -527,7 +527,7 @@ export default function Navbar() {
               className="flex items-center gap-2 glass-light px-3 py-2 cursor-pointer min-w-[180px]"
               onClick={() => setOpen(!open)}
             >
-              <MapPin className="w-4 h-4 text-[#7C9CFF]" />
+              <MapPin className="w-4 h-4 text-[#78EAF8]" />
               <span className="text-sm text-[#E2E8F0] font-medium">{city}</span>
               <motion.div
                 animate={{ rotate: open ? 180 : 0 }}
@@ -554,11 +554,11 @@ export default function Navbar() {
                         placeholder="Search any city worldwide…"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full bg-[#020617] border border-[#1E293B] rounded-lg px-3 py-2 text-sm text-[#E2E8F0] placeholder-[#64748B] outline-none focus:border-[#7C9CFF] transition-colors pr-8"
+                        className="w-full bg-[#020617] border border-[#1E293B] rounded-lg px-3 py-2 text-sm text-[#E2E8F0] placeholder-[#64748B] outline-none focus:border-[#78EAF8] transition-colors pr-8"
                         autoFocus
                       />
                       {searching && (
-                        <Loader2 className="absolute right-3 top-2.5 w-4 h-4 text-[#7C9CFF] animate-spin" />
+                        <Loader2 className="absolute right-3 top-2.5 w-4 h-4 text-[#78EAF8] animate-spin" />
                       )}
                     </div>
                   </div>
@@ -571,7 +571,7 @@ export default function Navbar() {
                     {showNormalizedSearch && (
                       <p className="mt-1 text-[11px] text-[#94A3B8]">
                         Searching as:{" "}
-                        <span className="text-[#7C9CFF]">
+                        <span className="text-[#78EAF8]">
                           {normalizedSearch}
                         </span>
                       </p>
@@ -658,7 +658,7 @@ export default function Navbar() {
                       onClick={() => setMobileOpen(false)}
                       className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                         active
-                          ? "bg-[#7C9CFF]/15 text-[#7C9CFF]"
+                          ? "bg-[#78EAF8]/15 text-[#78EAF8]"
                           : "text-[#94A3B8] hover:text-[#E2E8F0] hover:bg-[#1E293B]/30"
                       }`}
                     >
@@ -682,7 +682,7 @@ export default function Navbar() {
                     )}
                   </button>
                   <div className="flex items-center gap-2 mb-2 px-2">
-                    <MapPin className="w-4 h-4 text-[#7C9CFF]" />
+                    <MapPin className="w-4 h-4 text-[#78EAF8]" />
                     <span className="text-xs text-[#94A3B8] uppercase tracking-widest font-medium">
                       Select City
                     </span>
@@ -693,16 +693,16 @@ export default function Navbar() {
                       placeholder="Search any city worldwide…"
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
-                      className="w-full bg-[#020617] border border-[#1E293B] rounded-lg px-3 py-2 text-sm text-[#E2E8F0] placeholder-[#64748B] outline-none focus:border-[#7C9CFF] transition-colors mb-1 pr-8"
+                      className="w-full bg-[#020617] border border-[#1E293B] rounded-lg px-3 py-2 text-sm text-[#E2E8F0] placeholder-[#64748B] outline-none focus:border-[#78EAF8] transition-colors mb-1 pr-8"
                     />
                     {searching && (
-                      <Loader2 className="absolute right-3 top-2.5 w-4 h-4 text-[#7C9CFF] animate-spin" />
+                      <Loader2 className="absolute right-3 top-2.5 w-4 h-4 text-[#78EAF8] animate-spin" />
                     )}
                   </div>
                   {showNormalizedSearch && (
                     <p className="px-2 mb-2 text-[11px] text-[#94A3B8]">
                       Searching as:{" "}
-                      <span className="text-[#7C9CFF]">{normalizedSearch}</span>
+                      <span className="text-[#78EAF8]">{normalizedSearch}</span>
                     </p>
                   )}
                   <ul className="max-h-44 overflow-y-auto rounded-lg border border-[#1E293B]/40 bg-[#020617]/80">

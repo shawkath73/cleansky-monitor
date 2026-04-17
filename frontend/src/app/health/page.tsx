@@ -142,7 +142,7 @@ export default function HealthPage() {
           Health Risk <span>Analysis</span>
         </h1>
         <p className="text-[#64748B] text-sm mt-2 uppercase tracking-widest">
-          Advisory <span className="text-[#7C9CFF]">{city}</span> Based on
+          Advisory <span className="text-[#78EAF8]">{city}</span> Based on
           current AQI
         </p>
       </motion.div>
@@ -196,7 +196,7 @@ export default function HealthPage() {
         {/* Who is affected */}
         <GlassCard delay={2}>
           <h2 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4 flex items-center gap-2">
-            <Users className="w-4 h-4 text-[#7C9CFF]" />
+            <Users className="w-4 h-4 text-[#78EAF8]" />
             Who is Affected?
           </h2>
           {health.sensitive_groups.length > 0 ? (
@@ -225,7 +225,7 @@ export default function HealthPage() {
             </motion.div>
           ) : (
             <div className="text-center py-8">
-              <PartyPopper className="w-10 h-10 text-[#7C9CFF] mx-auto" />
+              <PartyPopper className="w-10 h-10 text-[#78EAF8] mx-auto" />
               <p className="text-[#94A3B8] mt-2 text-sm">
                 No sensitive groups currently at risk!
               </p>
@@ -236,7 +236,7 @@ export default function HealthPage() {
         {/* Suggested Actions */}
         <GlassCard delay={3}>
           <h2 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4 flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-[#7C9CFF]" />
+            <ShieldCheck className="w-4 h-4 text-[#78EAF8]" />
             Suggested Actions
           </h2>
           <motion.div
@@ -256,7 +256,7 @@ export default function HealthPage() {
                   variants={listItem}
                   className="flex items-start gap-3 p-3 rounded-xl bg-[#0F172A]/50 border border-[#1E293B]"
                 >
-                  <Icon className="w-5 h-5 mt-0.5 shrink-0 text-[#7C9CFF]" />
+                  <Icon className="w-5 h-5 mt-0.5 shrink-0 text-[#78EAF8]" />
                   <span className="text-sm text-[#E2E8F0]">{action}</span>
                 </motion.div>
               );

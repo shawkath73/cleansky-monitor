@@ -8,24 +8,18 @@ import type { ForecastItem, ForecastSummary } from "@/lib/types";
 import GlassCard from "@/components/GlassCard";
 import { ChartSkeleton, CardSkeleton } from "@/components/LoadingSkeleton";
 import {
-  AreaChart,
-  Area,
+  BarChart,
+  Bar,
+  Cell,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
-  ReferenceLine,
   ReferenceArea,
 } from "recharts";
 import { motion } from "framer-motion";
-import {
-  AlertTriangle,
-  BarChart3,
-  ArrowDown,
-  ArrowUp,
-  Clock,
-} from "lucide-react";
+import { AlertTriangle, CloudMoon, Sunrise, Wind } from "lucide-react";
 
 const stagger = {
   hidden: {},
@@ -41,12 +35,55 @@ const fadeUp = {
   },
 };
 
-const STAT_ICONS: Record<string, React.ReactNode> = {
-  "Average AQI": <BarChart3 className="w-5 h-5 text-[#7C9CFF]" />,
-  Minimum: <ArrowDown className="w-5 h-5 text-[#34D399]" />,
-  Maximum: <ArrowUp className="w-5 h-5 text-[#EF4444]" />,
-  "Hours Covered": <Clock className="w-5 h-5 text-[#94A3B8]" />,
+type StatTone = "cyan" | "neutral" | "rose";
+
+const TONE_CLASSES: Record<
+  StatTone,
+  { edge: string; value: string; meter: string; cap: string }
+> = {
+  cyan: {
+    edge: "border-l-[#7DEFFF]",
+    value: "text-[#D9FAFF]",
+    meter: "bg-[#78EAF8]",
+    cap: "text-[#7DEFFF]",
+  },
+  neutral: {
+    edge: "border-l-[#B8C2D9]",
+    value: "text-[#E5EAF8]",
+    meter: "bg-[#B8C2D9]",
+    cap: "text-[#B8C2D9]",
+  },
+  rose: {
+    edge: "border-l-[#FFB1A8]",
+    value: "text-[#FFE4E0]",
+    meter: "bg-[#FFB1A8]",
+    cap: "text-[#FFB1A8]",
+  },
 };
+
+function formatSlotLabel(item: ForecastItem) {
+  const dt = new Date(
+    item.datetime ?? item.timestamp ?? new Date().toISOString(),
+  );
+  const end = item.end_datetime ? new Date(item.end_datetime) : null;
+  return end
+    ? `${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}-${end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+    : dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+function formatDayTime(item: ForecastItem) {
+  const dt = new Date(
+    item.datetime ?? item.timestamp ?? new Date().toISOString(),
+  );
+  return `${dt.toLocaleDateString([], { weekday: "short" }).toUpperCase()} ${dt.toLocaleTimeString(
+    [],
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    },
+  )}`;
+}
 
 export default function ForecastPage() {
   const { city, lat, lon } = useCity();
@@ -109,366 +146,295 @@ export default function ForecastPage() {
     );
   }
 
-  // Chart data
-  const targetBuckets = breakdownHours === 1 ? forecast.length : Math.ceil(48 / breakdownHours);
+  const targetBuckets =
+    breakdownHours === 1 ? forecast.length : Math.ceil(48 / breakdownHours);
   const displayForecast = forecast.slice(0, targetBuckets);
 
+  const avgAqi = summary
+    ? Math.round(summary.avg_aqi)
+    : Math.round(
+        displayForecast.reduce((acc, item) => acc + item.aqi, 0) /
+          Math.max(displayForecast.length, 1),
+      );
+  const minAqi = summary
+    ? Math.round(summary.min_aqi)
+    : Math.round(Math.min(...displayForecast.map((item) => item.aqi), 0));
+  const maxAqi = summary
+    ? Math.round(summary.max_aqi)
+    : Math.round(Math.max(...displayForecast.map((item) => item.aqi), 0));
+
   const chartData = displayForecast.map((item) => {
-    const dt = new Date(item.datetime ?? item.timestamp ?? new Date().toISOString());
-    const end = item.end_datetime ? new Date(item.end_datetime) : null;
-    const timeLabel = end
-      ? `${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}-${end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
-      : dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     return {
-      time: timeLabel,
-      date: dt.toLocaleDateString([], { month: "short", day: "numeric" }),
+      time: formatSlotLabel(item),
       aqi: Math.round(item.aqi),
       color: getAQIColorByValue(item.aqi),
     };
   });
 
+  const chartTickPositions = [
+    0,
+    Math.floor((chartData.length - 1) * 0.25),
+    Math.floor((chartData.length - 1) * 0.5),
+    Math.floor((chartData.length - 1) * 0.75),
+    Math.max(chartData.length - 1, 0),
+  ];
+
+  const readoutItems = displayForecast.slice(
+    0,
+    Math.min(displayForecast.length, 6),
+  );
+
   return (
     <motion.div
-      className="space-y-6"
+      className="space-y-6 md:space-y-7 pb-6"
       variants={stagger}
       initial="hidden"
       animate="show"
     >
-      {/* Header */}
       <motion.div variants={fadeUp}>
-        <h1 className="text-3xl md:text-4xl font-bold text-[#E2E8F0] leading-tight">
-          48-Hour AQI <span>Forecast</span>
-        </h1>
-        <p className="text-[#64748B] text-sm mt-2 uppercase tracking-widest">
-          Predictive trends <span className="text-[#7C9CFF]">{city}</span> ·
-          {" "}{breakdownHours}h buckets
-        </p>
-        <div className="mt-3 inline-flex rounded-lg border border-[#1E293B]/60 bg-[#020617]/70 p-1 gap-1">
-          {[1, 6, 12].map((h) => {
-            const active = breakdownHours === h;
-            return (
-              <button
-                key={h}
-                onClick={() => setBreakdownHours(h as 1 | 6 | 12)}
-                className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
-                  active
-                    ? "bg-[#7C9CFF]/20 text-[#7C9CFF]"
-                    : "text-[#94A3B8] hover:bg-[#1E293B]/40 hover:text-[#E2E8F0]"
-                }`}
-              >
-                {h}h
-              </button>
-            );
-          })}
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-[9px] sm:text-[10px] text-[#79D7F0] uppercase tracking-[0.26em] sm:tracking-[0.32em] font-semibold mb-2">
+              Atmospheric Outlook
+            </p>
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-[#DDE8FF] leading-[0.95] tracking-[-0.03em]">
+              48-Hour Air Quality Forecast
+            </h1>
+            <p className="text-[#7E8BA7] text-[10px] sm:text-xs uppercase tracking-[0.18em] sm:tracking-[0.28em] mt-3 sm:mt-4">
+              Live trend stream · {city}
+            </p>
+          </div>
+
+          <div className="inline-flex rounded-lg border border-[#1A2437]/80 bg-[#0B111D]/80 p-1 gap-1 self-start lg:self-auto w-full sm:w-auto justify-between sm:justify-start">
+            {[1, 6, 12].map((h) => {
+              const active = breakdownHours === h;
+              return (
+                <button
+                  key={h}
+                  onClick={() => setBreakdownHours(h as 1 | 6 | 12)}
+                  className={`px-3 sm:px-4 py-1.5 text-[10px] rounded-md transition-all uppercase tracking-[0.18em] sm:tracking-[0.25em] font-semibold ${
+                    active
+                      ? "bg-[#8CB6FF] text-[#05142A]"
+                      : "text-[#7A869F] hover:text-[#D8E6FF] hover:bg-[#1A2437]/70"
+                  }`}
+                >
+                  {h}H
+                </button>
+              );
+            })}
+          </div>
         </div>
       </motion.div>
 
-      {/* Summary stats */}
-      {summary && (
-        <motion.div
-          className="grid grid-cols-2 md:grid-cols-4 gap-4"
-          variants={fadeUp}
-        >
-          {[
-            { label: "Average AQI", value: summary.avg_aqi },
-            { label: "Minimum", value: summary.min_aqi },
-            { label: "Maximum", value: summary.max_aqi },
-            { label: "Hours Covered", value: summary.hours },
-          ].map((stat) => (
+      <motion.div
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4"
+        variants={fadeUp}
+      >
+        {[
+          { label: "Predicted Average", value: avgAqi, tone: "cyan" as const },
+          { label: "Period Minimum", value: minAqi, tone: "neutral" as const },
+          { label: "Period Maximum", value: maxAqi, tone: "rose" as const },
+        ].map((stat) => {
+          const tone = TONE_CLASSES[stat.tone];
+          const meter = Math.min(Math.round((stat.value / 500) * 100), 100);
+          return (
             <GlassCard
               key={stat.label}
               animate={false}
-              className="text-center py-4"
+              className={`border-l-2 ${tone.edge} px-4 sm:px-6 py-4 sm:py-5`}
             >
-              <div className="flex justify-center">
-                {STAT_ICONS[stat.label]}
-              </div>
-              <p className="text-2xl font-bold text-[#E2E8F0] mt-1">
-                {typeof stat.value === "number"
-                  ? Math.round(stat.value)
-                  : stat.value}
-              </p>
-              <p className="text-xs text-[#64748B] mt-1 uppercase tracking-wider">
+              <p className="text-[9px] uppercase tracking-[0.24em] font-semibold text-[#8A95AE] mb-3">
                 {stat.label}
               </p>
+              <div className="flex items-end gap-2">
+                <p
+                  className={`text-4xl sm:text-[44px] md:text-5xl font-extrabold leading-none ${tone.value}`}
+                >
+                  {stat.value}
+                </p>
+                <p
+                  className={`text-[9px] sm:text-[10px] uppercase tracking-[0.16em] sm:tracking-[0.2em] pb-1 font-semibold ${tone.cap}`}
+                >
+                  AQI US
+                </p>
+              </div>
+              <div className="h-1.5 mt-5 rounded-full bg-[#1E2736] overflow-hidden">
+                <div
+                  className={`h-full rounded-full ${tone.meter}`}
+                  style={{ width: `${meter}%` }}
+                />
+              </div>
             </GlassCard>
-          ))}
-        </motion.div>
-      )}
+          );
+        })}
+      </motion.div>
 
-      {/* Large chart */}
       <motion.div variants={fadeUp}>
-        <GlassCard delay={2}>
-          <h2 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4">
-            AQI Trend Over Time
-          </h2>
-          <div
-            className="overflow-x-auto"
-            style={{
-              scrollbarWidth: "none",
-              msOverflowStyle: "none",
-            }}
-          >
-            <style>{`.overflow-x-auto::-webkit-scrollbar { display: none; }`}</style>
-            <div className="h-80" style={{ minWidth: "600px" }}>
+        <GlassCard animate={false} className="p-0 overflow-hidden">
+          <div className="px-4 sm:px-6 md:px-8 pt-5 sm:pt-6 md:pt-8 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-semibold text-[#E3EBFF] tracking-[-0.02em]">
+                Temporal AQI Distribution
+              </h2>
+              <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.17em] sm:tracking-[0.24em] text-[#7D879E] mt-1">
+                Satellite Reanalysis & ML Correction
+              </p>
+            </div>
+            <div className="flex items-center gap-3 sm:gap-4 text-[9px] sm:text-[10px] uppercase tracking-[0.14em] sm:tracking-[0.2em] text-[#98A2B9] self-start sm:self-auto">
+              <div className="inline-flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#7CE9F8]" />
+                Good
+              </div>
+              <div className="inline-flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#F1ADA6]" />
+                Moderate
+              </div>
+            </div>
+          </div>
+
+          <div className="px-3 sm:px-4 md:px-6 pb-4 md:pb-6">
+            <div className="h-[260px] sm:h-[320px] md:h-[360px] rounded-xl bg-[#0D1524]/70 border border-[#1B2638] px-1 pt-2 md:px-3 md:pt-4">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData}>
-                  <defs>
-                    <linearGradient
-                      id="forecastGrad"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop offset="5%" stopColor="#7C9CFF" stopOpacity={0.4} />
-                      <stop offset="95%" stopColor="#7C9CFF" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
-                  {/* AQI Zone backgrounds */}
+                <BarChart
+                  data={chartData}
+                  margin={{ top: 16, right: 8, left: 8, bottom: 20 }}
+                >
                   <ReferenceArea
                     y1={0}
                     y2={50}
-                    fill="#7C9CFF"
-                    fillOpacity={0.03}
+                    fill="#66DFF2"
+                    fillOpacity={0.07}
                   />
                   <ReferenceArea
                     y1={50}
-                    y2={100}
-                    fill="#34D399"
-                    fillOpacity={0.03}
+                    y2={220}
+                    fill="#F0A8A2"
+                    fillOpacity={0.08}
                   />
-                  <ReferenceArea
-                    y1={100}
-                    y2={200}
-                    fill="#FBBF24"
-                    fillOpacity={0.03}
-                  />
-                  <ReferenceArea
-                    y1={200}
-                    y2={300}
-                    fill="#F97316"
-                    fillOpacity={0.03}
-                  />
-                  <ReferenceArea
-                    y1={300}
-                    y2={500}
-                    fill="#EF4444"
-                    fillOpacity={0.03}
-                  />
-                  {/* Reference lines for boundaries */}
-                  <ReferenceLine
-                    y={50}
-                    stroke="#7C9CFF"
+                  <CartesianGrid
+                    stroke="#1E2B3F"
                     strokeDasharray="3 3"
-                    strokeOpacity={0.2}
-                  />
-                  <ReferenceLine
-                    y={100}
-                    stroke="#34D399"
-                    strokeDasharray="3 3"
-                    strokeOpacity={0.2}
-                  />
-                  <ReferenceLine
-                    y={200}
-                    stroke="#FBBF24"
-                    strokeDasharray="3 3"
-                    strokeOpacity={0.2}
-                  />
-                  <ReferenceLine
-                    y={300}
-                    stroke="#F97316"
-                    strokeDasharray="3 3"
-                    strokeOpacity={0.2}
+                    vertical={false}
                   />
                   <XAxis
                     dataKey="time"
-                    stroke="#64748B"
-                    tick={{ fill: "#94A3B8", fontSize: 11 }}
-                    interval={Math.floor(chartData.length / 8)}
+                    stroke="#44516A"
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fill: "#6C7791", fontSize: 10 }}
+                    interval={0}
+                    tickFormatter={(_, idx) => {
+                      if (!chartTickPositions.includes(idx)) {
+                        return "";
+                      }
+                      if (idx === 0) return "NOW";
+                      const step = Math.round(
+                        (idx / Math.max(chartData.length - 1, 1)) * 48,
+                      );
+                      return `${step}H`;
+                    }}
                   />
                   <YAxis
-                    stroke="#64748B"
-                    tick={{ fill: "#94A3B8", fontSize: 11 }}
-                    domain={[0, "auto"]}
+                    stroke="#44516A"
+                    tick={{ fill: "#6C7791", fontSize: 10 }}
+                    tickLine={false}
+                    axisLine={false}
+                    domain={[0, 220]}
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#0F172A",
-                      border: "1px solid #1E293B",
-                      borderRadius: "12px",
-                      color: "#E2E8F0",
+                      backgroundColor: "#0A1220",
+                      border: "1px solid #1A2A42",
+                      borderRadius: "10px",
+                      color: "#DAE5FF",
+                      fontSize: "12px",
                     }}
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    formatter={(value: any) => [`${value}`, "AQI"]}
+                    labelStyle={{
+                      color: "#8EA0C5",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.1em",
+                    }}
+                    formatter={(value) => [`${value ?? "-"}`, "AQI"]}
                   />
-                  <Area
-                    type="monotone"
+                  <Bar
                     dataKey="aqi"
-                    stroke="#7C9CFF"
-                    strokeWidth={2}
-                    fill="url(#forecastGrad)"
-                    dot={false}
-                    activeDot={{ r: 5, fill: "#7C9CFF" }}
-                  />
-                </AreaChart>
+                    radius={[4, 4, 0, 0]}
+                    maxBarSize={28}
+                    isAnimationActive
+                    animationDuration={550}
+                  >
+                    {chartData.map((entry, idx) => (
+                      <Cell
+                        key={`cell-${idx}`}
+                        fill={entry.aqi <= 100 ? "#66DFF2" : "#E8A9A1"}
+                        fillOpacity={0.72}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
         </GlassCard>
       </motion.div>
 
-      {/* Hourly cards */}
       <motion.div variants={fadeUp}>
-        <h2 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4">
-          {breakdownHours === 1 ? "Hourly Breakdown" : `${breakdownHours}-Hour Breakdown`}
-        </h2>
+        <p className="text-[9px] sm:text-[10px] text-[#9DACCA] uppercase tracking-[0.2em] sm:tracking-[0.28em] font-semibold mb-3 sm:mb-4">
+          Sequential Data Readout
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+          {readoutItems.map((item, idx) => {
+            const category = item.category || getAQICategory(item.aqi);
+            const color = getAQIColorByValue(item.aqi);
+            const icon =
+              idx % 3 === 0 ? Wind : idx % 3 === 1 ? Sunrise : CloudMoon;
+            const Icon = icon;
 
-        {/* Mobile: horizontal scroll | Laptop+: wrapping grid */}
-        {/* Mobile scroll strip */}
-        <div
-          className="md:hidden overflow-x-auto pb-3"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-        >
-          <style>{`.hourly-strip::-webkit-scrollbar { display: none; }`}</style>
-          <div className="hourly-strip flex gap-2 w-max">
-            {displayForecast.map((item, idx) => {
-              const dt = new Date(item.datetime ?? item.timestamp ?? new Date().toISOString());
-              const end = item.end_datetime ? new Date(item.end_datetime) : null;
-              const category = item.category || getAQICategory(item.aqi);
-              const color = getAQIColorByValue(item.aqi);
-              const barPct = Math.min(Math.round((item.aqi / 500) * 100), 100);
-              return (
-                <motion.div
-                  key={idx}
-                  className="flex flex-col items-center gap-1 glass-light rounded-2xl pt-3 pb-2 px-3 cursor-default relative overflow-hidden"
-                  style={{ minWidth: "68px" }}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.25, delay: idx * 0.015 }}
-                  whileHover={{ scale: 1.06, y: -3 }}
-                >
-                  <div
-                    className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl"
-                    style={{ background: color }}
-                  />
-                  <span className="text-[10px] text-[#64748B] font-medium tabular-nums">
-                    {end
-                      ? `${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}-${end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
-                      : dt.toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                  </span>
-                  <div className="flex items-end gap-1.5 mt-1">
-                    <div className="w-1.5 bg-[#1E293B]/40 rounded-full h-8 flex items-end overflow-hidden">
-                      <div
-                        className="w-full rounded-full transition-all"
-                        style={{ height: `${barPct}%`, background: color }}
-                      />
-                    </div>
-                    <span
-                      className="text-lg font-bold leading-none"
-                      style={{ color }}
-                    >
+            return (
+              <motion.div
+                key={`${item.timestamp ?? item.datetime ?? idx}-${idx}`}
+                className="glass-light data-surface rounded-xl px-3 sm:px-4 py-3 border border-[#1A2435]"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25, delay: idx * 0.05 }}
+              >
+                <p className="text-[9px] uppercase tracking-[0.14em] sm:tracking-[0.2em] text-[#7E8AA3] font-semibold">
+                  {formatDayTime(item)}
+                </p>
+                <div className="flex items-end justify-between mt-2">
+                  <div>
+                    <p className="text-3xl sm:text-4xl leading-none font-extrabold text-[#E7EFFF]">
                       {Math.round(item.aqi)}
+                    </p>
+                    <p className="text-[9px] mt-1 uppercase tracking-[0.16em] text-[#74819D]">
+                      AQI INDEX
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end gap-1">
+                    <Icon className="w-4 h-4" style={{ color }} />
+                    <span className="text-xs" style={{ color }}>
+                      {getAQIEmoji(category)}
                     </span>
                   </div>
-                  <span className="text-sm leading-none mt-0.5">
-                    {getAQIEmoji(category)}
-                  </span>
-                  <span className="text-[9px] text-[#64748B] font-medium uppercase tracking-wide mt-0.5 text-center leading-tight">
-                    {category}
-                  </span>
-                </motion.div>
-              );
-            })}
-          </div>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
+      </motion.div>
 
-        {/* Laptop+ wrapping grid — groups by day */}
-        <div className="hidden md:block space-y-5">
-          {Array.from(
-            displayForecast.reduce((acc, item) => {
-              const dt = new Date(item.datetime ?? item.timestamp ?? new Date().toISOString());
-              const key = dt.toDateString();
-              if (!acc.has(key))
-                acc.set(key, {
-                  label: dt.toLocaleDateString([], {
-                    weekday: "long",
-                    month: "short",
-                    day: "numeric",
-                  }),
-                  items: [],
-                });
-              acc.get(key)!.items.push(item);
-              return acc;
-            }, new Map<string, { label: string; items: typeof forecast }>()),
-          ).map(([key, group]) => (
-            <div key={key}>
-              {/* Day label */}
-              <p className="text-xs text-[#7C9CFF] font-semibold uppercase tracking-widest mb-3 flex items-center gap-2">
-                <span className="inline-block w-4 h-px bg-[#7C9CFF]/40" />
-                {group.label}
-              </p>
-              <div className="grid grid-cols-6 lg:grid-cols-8 xl:grid-cols-12 gap-2">
-                {group.items.map((item, idx) => {
-                  const dt = new Date(item.datetime ?? item.timestamp ?? new Date().toISOString());
-                  const end = item.end_datetime ? new Date(item.end_datetime) : null;
-                  const category = item.category || getAQICategory(item.aqi);
-                  const color = getAQIColorByValue(item.aqi);
-                  const barPct = Math.min(
-                    Math.round((item.aqi / 500) * 100),
-                    100,
-                  );
-                  return (
-                    <motion.div
-                      key={idx}
-                      className="flex flex-col items-center gap-1 glass-light rounded-2xl pt-3 pb-2 px-2 cursor-default relative overflow-hidden"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.25, delay: idx * 0.02 }}
-                      whileHover={{ scale: 1.05, y: -3 }}
-                    >
-                      <div
-                        className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl"
-                        style={{ background: color }}
-                      />
-                      <span className="text-[10px] text-[#64748B] font-medium tabular-nums">
-                        {end
-                          ? `${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}-${end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
-                          : dt.toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                      </span>
-                      <div className="flex items-end gap-1 mt-1">
-                        <div className="w-1.5 bg-[#1E293B]/40 rounded-full h-7 flex items-end overflow-hidden">
-                          <div
-                            className="w-full rounded-full transition-all"
-                            style={{ height: `${barPct}%`, background: color }}
-                          />
-                        </div>
-                        <span
-                          className="text-base font-bold leading-none"
-                          style={{ color }}
-                        >
-                          {Math.round(item.aqi)}
-                        </span>
-                      </div>
-                      <span className="text-sm leading-none mt-0.5">
-                        {getAQIEmoji(category)}
-                      </span>
-                      <span className="text-[9px] text-[#64748B] font-medium uppercase tracking-wide mt-0.5 text-center leading-tight">
-                        {category}
-                      </span>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+      <motion.div
+        variants={fadeUp}
+        className="pt-4 border-t border-[#131E31] flex flex-col gap-3 text-[9px] sm:text-[10px] uppercase tracking-[0.14em] sm:tracking-[0.2em] text-[#5C677F] md:flex-row md:items-center md:justify-between"
+      >
+        <p>
+          © 2026 CleanSky Atmospheric Systems. Data filtered through the digital
+          lens.
+        </p>
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+          <span>Privacy Policy</span>
+          <span>API Docs</span>
+          <span>Network Status</span>
         </div>
       </motion.div>
     </motion.div>

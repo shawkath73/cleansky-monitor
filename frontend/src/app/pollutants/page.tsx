@@ -123,7 +123,7 @@ export default function PollutantsPage() {
           Pollution <span>Contributors</span>
         </h1>
         <p className="text-[#64748B] text-sm mt-2 uppercase tracking-widest">
-          Breakdown <span className="text-[#7C9CFF]">{city}</span>
+          Breakdown <span className="text-[#78EAF8]">{city}</span>
           {dominantPollutant && (
             <>
               {" "}
@@ -224,7 +224,7 @@ export default function PollutantsPage() {
                   }}
                 />
                 <Legend wrapperStyle={{ color: "#94A3B8", fontSize: 12 }} />
-                <Bar dataKey="Actual" fill="#7C9CFF" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Actual" fill="#78EAF8" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="WHO Limit" fill="#1E293B" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -257,7 +257,7 @@ export default function PollutantsPage() {
                     className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                       exceeded
                         ? "bg-red-500/20 text-red-400"
-                        : "bg-[#7C9CFF]/15 text-[#7C9CFF]"
+                        : "bg-[#78EAF8]/15 text-[#78EAF8]"
                     }`}
                   >
                     {exceeded ? "Exceeded" : "Safe"}
@@ -293,7 +293,7 @@ export default function PollutantsPage() {
                       ease: "easeOut",
                     }}
                     style={{
-                      backgroundColor: exceeded ? "#EF4444" : "#7C9CFF",
+                      backgroundColor: exceeded ? "#EF4444" : "#78EAF8",
                     }}
                   />
                 </div>
