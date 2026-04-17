@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import { Globe } from "lucide-react";
 
 // Leaflet must be loaded client-side only (no SSR)
 const AQIMap = dynamic(() => import("@/components/AQIMap"), {
@@ -41,23 +40,15 @@ export default function MapPage() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className="space-y-6"
+      className="space-y-4"
     >
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl md:text-4xl font-bold text-[#E2E8F0] leading-tight flex items-center gap-3">
-          <Globe className="w-8 h-8 text-[#78EAF8]" />
-          Global AQI Map
-        </h1>
-        <p className="text-[#64748B] text-sm mt-2 uppercase tracking-widest">
-          Real-time air quality data across the{" "}
-          <span className="text-[#78EAF8]">world</span> · Click any station for
-          details
+      <div className="px-1">
+        <p className="text-[10px] md:text-xs text-[#64748B] uppercase tracking-[0.24em]">
+          Tactical map interface · live station intelligence
         </p>
       </div>
 
-      {/* Map */}
-      <div style={{ height: "75vh", minHeight: "500px" }}>
+      <div style={{ height: "80vh", minHeight: "560px" }}>
         <AQIMap />
       </div>
     </motion.div>
