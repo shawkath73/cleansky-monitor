@@ -61,6 +61,8 @@ interface StationSnapshot {
   aqi?: number | string;
 }
 
+type TrendCompareMode = "overlay" | "30d" | "7d";
+
 const stagger = {
   hidden: {},
   show: { transition: { staggerChildren: 0.1 } },
@@ -90,7 +92,20 @@ export default function Dashboard() {
   );
   const [loading, setLoading] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
+  const [trendCompareMode, setTrendCompareMode] =
+    useState<TrendCompareMode>("overlay");
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const savedMode = window.localStorage.getItem("dashboard_compare_mode");
+    if (savedMode === "overlay" || savedMode === "30d" || savedMode === "7d") {
+      setTrendCompareMode(savedMode);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("dashboard_compare_mode", trendCompareMode);
+  }, [trendCompareMode]);
 
   useEffect(() => {
     let cancelled = false;
@@ -369,6 +384,20 @@ export default function Dashboard() {
         }))
       : trendCombinedFallback;
 
+  const avg30Aqi =
+    trendCombinedData.length > 0
+      ? Math.round(
+          trendCombinedData.reduce((sum, item) => sum + item.aqi30, 0) /
+            trendCombinedData.length,
+        )
+      : null;
+  const latestTrendAqi =
+    trendCombinedData.length > 0
+      ? trendCombinedData[trendCombinedData.length - 1].aqi30
+      : null;
+  const trendDelta =
+    avg30Aqi !== null && latestTrendAqi !== null ? latestTrendAqi - avg30Aqi : null;
+
   const trendTickInterval = Math.max(
     0,
     Math.ceil(Math.max(trendCombinedData.length, 1) / 8) - 1,
@@ -523,6 +552,16 @@ export default function Dashboard() {
         "forecast_max_aqi",
         "uncertainty_min_aqi",
         "uncertainty_max_aqi",
+        "confidence_score",
+        "last_updated_minutes",
+        "safe_window_start_utc",
+        "safe_window_end_utc",
+        "safe_window_avg_aqi",
+        "safe_window_trusted",
+        "network_active_stations",
+        "network_avg_aqi",
+        "hotspot_count",
+        "trend_compare_mode",
       ];
 
       const currentRow = {
@@ -546,6 +585,18 @@ export default function Dashboard() {
         forecast_max_aqi: "",
         uncertainty_min_aqi: "",
         uncertainty_max_aqi: "",
+        confidence_score: confidenceScore,
+        last_updated_minutes: lastUpdatedMinutes ?? "",
+        safe_window_start_utc: bestWindow
+          ? bestWindow.start.toISOString()
+          : "",
+        safe_window_end_utc: bestWindow ? bestWindow.end.toISOString() : "",
+        safe_window_avg_aqi: bestWindow ? Math.round(bestWindow.avgAqi) : "",
+        safe_window_trusted: safeWindowTrusted,
+        network_active_stations: activeStations,
+        network_avg_aqi: networkAvgAQI,
+        hotspot_count: hotspotStations.length,
+        trend_compare_mode: trendCompareMode,
       };
 
       const forecastRows = validForecastItems.map((item) => {
@@ -573,6 +624,16 @@ export default function Dashboard() {
           forecast_max_aqi: item.max_aqi ?? "",
           uncertainty_min_aqi: item.uncertainty_min_aqi ?? "",
           uncertainty_max_aqi: item.uncertainty_max_aqi ?? "",
+          confidence_score: confidenceScore,
+          last_updated_minutes: lastUpdatedMinutes ?? "",
+          safe_window_start_utc: "",
+          safe_window_end_utc: "",
+          safe_window_avg_aqi: "",
+          safe_window_trusted: safeWindowTrusted,
+          network_active_stations: activeStations,
+          network_avg_aqi: networkAvgAQI,
+          hotspot_count: hotspotStations.length,
+          trend_compare_mode: trendCompareMode,
         };
       });
 
@@ -1026,9 +1087,61 @@ export default function Dashboard() {
         variants={fadeUp}
       >
         <GlassCard>
-          <h3 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4">
-            7D / 30D AQI Trend
-          </h3>
+          <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+            <div>
+              <h3 className="text-sm font-medium text-[#64748B] uppercase tracking-widest">
+                7D / 30D AQI Trend
+              </h3>
+              <p className="text-xs text-[#64748B] mt-1">
+                Compare current movement with 30-day baseline.
+              </p>
+            </div>
+            <div className="inline-flex rounded-lg border border-[#1E293B]/60 bg-[#020617]/70 p-1 gap-1">
+              {[
+                { value: "overlay", label: "Overlay" },
+                { value: "30d", label: "30D" },
+                { value: "7d", label: "7D" },
+              ].map((mode) => {
+                const active = trendCompareMode === mode.value;
+                return (
+                  <button
+                    key={mode.value}
+                    type="button"
+                    onClick={() =>
+                      setTrendCompareMode(mode.value as TrendCompareMode)
+                    }
+                    className={`px-2.5 py-1 text-[11px] rounded-md transition-colors ${
+                      active
+                        ? "bg-[#7C9CFF]/20 text-[#7C9CFF]"
+                        : "text-[#94A3B8] hover:bg-[#1E293B]/40 hover:text-[#E2E8F0]"
+                    }`}
+                  >
+                    {mode.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div className="mb-3 inline-flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-[#0B1220]/70 border border-[#1E293B]/50">
+            <p className="text-xs text-[#94A3B8]">
+              Delta vs 30-day avg:
+              <span
+                className="ml-1 font-semibold"
+                style={{
+                  color:
+                    trendDelta === null
+                      ? "#94A3B8"
+                      : trendDelta <= 0
+                        ? "#22C55E"
+                        : "#F97316",
+                }}
+              >
+                {trendDelta === null
+                  ? "N/A"
+                  : `${trendDelta > 0 ? "+" : ""}${trendDelta}`}
+              </span>
+            </p>
+          </div>
           {trendCombinedData.length > 0 ? (
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -1057,22 +1170,26 @@ export default function Dashboard() {
                       color: "#E2E8F0",
                     }}
                   />
-                  <Line
-                    type="monotone"
-                    dataKey="aqi30"
-                    stroke="#7C9CFF"
-                    strokeWidth={2}
-                    dot={false}
-                    name="30-day"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="aqi7"
-                    stroke="#22D3EE"
-                    strokeWidth={2}
-                    dot={false}
-                    name="7-day"
-                  />
+                  {trendCompareMode !== "7d" && (
+                    <Line
+                      type="monotone"
+                      dataKey="aqi30"
+                      stroke="#7C9CFF"
+                      strokeWidth={2}
+                      dot={false}
+                      name="30-day"
+                    />
+                  )}
+                  {trendCompareMode !== "30d" && (
+                    <Line
+                      type="monotone"
+                      dataKey="aqi7"
+                      stroke="#22D3EE"
+                      strokeWidth={2}
+                      dot={false}
+                      name="7-day"
+                    />
+                  )}
                 </LineChart>
               </ResponsiveContainer>
             </div>

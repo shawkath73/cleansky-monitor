@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCity } from "@/context/CityContext";
-import { fetchCities, searchCities } from "@/lib/api";
+import { fetchCities, fetchCurrentAQI, searchCities } from "@/lib/api";
 import type { CitySearchResult } from "@/lib/api";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
+  Bell,
   CloudSun,
   MapPin,
   ChevronDown,
@@ -27,6 +28,22 @@ const NAV_LINKS = [
   { href: "/pollutants", label: "Pollutants" },
   { href: "/health", label: "Health" },
 ];
+
+type AlertLevel = "info" | "warning" | "critical";
+
+interface InAppAlert {
+  id: string;
+  level: AlertLevel;
+  title: string;
+  description: string;
+  time: string;
+}
+
+function getAlertAccent(level: AlertLevel): string {
+  if (level === "critical") return "#EF4444";
+  if (level === "warning") return "#F97316";
+  return "#7C9CFF";
+}
 
 // Debounce hook
 function useDebounce(value: string, delay: number) {
@@ -113,7 +130,7 @@ function CityItem({
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { city, setCity } = useCity();
+  const { city, lat, lon, setCity } = useCity();
 
   // Default cities (loaded once)
   const [defaultCities, setDefaultCities] = useState<CitySearchResult[]>([]);
@@ -125,7 +142,11 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [alertsOpen, setAlertsOpen] = useState(false);
+  const [alertsLoading, setAlertsLoading] = useState(false);
+  const [alerts, setAlerts] = useState<InAppAlert[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const alertsRef = useRef<HTMLDivElement>(null);
 
   const debouncedSearch = useDebounce(search, 300);
 
@@ -191,6 +212,103 @@ export default function Navbar() {
       });
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadAlerts() {
+      setAlertsLoading(true);
+
+      try {
+        const res = await fetchCurrentAQI(city, lat, lon);
+        if (cancelled) return;
+
+        const data = res.data;
+        const aqi = Math.round(data.aqi ?? 0);
+        const nowStamp = new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        const nextAlerts: InAppAlert[] = [];
+
+        if (aqi > 200) {
+          nextAlerts.push({
+            id: "aqi-critical",
+            level: "critical",
+            title: `Hazardous trend in ${city}`,
+            description: `AQI is ${aqi}. Avoid outdoor activity for sensitive groups.`,
+            time: nowStamp,
+          });
+        } else if (aqi > 100) {
+          nextAlerts.push({
+            id: "aqi-warning",
+            level: "warning",
+            title: `Elevated AQI in ${city}`,
+            description: `AQI is ${aqi}. Reduce prolonged outdoor exertion.`,
+            time: nowStamp,
+          });
+        } else {
+          nextAlerts.push({
+            id: "aqi-info",
+            level: "info",
+            title: `Air quality stable in ${city}`,
+            description: `AQI is ${aqi}. Conditions are currently low risk for most users.`,
+            time: nowStamp,
+          });
+        }
+
+        const parsedUpdatedAt = data.datetime ? new Date(data.datetime) : null;
+        const lastUpdatedMinutes =
+          parsedUpdatedAt && !Number.isNaN(parsedUpdatedAt.getTime())
+            ? Math.max(
+                0,
+                Math.floor(
+                  (Date.now() - parsedUpdatedAt.getTime()) / (1000 * 60),
+                ),
+              )
+            : null;
+
+        if (lastUpdatedMinutes !== null && lastUpdatedMinutes >= 30) {
+          nextAlerts.push({
+            id: "aqi-stale",
+            level: "warning",
+            title: "Data freshness warning",
+            description: `Latest city reading is ${lastUpdatedMinutes} minutes old.`,
+            time: nowStamp,
+          });
+        }
+
+        setAlerts(nextAlerts);
+      } catch {
+        if (cancelled) return;
+
+        setAlerts([
+          {
+            id: "alerts-unavailable",
+            level: "warning",
+            title: "Alert feed unavailable",
+            description:
+              "Unable to refresh alerts right now. Live monitoring will retry automatically.",
+            time: new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          },
+        ]);
+      } finally {
+        if (!cancelled) {
+          setAlertsLoading(false);
+        }
+      }
+    }
+
+    loadAlerts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [city, lat, lon]);
+
   // Dynamic search when user types
   useEffect(() => {
     if (debouncedSearch.length < 2) {
@@ -212,7 +330,9 @@ export default function Navbar() {
       .then((res) => {
         if (!cancelled) {
           setSearchResults(sortCitiesAlphabetically(res.results));
-          setNormalizedSearch((res.translated_query || res.normalized_query || "").trim());
+          setNormalizedSearch(
+            (res.translated_query || res.normalized_query || "").trim(),
+          );
           setSearching(false);
         }
       })
@@ -239,6 +359,10 @@ export default function Navbar() {
       ) {
         setOpen(false);
       }
+
+      if (alertsRef.current && !alertsRef.current.contains(e.target as Node)) {
+        setAlertsOpen(false);
+      }
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
@@ -257,12 +381,14 @@ export default function Navbar() {
     search.length >= 2 &&
     normalizedSearch.length > 0 &&
     normalizedSearch.toLowerCase() !== search.trim().toLowerCase();
+  const unreadAlertCount = alerts.filter((a) => a.level !== "info").length;
 
   const handleSelect = useCallback(
     (result: CitySearchResult) => {
       setCity(result.city || result.name || "Delhi", result.lat, result.lon);
       setOpen(false);
       setMobileOpen(false);
+      setAlertsOpen(false);
       setSearch("");
       setNormalizedSearch("");
       setSearchResults([]);
@@ -307,6 +433,78 @@ export default function Navbar() {
                 </Link>
               );
             })}
+          </div>
+
+          {/* Notifications */}
+          <div className="relative" ref={alertsRef}>
+            <button
+              onClick={() => setAlertsOpen((prev) => !prev)}
+              className="relative inline-flex items-center justify-center ml-2 p-2 rounded-lg glass-light text-[#94A3B8] hover:text-[#E2E8F0]"
+              aria-label="Open in-app alerts"
+              title="In-app alerts"
+            >
+              <Bell className="w-4 h-4" />
+              {unreadAlertCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-semibold bg-[#EF4444] text-white flex items-center justify-center">
+                  {unreadAlertCount}
+                </span>
+              )}
+            </button>
+
+            <AnimatePresence>
+              {alertsOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  className="absolute right-0 top-12 z-[3100] w-80 glass border border-[#1E293B]/50 rounded-xl overflow-hidden shadow-2xl"
+                >
+                  <div className="px-4 py-3 border-b border-[#1E293B]/40 flex items-center justify-between">
+                    <p className="text-sm font-semibold text-[#E2E8F0]">
+                      In-app Alerts
+                    </p>
+                    <span className="text-xs text-[#64748B]">{city}</span>
+                  </div>
+
+                  <ul className="max-h-72 overflow-y-auto p-2 space-y-2">
+                    {alertsLoading && (
+                      <li className="px-3 py-3 rounded-lg text-sm text-[#64748B] flex items-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Refreshing alerts...
+                      </li>
+                    )}
+
+                    {!alertsLoading &&
+                      alerts.map((alert) => {
+                        const accent = getAlertAccent(alert.level);
+                        return (
+                          <li
+                            key={alert.id}
+                            className="rounded-lg border px-3 py-2.5"
+                            style={{
+                              borderColor: `${accent}55`,
+                              backgroundColor: `${accent}12`,
+                            }}
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="text-sm font-medium text-[#E2E8F0]">
+                                {alert.title}
+                              </p>
+                              <span className="text-[11px] text-[#94A3B8] shrink-0">
+                                {alert.time}
+                              </span>
+                            </div>
+                            <p className="text-xs mt-1 text-[#C7D2FE] leading-relaxed">
+                              {alert.description}
+                            </p>
+                          </li>
+                        );
+                      })}
+                  </ul>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Theme toggle */}
@@ -372,7 +570,10 @@ export default function Navbar() {
                     </span>
                     {showNormalizedSearch && (
                       <p className="mt-1 text-[11px] text-[#94A3B8]">
-                        Searching as: <span className="text-[#7C9CFF]">{normalizedSearch}</span>
+                        Searching as:{" "}
+                        <span className="text-[#7C9CFF]">
+                          {normalizedSearch}
+                        </span>
                       </p>
                     )}
                   </div>
@@ -500,7 +701,8 @@ export default function Navbar() {
                   </div>
                   {showNormalizedSearch && (
                     <p className="px-2 mb-2 text-[11px] text-[#94A3B8]">
-                      Searching as: <span className="text-[#7C9CFF]">{normalizedSearch}</span>
+                      Searching as:{" "}
+                      <span className="text-[#7C9CFF]">{normalizedSearch}</span>
                     </p>
                   )}
                   <ul className="max-h-44 overflow-y-auto rounded-lg border border-[#1E293B]/40 bg-[#020617]/80">
