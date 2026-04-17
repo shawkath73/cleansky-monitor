@@ -396,7 +396,9 @@ export default function Dashboard() {
       ? trendCombinedData[trendCombinedData.length - 1].aqi30
       : null;
   const trendDelta =
-    avg30Aqi !== null && latestTrendAqi !== null ? latestTrendAqi - avg30Aqi : null;
+    avg30Aqi !== null && latestTrendAqi !== null
+      ? latestTrendAqi - avg30Aqi
+      : null;
 
   const trendTickInterval = Math.max(
     0,
@@ -429,9 +431,12 @@ export default function Dashboard() {
     .sort((a, b) => a.dt.getTime() - b.dt.getTime());
 
   const minWindowHours = 2;
-  let bestWindow:
-    | { start: Date; end: Date; avgAqi: number; maxAqi: number }
-    | null = null;
+  let bestWindow: {
+    start: Date;
+    end: Date;
+    avgAqi: number;
+    maxAqi: number;
+  } | null = null;
 
   for (let i = 0; i <= parsedForecast.length - minWindowHours; i += 1) {
     const chunk = parsedForecast.slice(i, i + minWindowHours);
@@ -443,7 +448,8 @@ export default function Dashboard() {
     if (!consecutive) continue;
 
     const aqiValues = chunk.map((x) => x.aqi);
-    const avgAqi = aqiValues.reduce((sum, val) => sum + val, 0) / aqiValues.length;
+    const avgAqi =
+      aqiValues.reduce((sum, val) => sum + val, 0) / aqiValues.length;
     const maxAqi = Math.max(...aqiValues);
 
     if (!bestWindow || avgAqi < bestWindow.avgAqi) {
@@ -587,9 +593,7 @@ export default function Dashboard() {
         uncertainty_max_aqi: "",
         confidence_score: confidenceScore,
         last_updated_minutes: lastUpdatedMinutes ?? "",
-        safe_window_start_utc: bestWindow
-          ? bestWindow.start.toISOString()
-          : "",
+        safe_window_start_utc: bestWindow ? bestWindow.start.toISOString() : "",
         safe_window_end_utc: bestWindow ? bestWindow.end.toISOString() : "",
         safe_window_avg_aqi: bestWindow ? Math.round(bestWindow.avgAqi) : "",
         safe_window_trusted: safeWindowTrusted,
@@ -637,7 +641,10 @@ export default function Dashboard() {
         };
       });
 
-      const csvContent = buildCsvContent(headers, [currentRow, ...forecastRows]);
+      const csvContent = buildCsvContent(headers, [
+        currentRow,
+        ...forecastRows,
+      ]);
       const citySlug = city
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
@@ -647,7 +654,10 @@ export default function Dashboard() {
         .replace(/[-:]/g, "")
         .replace(/\.\d{3}Z$/, "Z");
 
-      triggerCsvDownload(`cleansky_${citySlug || "city"}_${stamp}.csv`, csvContent);
+      triggerCsvDownload(
+        `cleansky_${citySlug || "city"}_${stamp}.csv`,
+        csvContent,
+      );
     } finally {
       setIsExporting(false);
     }
@@ -668,7 +678,7 @@ export default function Dashboard() {
               Monitoring Overview
             </h1>
             <p className="text-[#64748B] text-sm mt-2 uppercase tracking-widest">
-              Network status across tracked stations · Updated every 5 minutes
+              Network status across tracked stations
             </p>
           </div>
           <button
@@ -1034,7 +1044,8 @@ export default function Dashboard() {
           </h3>
           <p className="text-2xl font-bold text-[#E2E8F0]">{safeWindowLabel}</p>
           <p className="text-xs text-[#64748B] mt-2">
-            Best 2-hour window in the next 24 hours based on lowest forecast AQI.
+            Best 2-hour window in the next 24 hours based on lowest forecast
+            AQI.
           </p>
           <p
             className="text-xs mt-2"
