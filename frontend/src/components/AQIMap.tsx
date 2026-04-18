@@ -633,18 +633,6 @@ export default function AQIMap() {
         <SearchBridge />
       </MapContainer>
 
-      <div className="absolute bottom-0 inset-x-0 z-[1200] h-11 px-6 bg-[#0A101A]/95 border-t border-white/5 text-[9px] uppercase tracking-[0.16em] text-[#56647A] flex items-center justify-between pointer-events-none">
-        <p>
-          2024 CleanSky Atmospheric Systems. Data filtered through the digital
-          lens.
-        </p>
-        <div className="hidden md:flex items-center gap-6">
-          <span>Privacy Policy</span>
-          <span>API Docs</span>
-          <span>Network Status</span>
-        </div>
-      </div>
-
       <style>{`
         .aqi-div-marker {
           background: none !important;

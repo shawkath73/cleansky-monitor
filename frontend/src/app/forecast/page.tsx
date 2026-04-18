@@ -422,21 +422,6 @@ export default function ForecastPage() {
           })}
         </div>
       </motion.div>
-
-      <motion.div
-        variants={fadeUp}
-        className="pt-4 border-t border-[#131E31] flex flex-col gap-3 text-[9px] sm:text-[10px] uppercase tracking-[0.14em] sm:tracking-[0.2em] text-[#5C677F] md:flex-row md:items-center md:justify-between"
-      >
-        <p>
-          © 2026 CleanSky Atmospheric Systems. Data filtered through the digital
-          lens.
-        </p>
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-          <span>Privacy Policy</span>
-          <span>API Docs</span>
-          <span>Network Status</span>
-        </div>
-      </motion.div>
     </motion.div>
   );
 }

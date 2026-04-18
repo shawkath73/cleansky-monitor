@@ -361,21 +361,6 @@ export default function PollutantsPage() {
           </GlassCard>
         </div>
       </motion.div>
-
-      <motion.div
-        variants={fadeUp}
-        className="flex items-center justify-between px-1"
-      >
-        <p className="text-[10px] md:text-xs tracking-[0.14em] uppercase text-[#4B5563]">
-          2024 CleanSky Atmospheric Systems · Data filtered through the digital
-          lens
-        </p>
-        <div className="hidden md:flex items-center gap-5 text-[10px] tracking-[0.14em] uppercase text-[#4B5563]">
-          <span>Privacy Policy</span>
-          <span>API Docs</span>
-          <span>Network Status</span>
-        </div>
-      </motion.div>
     </motion.div>
   );
 }
