@@ -61,6 +61,8 @@ interface StationSnapshot {
   aqi?: number | string;
 }
 
+type TrendCompareMode = "overlay" | "30d" | "7d";
+
 const stagger = {
   hidden: {},
   show: { transition: { staggerChildren: 0.1 } },
@@ -90,7 +92,20 @@ export default function Dashboard() {
   );
   const [loading, setLoading] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
+  const [trendCompareMode, setTrendCompareMode] =
+    useState<TrendCompareMode>("overlay");
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const savedMode = window.localStorage.getItem("dashboard_compare_mode");
+    if (savedMode === "overlay" || savedMode === "30d" || savedMode === "7d") {
+      setTrendCompareMode(savedMode);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("dashboard_compare_mode", trendCompareMode);
+  }, [trendCompareMode]);
 
   useEffect(() => {
     let cancelled = false;
@@ -369,6 +384,22 @@ export default function Dashboard() {
         }))
       : trendCombinedFallback;
 
+  const avg30Aqi =
+    trendCombinedData.length > 0
+      ? Math.round(
+          trendCombinedData.reduce((sum, item) => sum + item.aqi30, 0) /
+            trendCombinedData.length,
+        )
+      : null;
+  const latestTrendAqi =
+    trendCombinedData.length > 0
+      ? trendCombinedData[trendCombinedData.length - 1].aqi30
+      : null;
+  const trendDelta =
+    avg30Aqi !== null && latestTrendAqi !== null
+      ? latestTrendAqi - avg30Aqi
+      : null;
+
   const trendTickInterval = Math.max(
     0,
     Math.ceil(Math.max(trendCombinedData.length, 1) / 8) - 1,
@@ -400,9 +431,12 @@ export default function Dashboard() {
     .sort((a, b) => a.dt.getTime() - b.dt.getTime());
 
   const minWindowHours = 2;
-  let bestWindow:
-    | { start: Date; end: Date; avgAqi: number; maxAqi: number }
-    | null = null;
+  let bestWindow: {
+    start: Date;
+    end: Date;
+    avgAqi: number;
+    maxAqi: number;
+  } | null = null;
 
   for (let i = 0; i <= parsedForecast.length - minWindowHours; i += 1) {
     const chunk = parsedForecast.slice(i, i + minWindowHours);
@@ -414,7 +448,8 @@ export default function Dashboard() {
     if (!consecutive) continue;
 
     const aqiValues = chunk.map((x) => x.aqi);
-    const avgAqi = aqiValues.reduce((sum, val) => sum + val, 0) / aqiValues.length;
+    const avgAqi =
+      aqiValues.reduce((sum, val) => sum + val, 0) / aqiValues.length;
     const maxAqi = Math.max(...aqiValues);
 
     if (!bestWindow || avgAqi < bestWindow.avgAqi) {
@@ -523,6 +558,16 @@ export default function Dashboard() {
         "forecast_max_aqi",
         "uncertainty_min_aqi",
         "uncertainty_max_aqi",
+        "confidence_score",
+        "last_updated_minutes",
+        "safe_window_start_utc",
+        "safe_window_end_utc",
+        "safe_window_avg_aqi",
+        "safe_window_trusted",
+        "network_active_stations",
+        "network_avg_aqi",
+        "hotspot_count",
+        "trend_compare_mode",
       ];
 
       const currentRow = {
@@ -546,6 +591,16 @@ export default function Dashboard() {
         forecast_max_aqi: "",
         uncertainty_min_aqi: "",
         uncertainty_max_aqi: "",
+        confidence_score: confidenceScore,
+        last_updated_minutes: lastUpdatedMinutes ?? "",
+        safe_window_start_utc: bestWindow ? bestWindow.start.toISOString() : "",
+        safe_window_end_utc: bestWindow ? bestWindow.end.toISOString() : "",
+        safe_window_avg_aqi: bestWindow ? Math.round(bestWindow.avgAqi) : "",
+        safe_window_trusted: safeWindowTrusted,
+        network_active_stations: activeStations,
+        network_avg_aqi: networkAvgAQI,
+        hotspot_count: hotspotStations.length,
+        trend_compare_mode: trendCompareMode,
       };
 
       const forecastRows = validForecastItems.map((item) => {
@@ -573,10 +628,23 @@ export default function Dashboard() {
           forecast_max_aqi: item.max_aqi ?? "",
           uncertainty_min_aqi: item.uncertainty_min_aqi ?? "",
           uncertainty_max_aqi: item.uncertainty_max_aqi ?? "",
+          confidence_score: confidenceScore,
+          last_updated_minutes: lastUpdatedMinutes ?? "",
+          safe_window_start_utc: "",
+          safe_window_end_utc: "",
+          safe_window_avg_aqi: "",
+          safe_window_trusted: safeWindowTrusted,
+          network_active_stations: activeStations,
+          network_avg_aqi: networkAvgAQI,
+          hotspot_count: hotspotStations.length,
+          trend_compare_mode: trendCompareMode,
         };
       });
 
-      const csvContent = buildCsvContent(headers, [currentRow, ...forecastRows]);
+      const csvContent = buildCsvContent(headers, [
+        currentRow,
+        ...forecastRows,
+      ]);
       const citySlug = city
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
@@ -586,7 +654,10 @@ export default function Dashboard() {
         .replace(/[-:]/g, "")
         .replace(/\.\d{3}Z$/, "Z");
 
-      triggerCsvDownload(`cleansky_${citySlug || "city"}_${stamp}.csv`, csvContent);
+      triggerCsvDownload(
+        `cleansky_${citySlug || "city"}_${stamp}.csv`,
+        csvContent,
+      );
     } finally {
       setIsExporting(false);
     }
@@ -607,14 +678,14 @@ export default function Dashboard() {
               Monitoring Overview
             </h1>
             <p className="text-[#64748B] text-sm mt-2 uppercase tracking-widest">
-              Network status across tracked stations · Updated every 5 minutes
+              Network status across tracked stations
             </p>
           </div>
           <button
             type="button"
             onClick={handleDownloadCsv}
             disabled={!aqiData || isExporting}
-            className="inline-flex w-full md:w-auto items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#020617] border border-[#1E293B] text-sm text-[#E2E8F0] hover:border-[#7C9CFF]/60 hover:text-[#7C9CFF] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            className="inline-flex w-full md:w-auto items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#020617] border border-[#1E293B] text-sm text-[#E2E8F0] hover:border-[#78EAF8]/60 hover:text-[#78EAF8] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <Download className="w-4 h-4" />
             {isExporting ? "Preparing CSV..." : "Download CSV"}
@@ -680,7 +751,7 @@ export default function Dashboard() {
       >
         <GlassCard>
           <h2 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4 flex items-center gap-2">
-            <Globe2 className="w-4 h-4 text-[#7C9CFF]" />
+            <Globe2 className="w-4 h-4 text-[#78EAF8]" />
             Top Pollution Hotspots
           </h2>
           <div className="space-y-2">
@@ -842,12 +913,12 @@ export default function Dashboard() {
       <motion.div variants={fadeUp}>
         <GlassCard delay={3}>
           <h2 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-[#7C9CFF]" />
+            <TrendingUp className="w-4 h-4 text-[#78EAF8]" />
             24-Hour AQI Forecast
           </h2>
           <div className="flex flex-wrap items-center gap-2 mb-3 text-[11px]">
             <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#0B1220]/70 border border-[#1E293B]/50 text-[#94A3B8]">
-              <span className="w-3 h-[2px] bg-[#7C9CFF]" /> Predicted AQI
+              <span className="w-3 h-[2px] bg-[#78EAF8]" /> Predicted AQI
             </span>
             <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#0B1220]/70 border border-[#1E293B]/50 text-[#94A3B8]">
               <span className="w-3 h-[2px] bg-[#22D3EE]" /> Median
@@ -857,7 +928,7 @@ export default function Dashboard() {
               Min/Max
             </span>
             <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#0B1220]/70 border border-[#1E293B]/50 text-[#94A3B8]">
-              <span className="w-3 h-2 bg-[#7C9CFF]/25 rounded-sm" />
+              <span className="w-3 h-2 bg-[#78EAF8]/25 rounded-sm" />
               Confidence area
             </span>
           </div>
@@ -878,8 +949,8 @@ export default function Dashboard() {
                 <AreaChart data={chartData}>
                   <defs>
                     <linearGradient id="aqiGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#7C9CFF" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#7C9CFF" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#78EAF8" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#78EAF8" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
@@ -915,7 +986,7 @@ export default function Dashboard() {
                     dataKey="uncertaintyBand"
                     stackId="uncertainty"
                     stroke="none"
-                    fill="#7C9CFF"
+                    fill="#78EAF8"
                     fillOpacity={0.12}
                     activeDot={false}
                   />
@@ -948,11 +1019,11 @@ export default function Dashboard() {
                   <Area
                     type="monotone"
                     dataKey="aqi"
-                    stroke="#7C9CFF"
+                    stroke="#78EAF8"
                     strokeWidth={2}
                     fill="url(#aqiGrad)"
                     dot={false}
-                    activeDot={{ r: 5, fill: "#7C9CFF" }}
+                    activeDot={{ r: 5, fill: "#78EAF8" }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -968,12 +1039,13 @@ export default function Dashboard() {
       >
         <GlassCard>
           <h3 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-3 flex items-center gap-2">
-            <Clock3 className="w-4 h-4 text-[#7C9CFF]" />
+            <Clock3 className="w-4 h-4 text-[#78EAF8]" />
             Safe Outdoor Window
           </h3>
           <p className="text-2xl font-bold text-[#E2E8F0]">{safeWindowLabel}</p>
           <p className="text-xs text-[#64748B] mt-2">
-            Best 2-hour window in the next 24 hours based on lowest forecast AQI.
+            Best 2-hour window in the next 24 hours based on lowest forecast
+            AQI.
           </p>
           <p
             className="text-xs mt-2"
@@ -1026,9 +1098,61 @@ export default function Dashboard() {
         variants={fadeUp}
       >
         <GlassCard>
-          <h3 className="text-sm font-medium text-[#64748B] uppercase tracking-widest mb-4">
-            7D / 30D AQI Trend
-          </h3>
+          <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+            <div>
+              <h3 className="text-sm font-medium text-[#64748B] uppercase tracking-widest">
+                7D / 30D AQI Trend
+              </h3>
+              <p className="text-xs text-[#64748B] mt-1">
+                Compare current movement with 30-day baseline.
+              </p>
+            </div>
+            <div className="inline-flex rounded-lg border border-[#1E293B]/60 bg-[#020617]/70 p-1 gap-1">
+              {[
+                { value: "overlay", label: "Overlay" },
+                { value: "30d", label: "30D" },
+                { value: "7d", label: "7D" },
+              ].map((mode) => {
+                const active = trendCompareMode === mode.value;
+                return (
+                  <button
+                    key={mode.value}
+                    type="button"
+                    onClick={() =>
+                      setTrendCompareMode(mode.value as TrendCompareMode)
+                    }
+                    className={`px-2.5 py-1 text-[11px] rounded-md transition-colors ${
+                      active
+                        ? "bg-[#78EAF8]/20 text-[#78EAF8]"
+                        : "text-[#94A3B8] hover:bg-[#1E293B]/40 hover:text-[#E2E8F0]"
+                    }`}
+                  >
+                    {mode.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div className="mb-3 inline-flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-[#0B1220]/70 border border-[#1E293B]/50">
+            <p className="text-xs text-[#94A3B8]">
+              Delta vs 30-day avg:
+              <span
+                className="ml-1 font-semibold"
+                style={{
+                  color:
+                    trendDelta === null
+                      ? "#94A3B8"
+                      : trendDelta <= 0
+                        ? "#22C55E"
+                        : "#F97316",
+                }}
+              >
+                {trendDelta === null
+                  ? "N/A"
+                  : `${trendDelta > 0 ? "+" : ""}${trendDelta}`}
+              </span>
+            </p>
+          </div>
           {trendCombinedData.length > 0 ? (
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -1057,22 +1181,26 @@ export default function Dashboard() {
                       color: "#E2E8F0",
                     }}
                   />
-                  <Line
-                    type="monotone"
-                    dataKey="aqi30"
-                    stroke="#7C9CFF"
-                    strokeWidth={2}
-                    dot={false}
-                    name="30-day"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="aqi7"
-                    stroke="#22D3EE"
-                    strokeWidth={2}
-                    dot={false}
-                    name="7-day"
-                  />
+                  {trendCompareMode !== "7d" && (
+                    <Line
+                      type="monotone"
+                      dataKey="aqi30"
+                      stroke="#78EAF8"
+                      strokeWidth={2}
+                      dot={false}
+                      name="30-day"
+                    />
+                  )}
+                  {trendCompareMode !== "30d" && (
+                    <Line
+                      type="monotone"
+                      dataKey="aqi7"
+                      stroke="#22D3EE"
+                      strokeWidth={2}
+                      dot={false}
+                      name="7-day"
+                    />
+                  )}
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -1193,7 +1321,7 @@ export default function Dashboard() {
                     }}
                     style={{
                       backgroundColor:
-                        pol.status === "exceeded" ? "#F97316" : "#7C9CFF",
+                        pol.status === "exceeded" ? "#F97316" : "#78EAF8",
                     }}
                   />
                 </div>
