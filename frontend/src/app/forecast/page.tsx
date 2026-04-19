@@ -194,13 +194,9 @@ export default function ForecastPage() {
       <motion.div variants={fadeUp}>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-[9px] sm:text-[10px] text-[#79D7F0] uppercase tracking-[0.26em] sm:tracking-[0.32em] font-semibold mb-2">
-              Atmospheric Outlook
-            </p>
-            <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-[#DDE8FF] leading-[0.95] tracking-[-0.03em]">
-              48-Hour Air Quality Forecast
-            </h1>
-            <p className="text-[#7E8BA7] text-[10px] sm:text-xs uppercase tracking-[0.18em] sm:tracking-[0.28em] mt-3 sm:mt-4">
+            <p className="page-kicker mb-2">Atmospheric Outlook</p>
+            <h1 className="page-title">48-Hour Air Quality Forecast</h1>
+            <p className="page-subtitle mt-3 sm:mt-4">
               Live trend stream · {city}
             </p>
           </div>
@@ -273,10 +269,8 @@ export default function ForecastPage() {
         <GlassCard animate={false} className="p-0 overflow-hidden">
           <div className="px-4 sm:px-6 md:px-8 pt-5 sm:pt-6 md:pt-8 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             <div>
-              <h2 className="text-xl sm:text-2xl font-semibold text-[#E3EBFF] tracking-[-0.02em]">
-                Temporal AQI Distribution
-              </h2>
-              <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.17em] sm:tracking-[0.24em] text-[#7D879E] mt-1">
+              <h2 className="section-title">Temporal AQI Distribution</h2>
+              <p className="section-kicker mt-1 text-[#7D879E]">
                 Satellite Reanalysis & ML Correction
               </p>
             </div>
@@ -379,7 +373,7 @@ export default function ForecastPage() {
       </motion.div>
 
       <motion.div variants={fadeUp}>
-        <p className="text-[9px] sm:text-[10px] text-[#9DACCA] uppercase tracking-[0.2em] sm:tracking-[0.28em] font-semibold mb-3 sm:mb-4">
+        <p className="section-kicker mb-3 sm:mb-4 text-[#9DACCA]">
           Sequential Data Readout
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">

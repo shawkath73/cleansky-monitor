@@ -156,13 +156,14 @@ export default function HealthPage() {
     >
       {/* Header */}
       <motion.div variants={fadeUp} className="flex flex-col gap-2">
-        <h1 className="text-3xl md:text-5xl font-bold text-[#E2E8F0] tracking-tight">
+        <p className="page-kicker">Health Advisory</p>
+        <h1 className="page-title">
           Health Risk{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#78EAF8] to-[#3B82F6]">
             Analysis
           </span>
         </h1>
-        <p className="text-[#94A3B8] text-sm md:text-base font-medium">
+        <p className="page-subtitle">
           Personalized advisory for{" "}
           <span className="text-[#E2E8F0] font-semibold">{city}</span> based on
           real-time AQI
@@ -232,7 +233,7 @@ export default function HealthPage() {
           <GlassCard className="h-full flex flex-col p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-lg md:text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                <h2 className="section-title text-white flex items-center gap-2">
                   <Users className="w-5 h-5 text-[#78EAF8]" />
                   Vulnerability Assessment
                 </h2>
@@ -290,7 +291,7 @@ export default function HealthPage() {
           <GlassCard className="h-full flex flex-col p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-lg md:text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                <h2 className="section-title text-white flex items-center gap-2">
                   <ShieldCheck className="w-5 h-5 text-[#3B82F6]" />
                   Mitigation Plan
                 </h2>

@@ -27,7 +27,10 @@ const AQIMap = dynamic(() => import("@/components/AQIMap"), {
           gap: "12px",
         }}
       >
-        <div className="skeleton" style={{ width: "32px", height: "32px", borderRadius: "50%" }} />
+        <div
+          className="skeleton"
+          style={{ width: "32px", height: "32px", borderRadius: "50%" }}
+        />
         <div className="skeleton" style={{ width: "120px", height: "12px" }} />
       </div>
     </div>
@@ -43,7 +46,7 @@ export default function MapPage() {
       className="space-y-4"
     >
       <div className="px-1">
-        <p className="text-[10px] md:text-xs text-[#64748B] uppercase tracking-[0.24em]">
+        <p className="page-kicker">
           Tactical map interface · live station intelligence
         </p>
       </div>

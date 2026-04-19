@@ -674,10 +674,9 @@ export default function Dashboard() {
       <motion.div variants={fadeUp} className="hero-atmosphere rounded-2xl p-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-[#E2E8F0] leading-tight">
-              Monitoring Overview
-            </h1>
-            <p className="text-[#64748B] text-sm mt-2 uppercase tracking-widest">
+            <p className="page-kicker mb-2">City Control Center</p>
+            <h1 className="page-title">Monitoring Overview</h1>
+            <p className="page-subtitle mt-2">
               Network status across tracked stations
             </p>
           </div>
