@@ -160,10 +160,9 @@ export default function PollutantsPage() {
       animate="show"
     >
       <motion.div variants={fadeUp}>
-        <h1 className="text-3xl md:text-4xl font-bold text-[#E2E8F0] tracking-tight">
-          Pollutants Intelligence
-        </h1>
-        <p className="text-xs md:text-sm text-[#64748B] uppercase tracking-[0.2em] mt-2">
+        <p className="page-kicker">Pollutant Diagnostics</p>
+        <h1 className="page-title">Pollutants Intelligence</h1>
+        <p className="page-subtitle mt-2">
           Live atmospheric profile for{" "}
           <span className="text-[#78EAF8]">{city}</span>
           {dominantPollutant ? (
@@ -224,7 +223,7 @@ export default function PollutantsPage() {
           <GlassCard className="p-6 md:p-7">
             {selected && selectedCopy ? (
               <>
-                <h2 className="text-3xl md:text-[42px] font-extrabold leading-tight tracking-tight text-[#E5E7EB]">
+                <h2 className="section-title text-[#E5E7EB]">
                   {selectedCopy.title}
                 </h2>
                 <p className="text-[#9AA6BC] text-sm md:text-base mt-4 leading-relaxed max-w-4xl">
@@ -233,7 +232,7 @@ export default function PollutantsPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
                   <div>
-                    <h3 className="text-2xl font-bold text-[#E5E7EB] mb-4">
+                    <h3 className="section-title text-[#E5E7EB] mb-4">
                       Source Tracking
                     </h3>
                     <div className="space-y-4">
@@ -275,7 +274,7 @@ export default function PollutantsPage() {
                   </div>
 
                   <div>
-                    <h3 className="text-2xl font-bold text-[#E5E7EB] mb-4">
+                    <h3 className="section-title text-[#E5E7EB] mb-4">
                       Health Impacts
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
@@ -304,7 +303,7 @@ export default function PollutantsPage() {
           </GlassCard>
 
           <GlassCard className="p-6 md:p-7">
-            <h3 className="text-3xl font-bold text-[#E5E7EB] mb-6">
+            <h3 className="section-title text-[#E5E7EB] mb-6">
               Current Levels vs WHO Guidelines
             </h3>
             <div className="space-y-5">

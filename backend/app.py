@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
@@ -62,6 +62,19 @@ def create_app():
                 "/api/users/alerts"
             ]
         }
+
+    @app.after_request
+    def set_cache_headers(response):
+        path = request.path or ""
+
+        if path.startswith("/api/current-aqi"):
+            response.headers["Cache-Control"] = "public, max-age=600"
+        elif path.startswith("/api/forecast"):
+            response.headers["Cache-Control"] = "public, max-age=1800"
+        elif path.startswith("/api/cities"):
+            response.headers["Cache-Control"] = "public, max-age=86400"
+
+        return response
 
     return app
 

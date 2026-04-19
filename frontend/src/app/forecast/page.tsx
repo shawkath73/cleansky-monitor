@@ -194,13 +194,9 @@ export default function ForecastPage() {
       <motion.div variants={fadeUp}>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-[9px] sm:text-[10px] text-[#79D7F0] uppercase tracking-[0.26em] sm:tracking-[0.32em] font-semibold mb-2">
-              Atmospheric Outlook
-            </p>
-            <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-[#DDE8FF] leading-[0.95] tracking-[-0.03em]">
-              48-Hour Air Quality Forecast
-            </h1>
-            <p className="text-[#7E8BA7] text-[10px] sm:text-xs uppercase tracking-[0.18em] sm:tracking-[0.28em] mt-3 sm:mt-4">
+            <p className="page-kicker mb-2">Atmospheric Outlook</p>
+            <h1 className="page-title">48-Hour Air Quality Forecast</h1>
+            <p className="page-subtitle mt-3 sm:mt-4">
               Live trend stream · {city}
             </p>
           </div>
@@ -273,10 +269,8 @@ export default function ForecastPage() {
         <GlassCard animate={false} className="p-0 overflow-hidden">
           <div className="px-4 sm:px-6 md:px-8 pt-5 sm:pt-6 md:pt-8 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             <div>
-              <h2 className="text-xl sm:text-2xl font-semibold text-[#E3EBFF] tracking-[-0.02em]">
-                Temporal AQI Distribution
-              </h2>
-              <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.17em] sm:tracking-[0.24em] text-[#7D879E] mt-1">
+              <h2 className="section-title">Temporal AQI Distribution</h2>
+              <p className="section-kicker mt-1 text-[#7D879E]">
                 Satellite Reanalysis & ML Correction
               </p>
             </div>
@@ -293,93 +287,95 @@ export default function ForecastPage() {
           </div>
 
           <div className="px-3 sm:px-4 md:px-6 pb-4 md:pb-6">
-            <div className="h-[260px] sm:h-[320px] md:h-[360px] rounded-xl bg-[#0D1524]/70 border border-[#1B2638] px-1 pt-2 md:px-3 md:pt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={chartData}
-                  margin={{ top: 16, right: 8, left: 8, bottom: 20 }}
-                >
-                  <ReferenceArea
-                    y1={0}
-                    y2={50}
-                    fill="#66DFF2"
-                    fillOpacity={0.07}
-                  />
-                  <ReferenceArea
-                    y1={50}
-                    y2={220}
-                    fill="#F0A8A2"
-                    fillOpacity={0.08}
-                  />
-                  <CartesianGrid
-                    stroke="#1E2B3F"
-                    strokeDasharray="3 3"
-                    vertical={false}
-                  />
-                  <XAxis
-                    dataKey="time"
-                    stroke="#44516A"
-                    tickLine={false}
-                    axisLine={false}
-                    tick={{ fill: "#6C7791", fontSize: 10 }}
-                    interval={0}
-                    tickFormatter={(_, idx) => {
-                      if (!chartTickPositions.includes(idx)) {
-                        return "";
-                      }
-                      if (idx === 0) return "NOW";
-                      const step = Math.round(
-                        (idx / Math.max(chartData.length - 1, 1)) * 48,
-                      );
-                      return `${step}H`;
-                    }}
-                  />
-                  <YAxis
-                    stroke="#44516A"
-                    tick={{ fill: "#6C7791", fontSize: 10 }}
-                    tickLine={false}
-                    axisLine={false}
-                    domain={[0, 220]}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#0A1220",
-                      border: "1px solid #1A2A42",
-                      borderRadius: "10px",
-                      color: "#DAE5FF",
-                      fontSize: "12px",
-                    }}
-                    labelStyle={{
-                      color: "#8EA0C5",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.1em",
-                    }}
-                    formatter={(value) => [`${value ?? "-"}`, "AQI"]}
-                  />
-                  <Bar
-                    dataKey="aqi"
-                    radius={[4, 4, 0, 0]}
-                    maxBarSize={28}
-                    isAnimationActive
-                    animationDuration={550}
+            <div className="h-[260px] sm:h-[320px] md:h-[360px] rounded-xl bg-[#0D1524]/70 border border-[#1B2638] px-1 pt-2 md:px-3 md:pt-4 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="min-w-[600px] lg:min-w-full h-full pr-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={chartData}
+                    margin={{ top: 16, right: 8, left: 8, bottom: 20 }}
                   >
-                    {chartData.map((entry, idx) => (
-                      <Cell
-                        key={`cell-${idx}`}
-                        fill={entry.aqi <= 100 ? "#66DFF2" : "#E8A9A1"}
-                        fillOpacity={0.72}
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+                    <ReferenceArea
+                      y1={0}
+                      y2={50}
+                      fill="#66DFF2"
+                      fillOpacity={0.07}
+                    />
+                    <ReferenceArea
+                      y1={50}
+                      y2={220}
+                      fill="#F0A8A2"
+                      fillOpacity={0.08}
+                    />
+                    <CartesianGrid
+                      stroke="#1E2B3F"
+                      strokeDasharray="3 3"
+                      vertical={false}
+                    />
+                    <XAxis
+                      dataKey="time"
+                      stroke="#44516A"
+                      tickLine={false}
+                      axisLine={false}
+                      tick={{ fill: "#6C7791", fontSize: 10 }}
+                      interval={0}
+                      tickFormatter={(_, idx) => {
+                        if (!chartTickPositions.includes(idx)) {
+                          return "";
+                        }
+                        if (idx === 0) return "NOW";
+                        const step = Math.round(
+                          (idx / Math.max(chartData.length - 1, 1)) * 48,
+                        );
+                        return `${step}H`;
+                      }}
+                    />
+                    <YAxis
+                      stroke="#44516A"
+                      tick={{ fill: "#6C7791", fontSize: 10 }}
+                      tickLine={false}
+                      axisLine={false}
+                      domain={[0, 220]}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#0A1220",
+                        border: "1px solid #1A2A42",
+                        borderRadius: "10px",
+                        color: "#DAE5FF",
+                        fontSize: "12px",
+                      }}
+                      labelStyle={{
+                        color: "#8EA0C5",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.1em",
+                      }}
+                      formatter={(value) => [`${value ?? "-"}`, "AQI"]}
+                    />
+                    <Bar
+                      dataKey="aqi"
+                      radius={[4, 4, 0, 0]}
+                      maxBarSize={28}
+                      isAnimationActive
+                      animationDuration={550}
+                    >
+                      {chartData.map((entry, idx) => (
+                        <Cell
+                          key={`cell-${idx}`}
+                          fill={entry.aqi <= 100 ? "#66DFF2" : "#E8A9A1"}
+                          fillOpacity={0.72}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </div>
         </GlassCard>
       </motion.div>
 
       <motion.div variants={fadeUp}>
-        <p className="text-[9px] sm:text-[10px] text-[#9DACCA] uppercase tracking-[0.2em] sm:tracking-[0.28em] font-semibold mb-3 sm:mb-4">
+        <p className="section-kicker mb-3 sm:mb-4 text-[#9DACCA]">
           Sequential Data Readout
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">

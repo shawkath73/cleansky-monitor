@@ -58,6 +58,12 @@ CleanSky Monitor is a predictive air quality platform with a Flask backend and a
 - Leaflet + react-leaflet
 - lucide-react
 
+## Documentation
+
+- Project docs index: [docs/README.md](docs/README.md)
+- Frontend guide: [docs/frontend/frontend-readme.md](docs/frontend/frontend-readme.md)
+- SEO implementation plan: [docs/seo/seo-refactored.md](docs/seo/seo-refactored.md)
+
 ## Project Structure
 
 ```text
@@ -68,6 +74,9 @@ cleansky-monitor/
 │   ├── models/
 │   ├── routes/
 │   └── services/
+├── docs/
+│   ├── frontend/
+│   └── seo/
 ├── frontend/
 │   ├── package.json
 │   ├── next.config.ts
