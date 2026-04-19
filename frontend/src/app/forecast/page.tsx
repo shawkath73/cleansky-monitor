@@ -287,86 +287,88 @@ export default function ForecastPage() {
           </div>
 
           <div className="px-3 sm:px-4 md:px-6 pb-4 md:pb-6">
-            <div className="h-[260px] sm:h-[320px] md:h-[360px] rounded-xl bg-[#0D1524]/70 border border-[#1B2638] px-1 pt-2 md:px-3 md:pt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={chartData}
-                  margin={{ top: 16, right: 8, left: 8, bottom: 20 }}
-                >
-                  <ReferenceArea
-                    y1={0}
-                    y2={50}
-                    fill="#66DFF2"
-                    fillOpacity={0.07}
-                  />
-                  <ReferenceArea
-                    y1={50}
-                    y2={220}
-                    fill="#F0A8A2"
-                    fillOpacity={0.08}
-                  />
-                  <CartesianGrid
-                    stroke="#1E2B3F"
-                    strokeDasharray="3 3"
-                    vertical={false}
-                  />
-                  <XAxis
-                    dataKey="time"
-                    stroke="#44516A"
-                    tickLine={false}
-                    axisLine={false}
-                    tick={{ fill: "#6C7791", fontSize: 10 }}
-                    interval={0}
-                    tickFormatter={(_, idx) => {
-                      if (!chartTickPositions.includes(idx)) {
-                        return "";
-                      }
-                      if (idx === 0) return "NOW";
-                      const step = Math.round(
-                        (idx / Math.max(chartData.length - 1, 1)) * 48,
-                      );
-                      return `${step}H`;
-                    }}
-                  />
-                  <YAxis
-                    stroke="#44516A"
-                    tick={{ fill: "#6C7791", fontSize: 10 }}
-                    tickLine={false}
-                    axisLine={false}
-                    domain={[0, 220]}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#0A1220",
-                      border: "1px solid #1A2A42",
-                      borderRadius: "10px",
-                      color: "#DAE5FF",
-                      fontSize: "12px",
-                    }}
-                    labelStyle={{
-                      color: "#8EA0C5",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.1em",
-                    }}
-                    formatter={(value) => [`${value ?? "-"}`, "AQI"]}
-                  />
-                  <Bar
-                    dataKey="aqi"
-                    radius={[4, 4, 0, 0]}
-                    maxBarSize={28}
-                    isAnimationActive
-                    animationDuration={550}
+            <div className="h-[260px] sm:h-[320px] md:h-[360px] rounded-xl bg-[#0D1524]/70 border border-[#1B2638] px-1 pt-2 md:px-3 md:pt-4 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="min-w-[600px] lg:min-w-full h-full pr-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={chartData}
+                    margin={{ top: 16, right: 8, left: 8, bottom: 20 }}
                   >
-                    {chartData.map((entry, idx) => (
-                      <Cell
-                        key={`cell-${idx}`}
-                        fill={entry.aqi <= 100 ? "#66DFF2" : "#E8A9A1"}
-                        fillOpacity={0.72}
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+                    <ReferenceArea
+                      y1={0}
+                      y2={50}
+                      fill="#66DFF2"
+                      fillOpacity={0.07}
+                    />
+                    <ReferenceArea
+                      y1={50}
+                      y2={220}
+                      fill="#F0A8A2"
+                      fillOpacity={0.08}
+                    />
+                    <CartesianGrid
+                      stroke="#1E2B3F"
+                      strokeDasharray="3 3"
+                      vertical={false}
+                    />
+                    <XAxis
+                      dataKey="time"
+                      stroke="#44516A"
+                      tickLine={false}
+                      axisLine={false}
+                      tick={{ fill: "#6C7791", fontSize: 10 }}
+                      interval={0}
+                      tickFormatter={(_, idx) => {
+                        if (!chartTickPositions.includes(idx)) {
+                          return "";
+                        }
+                        if (idx === 0) return "NOW";
+                        const step = Math.round(
+                          (idx / Math.max(chartData.length - 1, 1)) * 48,
+                        );
+                        return `${step}H`;
+                      }}
+                    />
+                    <YAxis
+                      stroke="#44516A"
+                      tick={{ fill: "#6C7791", fontSize: 10 }}
+                      tickLine={false}
+                      axisLine={false}
+                      domain={[0, 220]}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#0A1220",
+                        border: "1px solid #1A2A42",
+                        borderRadius: "10px",
+                        color: "#DAE5FF",
+                        fontSize: "12px",
+                      }}
+                      labelStyle={{
+                        color: "#8EA0C5",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.1em",
+                      }}
+                      formatter={(value) => [`${value ?? "-"}`, "AQI"]}
+                    />
+                    <Bar
+                      dataKey="aqi"
+                      radius={[4, 4, 0, 0]}
+                      maxBarSize={28}
+                      isAnimationActive
+                      animationDuration={550}
+                    >
+                      {chartData.map((entry, idx) => (
+                        <Cell
+                          key={`cell-${idx}`}
+                          fill={entry.aqi <= 100 ? "#66DFF2" : "#E8A9A1"}
+                          fillOpacity={0.72}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </div>
         </GlassCard>

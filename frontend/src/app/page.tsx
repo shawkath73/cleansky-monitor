@@ -935,15 +935,8 @@ export default function Dashboard() {
             Includes min/max/median trajectories and a deterministic confidence
             area that widens over forecast horizon.
           </p>
-          <div
-            className="overflow-x-auto"
-            style={{
-              scrollbarWidth: "none",
-              msOverflowStyle: "none",
-            }}
-          >
-            <style>{`.overflow-x-auto::-webkit-scrollbar { display: none; }`}</style>
-            <div className="h-64" style={{ minWidth: "600px" }}>
+          <div className="overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="h-64 min-w-[600px] lg:min-w-full pr-2">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData}>
                   <defs>
@@ -1153,55 +1146,57 @@ export default function Dashboard() {
             </p>
           </div>
           {trendCombinedData.length > 0 ? (
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={trendCombinedData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
-                  <XAxis
-                    dataKey="date"
-                    stroke="#64748B"
-                    tick={{ fill: "#94A3B8", fontSize: 10 }}
-                    interval={trendTickInterval}
-                    minTickGap={16}
-                    tickMargin={8}
-                    angle={-28}
-                    textAnchor="end"
-                    height={56}
-                  />
-                  <YAxis
-                    stroke="#64748B"
-                    tick={{ fill: "#94A3B8", fontSize: 11 }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#0F172A",
-                      border: "1px solid #1E293B",
-                      borderRadius: "12px",
-                      color: "#E2E8F0",
-                    }}
-                  />
-                  {trendCompareMode !== "7d" && (
-                    <Line
-                      type="monotone"
-                      dataKey="aqi30"
-                      stroke="#78EAF8"
-                      strokeWidth={2}
-                      dot={false}
-                      name="30-day"
+            <div className="h-64 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="h-full min-w-[600px] lg:min-w-full pr-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={trendCombinedData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
+                    <XAxis
+                      dataKey="date"
+                      stroke="#64748B"
+                      tick={{ fill: "#94A3B8", fontSize: 10 }}
+                      interval={trendTickInterval}
+                      minTickGap={16}
+                      tickMargin={8}
+                      angle={-28}
+                      textAnchor="end"
+                      height={56}
                     />
-                  )}
-                  {trendCompareMode !== "30d" && (
-                    <Line
-                      type="monotone"
-                      dataKey="aqi7"
-                      stroke="#22D3EE"
-                      strokeWidth={2}
-                      dot={false}
-                      name="7-day"
+                    <YAxis
+                      stroke="#64748B"
+                      tick={{ fill: "#94A3B8", fontSize: 11 }}
                     />
-                  )}
-                </LineChart>
-              </ResponsiveContainer>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#0F172A",
+                        border: "1px solid #1E293B",
+                        borderRadius: "12px",
+                        color: "#E2E8F0",
+                      }}
+                    />
+                    {trendCompareMode !== "7d" && (
+                      <Line
+                        type="monotone"
+                        dataKey="aqi30"
+                        stroke="#78EAF8"
+                        strokeWidth={2}
+                        dot={false}
+                        name="30-day"
+                      />
+                    )}
+                    {trendCompareMode !== "30d" && (
+                      <Line
+                        type="monotone"
+                        dataKey="aqi7"
+                        stroke="#22D3EE"
+                        strokeWidth={2}
+                        dot={false}
+                        name="7-day"
+                      />
+                    )}
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           ) : (
             <p className="text-sm text-[#64748B]">Not enough history yet.</p>
@@ -1213,39 +1208,41 @@ export default function Dashboard() {
             Hour of Day Pattern
           </h3>
           {hourPatternData.length > 0 ? (
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={hourPatternData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
-                  <XAxis
-                    dataKey="hour"
-                    stroke="#64748B"
-                    tick={{ fill: "#94A3B8", fontSize: 11 }}
-                    interval={2}
-                  />
-                  <YAxis
-                    stroke="#64748B"
-                    tick={{ fill: "#94A3B8", fontSize: 11 }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#0F172A",
-                      border: "1px solid #1E293B",
-                      borderRadius: "12px",
-                      color: "#E2E8F0",
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="aqi"
-                    stroke="#34D399"
-                    fill="#34D399"
-                    fillOpacity={0.15}
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+            <div className="h-64 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="h-full min-w-[600px] lg:min-w-full pr-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={hourPatternData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
+                    <XAxis
+                      dataKey="hour"
+                      stroke="#64748B"
+                      tick={{ fill: "#94A3B8", fontSize: 11 }}
+                      interval={2}
+                    />
+                    <YAxis
+                      stroke="#64748B"
+                      tick={{ fill: "#94A3B8", fontSize: 11 }}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#0F172A",
+                        border: "1px solid #1E293B",
+                        borderRadius: "12px",
+                        color: "#E2E8F0",
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="aqi"
+                      stroke="#34D399"
+                      fill="#34D399"
+                      fillOpacity={0.15}
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           ) : (
             <p className="text-sm text-[#64748B]">Not enough history yet.</p>
@@ -1257,30 +1254,32 @@ export default function Dashboard() {
             Weekday Pattern
           </h3>
           {weekdayPatternData.length > 0 ? (
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={weekdayPatternData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
-                  <XAxis
-                    dataKey="day"
-                    stroke="#64748B"
-                    tick={{ fill: "#94A3B8", fontSize: 11 }}
-                  />
-                  <YAxis
-                    stroke="#64748B"
-                    tick={{ fill: "#94A3B8", fontSize: 11 }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#0F172A",
-                      border: "1px solid #1E293B",
-                      borderRadius: "12px",
-                      color: "#E2E8F0",
-                    }}
-                  />
-                  <Bar dataKey="aqi" fill="#F59E0B" radius={[6, 6, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="h-64 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="h-full min-w-[600px] lg:min-w-full pr-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={weekdayPatternData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
+                    <XAxis
+                      dataKey="day"
+                      stroke="#64748B"
+                      tick={{ fill: "#94A3B8", fontSize: 11 }}
+                    />
+                    <YAxis
+                      stroke="#64748B"
+                      tick={{ fill: "#94A3B8", fontSize: 11 }}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#0F172A",
+                        border: "1px solid #1E293B",
+                        borderRadius: "12px",
+                        color: "#E2E8F0",
+                      }}
+                    />
+                    <Bar dataKey="aqi" fill="#F59E0B" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           ) : (
             <p className="text-sm text-[#64748B]">Not enough history yet.</p>
