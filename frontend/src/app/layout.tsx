@@ -11,7 +11,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "CleanSky — Air Quality Monitor",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://cleansky-monitor.vercel.app/",
+  ),
+  title: {
+    default: "CleanSky - Air Quality Monitor",
+    template: "%s | CleanSky",
+  },
   description:
     "Real-time air quality monitoring and 48-hour AQI forecasts for Indian cities. Powered by ML predictions.",
   keywords: [
@@ -22,6 +28,20 @@ export const metadata: Metadata = {
     "India",
     "CleanSky",
   ],
+  openGraph: {
+    type: "website",
+    title: "CleanSky - Air Quality Monitor",
+    description:
+      "Real-time air quality monitoring and 48-hour AQI forecasts for Indian cities.",
+    siteName: "CleanSky",
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CleanSky - Air Quality Monitor",
+    description:
+      "Real-time air quality monitoring and 48-hour AQI forecasts for Indian cities.",
+  },
 };
 
 export default function RootLayout({

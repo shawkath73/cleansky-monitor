@@ -1,0 +1,73 @@
+import type { Metadata } from "next";
+
+function normalizeCitySlug(slug: unknown): string {
+  if (typeof slug !== "string") return "delhi";
+  const normalized = slug.trim().toLowerCase();
+  return normalized.length > 0 ? normalized : "delhi";
+}
+
+export function cityLabelFromSlug(slug: unknown): string {
+  return normalizeCitySlug(slug)
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+async function fetchLiveAqi(cityLabel: string): Promise<number | null> {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+  try {
+    const res = await fetch(
+      `${siteUrl}/api/current-aqi?city=${encodeURIComponent(cityLabel)}`,
+      {
+        next: { revalidate: 300 },
+      },
+    );
+
+    if (!res.ok) return null;
+
+    const json = (await res.json()) as { data?: { aqi?: number } };
+    const aqi = json?.data?.aqi;
+    return typeof aqi === "number" ? Math.round(aqi) : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function createCityMetadata(
+  citySlug: unknown,
+  pageTitle: string,
+  pageDescription: string,
+  pathSuffix = "",
+): Promise<Metadata> {
+  const safeSlug = normalizeCitySlug(citySlug);
+  const cityLabel = cityLabelFromSlug(safeSlug);
+  const title = pageTitle.replaceAll("[City]", cityLabel);
+  const baseDescription = pageDescription.replaceAll("[City]", cityLabel);
+  const aqi = await fetchLiveAqi(cityLabel);
+  const description =
+    aqi !== null
+      ? `${baseDescription} Current AQI: ${aqi}.`
+      : baseDescription;
+  const canonicalPath = `/${safeSlug}${pathSuffix}`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: canonicalPath,
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalPath,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
+}

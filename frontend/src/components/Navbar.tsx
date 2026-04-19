@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCity } from "@/context/CityContext";
+import { toCitySlug, useCity } from "@/context/CityContext";
 import { fetchCities, fetchCurrentAQI, searchCities } from "@/lib/api";
 import type { CitySearchResult } from "@/lib/api";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -22,11 +22,11 @@ import {
 } from "lucide-react";
 
 const NAV_LINKS = [
-  { href: "/", label: "Dashboard" },
-  { href: "/map", label: "Map" },
-  { href: "/forecast", label: "Forecast" },
-  { href: "/pollutants", label: "Pollutants" },
-  { href: "/health", label: "Health" },
+  { segment: "", label: "Dashboard" },
+  { segment: "/map", label: "Map" },
+  { segment: "/forecast", label: "Forecast" },
+  { segment: "/pollutants", label: "Pollutants" },
+  { segment: "/health", label: "Health" },
 ];
 
 type AlertLevel = "info" | "warning" | "critical";
@@ -131,6 +131,7 @@ function CityItem({
 export default function Navbar() {
   const pathname = usePathname();
   const { city, lat, lon, setCity } = useCity();
+  const citySlug = toCitySlug(city);
 
   // Default cities (loaded once)
   const [defaultCities, setDefaultCities] = useState<CitySearchResult[]>([]);
@@ -400,6 +401,16 @@ export default function Navbar() {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   }, []);
 
+  const buildCityHref = (segment: string) => `/${citySlug}${segment}`;
+
+  const isNavActive = (segment: string) => {
+    const href = buildCityHref(segment);
+    if (segment === "") {
+      return pathname === href;
+    }
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
   return (
     <nav
       className="sticky top-0 z-[3000] isolate glass border-b border-[#1E293B]/30"
@@ -408,7 +419,10 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 shrink-0">
+          <Link
+            href={buildCityHref("")}
+            className="flex items-center gap-2.5 shrink-0"
+          >
             <CloudSun className="w-6 h-6 text-[#78EAF8]" />
             <span className="text-xl font-bold text-[#E2E8F0] tracking-widest uppercase">
               Clean<span className="text-[#78EAF8]">Sky</span>
@@ -418,11 +432,12 @@ export default function Navbar() {
           {/* Desktop nav links */}
           <div className="hidden md:flex items-center gap-1">
             {NAV_LINKS.map((link) => {
-              const active = pathname === link.href;
+              const href = buildCityHref(link.segment);
+              const active = isNavActive(link.segment);
               return (
                 <Link
-                  key={link.href}
-                  href={link.href}
+                  key={link.segment || "dashboard"}
+                  href={href}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     active
                       ? "bg-[#78EAF8]/15 text-[#78EAF8]"
@@ -650,11 +665,12 @@ export default function Navbar() {
             >
               <div className="pb-4 mt-2 pt-3 flex flex-col gap-1">
                 {NAV_LINKS.map((link) => {
-                  const active = pathname === link.href;
+                  const href = buildCityHref(link.segment);
+                  const active = isNavActive(link.segment);
                   return (
                     <Link
-                      key={link.href}
-                      href={link.href}
+                      key={link.segment || "dashboard-mobile"}
+                      href={href}
                       onClick={() => setMobileOpen(false)}
                       className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                         active
