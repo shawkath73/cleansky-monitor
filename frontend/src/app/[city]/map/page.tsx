@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import JsonLd from "@/components/JsonLd";
+import MapPage from "../../map/page";
 import { createCityMetadata } from "../seo";
 
 export async function generateMetadata({
@@ -14,4 +16,15 @@ export async function generateMetadata({
 	);
 }
 
-export { default } from "../../map/page";
+export default function CityMapRoute({
+	params,
+}: {
+	params: { city: string };
+}) {
+	return (
+		<>
+			<JsonLd citySlug={params.city} section="map" />
+			<MapPage />
+		</>
+	);
+}

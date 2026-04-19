@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import JsonLd from "@/components/JsonLd";
+import ForecastPage from "../../forecast/page";
 import { createCityMetadata } from "../seo";
 
 export async function generateMetadata({
@@ -14,4 +16,15 @@ export async function generateMetadata({
 	);
 }
 
-export { default } from "../../forecast/page";
+export default function CityForecastRoute({
+	params,
+}: {
+	params: { city: string };
+}) {
+	return (
+		<>
+			<JsonLd citySlug={params.city} section="forecast" />
+			<ForecastPage />
+		</>
+	);
+}

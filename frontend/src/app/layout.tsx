@@ -35,12 +35,21 @@ export const metadata: Metadata = {
       "Real-time air quality monitoring and 48-hour AQI forecasts for Indian cities.",
     siteName: "CleanSky",
     url: "/",
+    images: [
+      {
+        url: "/api/og",
+        width: 1200,
+        height: 630,
+        alt: "CleanSky Air Quality Monitor",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "CleanSky - Air Quality Monitor",
     description:
       "Real-time air quality monitoring and 48-hour AQI forecasts for Indian cities.",
+    images: ["/api/og"],
   },
 };
 

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import JsonLd from "@/components/JsonLd";
+import PollutantsPage from "../../pollutants/page";
 import { createCityMetadata } from "../seo";
 
 export async function generateMetadata({
@@ -14,4 +16,15 @@ export async function generateMetadata({
 	);
 }
 
-export { default } from "../../pollutants/page";
+export default function CityPollutantsRoute({
+	params,
+}: {
+	params: { city: string };
+}) {
+	return (
+		<>
+			<JsonLd citySlug={params.city} section="pollutants" />
+			<PollutantsPage />
+		</>
+	);
+}

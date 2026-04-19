@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cache } from "react";
 
 function normalizeCitySlug(slug: unknown): string {
   if (typeof slug !== "string") return "delhi";
@@ -14,7 +15,7 @@ export function cityLabelFromSlug(slug: unknown): string {
     .join(" ");
 }
 
-async function fetchLiveAqi(cityLabel: string): Promise<number | null> {
+const fetchLiveAqi = cache(async (cityLabel: string): Promise<number | null> => {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
   try {
@@ -33,7 +34,7 @@ async function fetchLiveAqi(cityLabel: string): Promise<number | null> {
   } catch {
     return null;
   }
-}
+});
 
 export async function createCityMetadata(
   citySlug: unknown,
@@ -41,16 +42,17 @@ export async function createCityMetadata(
   pageDescription: string,
   pathSuffix = "",
 ): Promise<Metadata> {
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://cleansky-monitor.vercel.app";
   const safeSlug = normalizeCitySlug(citySlug);
   const cityLabel = cityLabelFromSlug(safeSlug);
   const title = pageTitle.replaceAll("[City]", cityLabel);
   const baseDescription = pageDescription.replaceAll("[City]", cityLabel);
   const aqi = await fetchLiveAqi(cityLabel);
   const description =
-    aqi !== null
-      ? `${baseDescription} Current AQI: ${aqi}.`
-      : baseDescription;
+    aqi !== null ? `${baseDescription} Current AQI: ${aqi}.` : baseDescription;
   const canonicalPath = `/${safeSlug}${pathSuffix}`;
+  const imageUrl = `${siteUrl}/api/og?city=${encodeURIComponent(cityLabel)}${aqi !== null ? `&aqi=${aqi}` : ""}`;
 
   return {
     title,
@@ -63,11 +65,20 @@ export async function createCityMetadata(
       description,
       url: canonicalPath,
       type: "website",
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${cityLabel} air quality overview`,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [imageUrl],
     },
   };
 }
