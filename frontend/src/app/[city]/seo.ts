@@ -16,15 +16,16 @@ export function cityLabelFromSlug(slug: unknown): string {
 }
 
 const fetchLiveAqi = cache(async (cityLabel: string): Promise<number | null> => {
-  const fetchOrigin = process.env.NODE_ENV === "development"
-    ? "http://localhost:3000"
-    : (process.env.NEXT_PUBLIC_SITE_URL || "https://cleansky-monitor.vercel.app");
+  const backendUrl = process.env.NODE_ENV === "development"
+    ? "http://127.0.0.1:5000"
+    : (process.env.NEXT_PUBLIC_API_URL || "https://cleansky-monitor.onrender.com");
 
   try {
     const res = await fetch(
-      `${fetchOrigin}/api/current-aqi?city=${encodeURIComponent(cityLabel)}`,
+      `${backendUrl}/api/current-aqi?city=${encodeURIComponent(cityLabel)}`,
       {
         next: { revalidate: 300 },
+        signal: AbortSignal.timeout(10000),
       },
     );
 

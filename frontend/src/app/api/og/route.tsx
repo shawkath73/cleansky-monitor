@@ -11,11 +11,18 @@ function aqiColor(aqi: number | null): string {
   return "#7C3AED";
 }
 
-async function fetchAqiFromApi(origin: string, city: string): Promise<number | null> {
+async function fetchAqiFromApi(city: string): Promise<number | null> {
+  const backendUrl = process.env.NODE_ENV === "development"
+    ? "http://127.0.0.1:5000"
+    : (process.env.NEXT_PUBLIC_API_URL || "https://cleansky-monitor.onrender.com");
+
   try {
     const res = await fetch(
-      `${origin}/api/current-aqi?city=${encodeURIComponent(city)}`,
-      { next: { revalidate: 300 } },
+      `${backendUrl}/api/current-aqi?city=${encodeURIComponent(city)}`,
+      { 
+        next: { revalidate: 300 },
+        signal: AbortSignal.timeout(10000) 
+      },
     );
 
     if (!res.ok) return null;
@@ -29,14 +36,14 @@ async function fetchAqiFromApi(origin: string, city: string): Promise<number | n
 }
 
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
   const city = (searchParams.get("city") || "Delhi").trim() || "Delhi";
 
   const aqiParam = searchParams.get("aqi");
   const parsedAqi = aqiParam ? Number(aqiParam) : Number.NaN;
   const resolvedAqi = Number.isFinite(parsedAqi)
     ? Math.round(parsedAqi)
-    : await fetchAqiFromApi(origin, city);
+    : await fetchAqiFromApi(city);
 
   const accent = aqiColor(resolvedAqi);
   const aqiLabel = resolvedAqi === null ? "AQI unavailable" : `AQI ${resolvedAqi}`;

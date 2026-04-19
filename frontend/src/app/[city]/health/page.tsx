@@ -6,24 +6,26 @@ import { createCityMetadata } from "../seo";
 export async function generateMetadata({
 	params,
 }: {
-	params: { city: string };
+	params: Promise<{ city: string }>;
 }): Promise<Metadata> {
+	const { city } = await params;
 	return await createCityMetadata(
-		params.city,
+		city,
 		"[City] Air Quality Health Advisory",
 		"Review risk guidance, sensitive-group alerts, and mitigation actions based on live AQI conditions in [City].",
 		"/health",
 	);
 }
 
-export default function CityHealthRoute({
+export default async function CityHealthRoute({
 	params,
 }: {
-	params: { city: string };
+	params: Promise<{ city: string }>;
 }) {
+	const { city } = await params;
 	return (
 		<>
-			<JsonLd citySlug={params.city} section="health" />
+			<JsonLd citySlug={city} section="health" />
 			<HealthPage />
 		</>
 	);

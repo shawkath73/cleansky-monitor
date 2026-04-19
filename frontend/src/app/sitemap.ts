@@ -31,13 +31,14 @@ function toCitySlug(value: string): string {
 }
 
 async function getCitySlugs(): Promise<string[]> {
-  const fetchOrigin = process.env.NODE_ENV === "development"
-    ? "http://localhost:3000"
-    : (process.env.NEXT_PUBLIC_SITE_URL || "https://cleansky-monitor.vercel.app");
+  const backendUrl = process.env.NODE_ENV === "development"
+    ? "http://127.0.0.1:5000"
+    : (process.env.NEXT_PUBLIC_API_URL || "https://cleansky-monitor.onrender.com");
 
   try {
-    const response = await fetch(`${fetchOrigin}/api/cities`, {
+    const response = await fetch(`${backendUrl}/api/cities`, {
       next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(10000), // 10s timeout so build doesn't hang wait for Render to wake up
     });
 
     if (!response.ok) {
