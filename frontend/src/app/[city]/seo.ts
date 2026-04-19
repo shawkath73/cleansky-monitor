@@ -16,11 +16,13 @@ export function cityLabelFromSlug(slug: unknown): string {
 }
 
 const fetchLiveAqi = cache(async (cityLabel: string): Promise<number | null> => {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const fetchOrigin = process.env.NODE_ENV === "development"
+    ? "http://localhost:3000"
+    : (process.env.NEXT_PUBLIC_SITE_URL || "https://cleansky-monitor.vercel.app");
 
   try {
     const res = await fetch(
-      `${siteUrl}/api/current-aqi?city=${encodeURIComponent(cityLabel)}`,
+      `${fetchOrigin}/api/current-aqi?city=${encodeURIComponent(cityLabel)}`,
       {
         next: { revalidate: 300 },
       },

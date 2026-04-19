@@ -14,7 +14,7 @@ function sectionLabel(section: JsonLdProps["section"]): string {
 }
 
 export default function JsonLd({ citySlug, section = "dashboard" }: JsonLdProps) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cleansky-monitor.vercel.app";
   const cityLabel = cityLabelFromSlug(citySlug);
   const suffix = section === "dashboard" ? "" : `/${section}`;
   const pageUrl = `${siteUrl}/${citySlug}${suffix}`;

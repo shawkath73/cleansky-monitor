@@ -31,10 +31,12 @@ function toCitySlug(value: string): string {
 }
 
 async function getCitySlugs(): Promise<string[]> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const fetchOrigin = process.env.NODE_ENV === "development"
+    ? "http://localhost:3000"
+    : (process.env.NEXT_PUBLIC_SITE_URL || "https://cleansky-monitor.vercel.app");
 
   try {
-    const response = await fetch(`${siteUrl}/api/cities`, {
+    const response = await fetch(`${fetchOrigin}/api/cities`, {
       next: { revalidate: 3600 },
     });
 
@@ -59,7 +61,7 @@ async function getCitySlugs(): Promise<string[]> {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cleansky-monitor.vercel.app";
   const cities = await getCitySlugs();
   const now = new Date();
 
