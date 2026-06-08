@@ -73,6 +73,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 1,
     },
+    {
+      url: `${siteUrl}/cities`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/aqi`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.85,
+    },
   ];
 
   for (const city of cities) {

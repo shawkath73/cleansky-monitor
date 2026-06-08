@@ -1,4 +1,5 @@
 import { Github } from "lucide-react";
+import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -19,8 +20,11 @@ export default function Footer() {
         </div>
 
         <div className="mt-8 pt-6 border-t border-[#1E293B]/20 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-[#64748B] uppercase tracking-wider">
-            &copy; {new Date().getFullYear()} CleanSky. All rights reserved.
+          <p className="text-xs text-[#64748B] uppercase tracking-wider flex items-center gap-4">
+            <span>&copy; {new Date().getFullYear()} CleanSky. All rights reserved.</span>
+            <Link href="/cities" className="hover:text-[#78EAF8] transition-colors">View All Cities</Link>
+            <span className="text-[#1E293B]">|</span>
+            <Link href="/aqi" className="hover:text-[#78EAF8] transition-colors">India Cities AQI Today</Link>
           </p>
           <p className="text-xs text-[#64748B] uppercase tracking-wider">
             Powered by XG BOOST 3.2.0{" "}
