@@ -14,41 +14,43 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL || "https://cleansky-monitor.vercel.app",
   ),
+  verification: {
+    google:
+      process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ||
+      "your-verification-code-here",
+  },
   title: {
-    default: "CleanSky - Air Quality Monitor",
-    template: "%s | CleanSky",
+    default: "CleanSky — India AQI Forecast",
+    template: "%s | CleanSky AQI",
   },
   description:
-    "Real-time air quality monitoring and 48-hour AQI forecasts for Indian cities. Powered by ML predictions.",
+    "Real-time air quality index with 48-hour ML predictions for Indian cities. Powered by XGBoost.",
   keywords: [
-    "AQI",
-    "air quality",
-    "pollution",
-    "forecast",
-    "India",
+    "AQI India",
+    "air quality forecast",
+    "Delhi AQI today",
+    "PM2.5 prediction",
     "CleanSky",
   ],
   openGraph: {
     type: "website",
-    title: "CleanSky - Air Quality Monitor",
-    description:
-      "Real-time air quality monitoring and 48-hour AQI forecasts for Indian cities.",
-    siteName: "CleanSky",
+    siteName: "CleanSky Monitor",
+    title: "CleanSky — India AQI Forecast",
+    description: "Real-time AQI with 48-hour ML predictions.",
     url: "/",
     images: [
       {
         url: "/api/og",
         width: 1200,
         height: 630,
-        alt: "CleanSky Air Quality Monitor",
+        alt: "CleanSky Air Quality Monitor Overview",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "CleanSky - Air Quality Monitor",
-    description:
-      "Real-time air quality monitoring and 48-hour AQI forecasts for Indian cities.",
+    title: "CleanSky AQI Monitor",
+    description: "Real-time India AQI with ML forecasts",
     images: ["/api/og"],
   },
 };
